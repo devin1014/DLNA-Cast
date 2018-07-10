@@ -64,13 +64,13 @@ public class BaseCastEventSubscription extends SubscriptionCallback
     @Override
     protected void eventReceived(GENASubscription subscription)
     {
-        mLogger.d("eventReceived:" + subscription);
+        mLogger.i("eventReceived:" + subscription);
     }
 
     @Override
     protected void eventsMissed(GENASubscription subscription, int numberOfMissedEvents)
     {
-        mLogger.d("eventsMissed:" + subscription);
+        mLogger.i("eventsMissed:" + subscription);
     }
 
     void notifyCallback(Runnable runnable)
@@ -100,7 +100,7 @@ public class BaseCastEventSubscription extends SubscriptionCallback
         {
             super.eventReceived(subscription);
 
-            mLogger.d("currentValues:" + subscription.getCurrentValues());
+            mLogger.i("currentValues:" + subscription.getCurrentValues());
 
             Map currentValues = subscription.getCurrentValues();
 
@@ -180,7 +180,7 @@ public class BaseCastEventSubscription extends SubscriptionCallback
             {
                 position = lastChange.getEventedValue(0, AVTransportVariable.RelativeTimePosition.class).getValue();
 
-                final int intTime = CastUtils.getIntTime(position);
+                final long intTime = CastUtils.getIntTime(position);
 
                 notifyCallback(new Runnable()
                 {
@@ -205,6 +205,8 @@ public class BaseCastEventSubscription extends SubscriptionCallback
         protected void eventReceived(GENASubscription subscription)
         {
             super.eventReceived(subscription);
+
+            mLogger.i("currentValues:" + subscription.getCurrentValues());
 
             Map currentValues = subscription.getCurrentValues();
 

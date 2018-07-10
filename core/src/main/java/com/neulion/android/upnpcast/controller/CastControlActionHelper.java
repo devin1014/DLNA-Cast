@@ -22,6 +22,9 @@ import org.fourthline.cling.support.avtransport.callback.SetAVTransportURI;
 import org.fourthline.cling.support.avtransport.callback.Stop;
 import org.fourthline.cling.support.model.MediaInfo;
 import org.fourthline.cling.support.model.PositionInfo;
+import org.fourthline.cling.support.renderingcontrol.callback.GetMute;
+import org.fourthline.cling.support.renderingcontrol.callback.GetVolume;
+import org.fourthline.cling.support.renderingcontrol.callback.SetMute;
 import org.fourthline.cling.support.renderingcontrol.callback.SetVolume;
 
 
@@ -57,7 +60,7 @@ class CastControlActionHelper
         mRenderControlService = renderControlService;
     }
 
-    public SetAVTransportURI getCastOpenAction(final String url, String metadata)
+    public SetAVTransportURI setAvTransportAction(final String url, String metadata)
     {
         return new SetAVTransportURI(mAVTransportService, url, metadata)
         {
@@ -80,7 +83,7 @@ class CastControlActionHelper
             @Override
             public void failure(ActionInvocation invocation, UpnpResponse operation, final String defaultMsg)
             {
-                mLogger.w("SetAVTransportURI failure:" + defaultMsg);
+                mLogger.w(getClass().getSimpleName() + String.format(" [%s]", defaultMsg));
 
                 notifyCallback(new Runnable()
                 {
@@ -97,7 +100,7 @@ class CastControlActionHelper
         };
     }
 
-    public Play getCastPlayAction()
+    public Play setPlayAction()
     {
         return new Play(mAVTransportService)
         {
@@ -120,12 +123,12 @@ class CastControlActionHelper
             @Override
             public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
             {
-                mLogger.w("play failure:" + defaultMsg);
+                mLogger.w(getClass().getSimpleName() + String.format(" [%s]", defaultMsg));
             }
         };
     }
 
-    public Pause getCastPauseAction()
+    public Pause setPauseAction()
     {
         return new Pause(mAVTransportService)
         {
@@ -148,12 +151,12 @@ class CastControlActionHelper
             @Override
             public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
             {
-                mLogger.w("pause failure:" + defaultMsg);
+                mLogger.w(getClass().getSimpleName() + String.format(" [%s]", defaultMsg));
             }
         };
     }
 
-    public Stop getCastStopAction()
+    public Stop setStopAction()
     {
         return new Stop(mAVTransportService)
         {
@@ -176,12 +179,12 @@ class CastControlActionHelper
             @Override
             public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
             {
-                mLogger.w("stop failure:" + defaultMsg);
+                mLogger.w(getClass().getSimpleName() + String.format(" [%s]", defaultMsg));
             }
         };
     }
 
-    public Seek getCastSeekAction(final int position)
+    public Seek setSeekAction(final int position)
     {
         return new Seek(mAVTransportService, CastUtils.getStringTime(position))
         {
@@ -201,14 +204,14 @@ class CastControlActionHelper
             @Override
             public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
             {
-                mLogger.w("seek failure:" + defaultMsg);
+                mLogger.w(getClass().getSimpleName() + String.format(" [%s]", defaultMsg));
             }
         };
     }
 
-    public SetVolume getCastVolumeAction(final long volume)
+    public SetVolume setVolumeAction(final long volume)
     {
-        return new SetVolume(mAVTransportService, volume)
+        return new SetVolume(mRenderControlService, volume)
         {
             @Override
             public void success(ActionInvocation invocation)
@@ -229,20 +232,58 @@ class CastControlActionHelper
             @Override
             public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
             {
-                mLogger.w("setVolume failure:" + defaultMsg);
+                mLogger.w(getClass().getSimpleName() + String.format(" [%s]", defaultMsg));
             }
         };
     }
 
-    public GetMediaInfo getCastMediaInfo()
+    public SetMute setMuteAction(boolean mute)
     {
-        return new GetMediaInfo(mAVTransportService)
+        return new SetMute(mRenderControlService, mute)
         {
             @Override
             public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
             {
-                mLogger.w("seek failure:" + defaultMsg);
+                mLogger.w(getClass().getSimpleName() + String.format(" [%s]", defaultMsg));
+            }
+        };
+    }
 
+    public GetMute getMuteAction()
+    {
+        return new GetMute(mRenderControlService)
+        {
+            @Override
+            public void received(ActionInvocation actionInvocation, final boolean currentMute)
+            {
+                notifyCallback(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        if (mControlListener != null && currentMute)
+                        {
+                            mControlListener.onVolume(0);
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
+            {
+                mLogger.w(getClass().getSimpleName() + String.format(" [%s]", defaultMsg));
+            }
+        };
+    }
+
+    public GetVolume getVolumeAction()
+    {
+        return new GetVolume(mRenderControlService)
+        {
+            @Override
+            public void received(ActionInvocation actionInvocation, final int currentVolume)
+            {
                 notifyCallback(new Runnable()
                 {
                     @Override
@@ -250,12 +291,24 @@ class CastControlActionHelper
                     {
                         if (mControlListener != null)
                         {
-                            mControlListener.onSyncMediaInfo(null, null);
+                            mControlListener.onVolume(currentVolume);
                         }
                     }
                 });
             }
 
+            @Override
+            public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
+            {
+                mLogger.w(getClass().getSimpleName() + String.format(" [%s]", defaultMsg));
+            }
+        };
+    }
+
+    public GetMediaInfo getMediaInfo()
+    {
+        return new GetMediaInfo(mAVTransportService)
+        {
             @Override
             public void received(ActionInvocation invocation, final MediaInfo mediaInfo)
             {
@@ -277,17 +330,35 @@ class CastControlActionHelper
                     }
                 });
             }
+
+            @Override
+            public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
+            {
+                mLogger.w(getClass().getSimpleName() + String.format(" [%s]", defaultMsg));
+
+                notifyCallback(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        if (mControlListener != null)
+                        {
+                            mControlListener.onSyncMediaInfo(null, null);
+                        }
+                    }
+                });
+            }
         };
     }
 
-    public GetPositionInfo getCastPositionInfo()
+    public GetPositionInfo getPositionInfo()
     {
         return new GetPositionInfo(mAVTransportService)
         {
             @Override
             public void received(ActionInvocation invocation, final PositionInfo positionInfo)
             {
-                mLogger.w("GetPositionInfo:" + positionInfo);
+                mLogger.d("GetPositionInfo:" + positionInfo);
 
                 notifyCallback(new Runnable()
                 {

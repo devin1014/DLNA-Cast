@@ -86,7 +86,7 @@ public class CastControlImp implements ICastControl
         {
             String metadata = UpnpCastUtil.pushMediaToRender(castObject.url, castObject.id, castObject.name, castObject.duration);
 
-            mControlPoint.execute(mActionHelper.getCastOpenAction(castObject.url, metadata));
+            mControlPoint.execute(mActionHelper.setAvTransportAction(castObject.url, metadata));
         }
     }
 
@@ -95,7 +95,7 @@ public class CastControlImp implements ICastControl
     {
         if (checkCastObject())
         {
-            mControlPoint.execute(mActionHelper.getCastPlayAction());
+            mControlPoint.execute(mActionHelper.setPlayAction());
         }
     }
 
@@ -104,7 +104,7 @@ public class CastControlImp implements ICastControl
     {
         if (checkCastObject())
         {
-            mControlPoint.execute(mActionHelper.getCastPauseAction());
+            mControlPoint.execute(mActionHelper.setPauseAction());
         }
     }
 
@@ -113,7 +113,7 @@ public class CastControlImp implements ICastControl
     {
         if (checkCastObject())
         {
-            mControlPoint.execute(mActionHelper.getCastStopAction());
+            mControlPoint.execute(mActionHelper.setStopAction());
         }
     }
 
@@ -122,7 +122,7 @@ public class CastControlImp implements ICastControl
     {
         if (checkCastObject())
         {
-            mControlPoint.execute(mActionHelper.getCastSeekAction(position));
+            mControlPoint.execute(mActionHelper.setSeekAction(position));
         }
     }
 
@@ -131,7 +131,7 @@ public class CastControlImp implements ICastControl
     {
         if (checkCastObject())
         {
-            mControlPoint.execute(mActionHelper.getCastVolumeAction(percent));
+            mControlPoint.execute(mActionHelper.setVolumeAction(percent));
         }
     }
 
@@ -145,7 +145,11 @@ public class CastControlImp implements ICastControl
     {
         if (checkCastObject())
         {
-            mControlPoint.execute(mActionHelper.getCastMediaInfo());
+            mControlPoint.execute(mActionHelper.getMediaInfo());
+
+            mControlPoint.execute(mActionHelper.getVolumeAction());
+
+            mControlPoint.execute(mActionHelper.getMuteAction());
         }
     }
 
@@ -168,7 +172,7 @@ public class CastControlImp implements ICastControl
     {
         if (checkCastObject())
         {
-            mControlPoint.execute(mActionHelper.getCastPositionInfo());
+            mControlPoint.execute(mActionHelper.getPositionInfo());
         }
     }
 

@@ -240,6 +240,8 @@ public class MainActivity extends AppCompatActivity
         public void onVolume(long volume)
         {
             Toast.makeText(MainActivity.this, "音量：" + volume, Toast.LENGTH_SHORT).show();
+
+            mVolumeBar.setProgress((int) volume);
         }
 
         @SuppressLint("SetTextI18n")
