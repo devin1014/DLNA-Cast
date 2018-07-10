@@ -1,0 +1,6 @@
+*.iml
+
+build/
+
+local.properties
+

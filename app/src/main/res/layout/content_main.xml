@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".MainActivity"
+    tools:ignore="HardcodedText,SpUsage"
+    tools:showIn="@layout/activity_main">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/cast_device_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/cast_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:padding="4dp"
+            android:text="当前连接设备："
+            android:textSize="14dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="#888888" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="搜索" />
+
+            <Button
+                android:id="@+id/btn_cast"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="投射" />
+
+            <Button
+                android:id="@+id/btn_cast_resume"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="播放" />
+
+            <Button
+                android:id="@+id/btn_cast_pause"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="暂停" />
+
+            <Button
+                android:id="@+id/btn_cast_stop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="停止" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="#888888" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="播放进度"
+            android:textSize="14dp" />
+
+        <SeekBar
+            android:id="@+id/seek_cast_duration"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="4dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="#888888" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="音量设置"
+            android:textSize="14dp" />
+
+        <SeekBar
+            android:id="@+id/seek_cast_volume"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="4dp" />
+
+    </LinearLayout>
+
+</android.support.v4.widget.NestedScrollView>
