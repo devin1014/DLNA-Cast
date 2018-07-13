@@ -6,7 +6,6 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView.Adapter;
 import android.view.LayoutInflater;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 
 import com.neulion.android.upnpcast.NLDeviceRegistryListener.OnRegistryDeviceListener;
@@ -29,22 +28,22 @@ public class DeviceAdapter extends Adapter<DeviceHolder> implements OnRegistryDe
 
     private Handler mHandler = new Handler(Looper.getMainLooper());
 
-    private OnClickListener mOnClickListener;
+    private OnItemSelectedListener mOnItemSelectedListener;
 
     private CastDevice mSelectedDevice;
 
-    public DeviceAdapter(Activity activity, OnClickListener listener)
+    public DeviceAdapter(Activity activity, OnItemSelectedListener listener)
     {
         mLayoutInflater = activity.getLayoutInflater();
 
-        mOnClickListener = listener;
+        mOnItemSelectedListener = listener;
     }
 
     @NonNull
     @Override
     public DeviceHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
     {
-        return new DeviceHolder(mLayoutInflater.inflate(R.layout.item_device_list, parent, false), mOnClickListener);
+        return new DeviceHolder(mLayoutInflater.inflate(R.layout.item_device_list, parent, false), mOnItemSelectedListener);
     }
 
     @Override
@@ -71,10 +70,11 @@ public class DeviceAdapter extends Adapter<DeviceHolder> implements OnRegistryDe
 
     public void setSelectedDevice(CastDevice device)
     {
-        if (mSelectedDevice != null && device != null && mSelectedDevice.getId().equals(device.getId()))
-        {
-            return;
-        }
+        // Notify: remove code here!
+        //        if (mSelectedDevice != null && device != null && mSelectedDevice.getId().equals(device.getId()))
+        //        {
+        //            return;
+        //        }
 
         mSelectedDevice = device;
 
@@ -87,7 +87,7 @@ public class DeviceAdapter extends Adapter<DeviceHolder> implements OnRegistryDe
 
         if (device != null && mSelectedDevice != null)
         {
-            return device.getId().equals(mSelectedDevice.getId());
+            return device == mSelectedDevice || device.getId().equals(mSelectedDevice.getId());
         }
 
         return false;
@@ -96,17 +96,24 @@ public class DeviceAdapter extends Adapter<DeviceHolder> implements OnRegistryDe
     @Override
     public void onDeviceAdded(CastDevice device)
     {
+        boolean added = false;
+
         for (CastDevice castDevice : mDeviceList)
         {
             if (castDevice.getId().equals(device.getId()))
             {
-                mDeviceList.remove(castDevice);
+                castDevice = new CastDevice(device.getDevice());
+
+                added = true;
 
                 break;
             }
         }
 
-        mDeviceList.add(device);
+        if (!added)
+        {
+            mDeviceList.add(device);
+        }
 
         if (Thread.currentThread() != Looper.getMainLooper().getThread())
         {
@@ -160,5 +167,10 @@ public class DeviceAdapter extends Adapter<DeviceHolder> implements OnRegistryDe
                 notifyDataSetChanged();
             }
         }
+    }
+
+    public interface OnItemSelectedListener
+    {
+        void onItemSelected(CastDevice castDevice, boolean selected);
     }
 }

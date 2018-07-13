@@ -4,12 +4,11 @@ import android.app.Activity;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
-import android.support.annotation.NonNull;
 
 import com.neulion.android.upnpcast.NLDeviceRegistryListener.OnRegistryDeviceListener;
 import com.neulion.android.upnpcast.controller.CastControlImp;
 import com.neulion.android.upnpcast.controller.CastObject;
-import com.neulion.android.upnpcast.controller.ICastControlListener;
+import com.neulion.android.upnpcast.controller.ICastEventListener;
 import com.neulion.android.upnpcast.device.CastDevice;
 import com.neulion.android.upnpcast.service.NLUpnpCastService;
 import com.neulion.android.upnpcast.service.UpnpCastServiceConnection;
@@ -48,7 +47,7 @@ public class NLUpnpCastManager implements IUpnpCast
 
     private NLUpnpCastService mUpnpCastService;
 
-    private ILogger mLogger = new DefaultLoggerImpl(NLUpnpCastManager.class.getSimpleName(), Constants.DEBUG);
+    private ILogger mLogger = new DefaultLoggerImpl(getClass().getSimpleName());
 
     private NLUpnpCastManager()
     {
@@ -58,6 +57,10 @@ public class NLUpnpCastManager implements IUpnpCast
     {
         if (activity != null)
         {
+            mLogger.i(">>>>>>>>>");
+
+            mLogger.i(String.format("bindUpnpCastService[%s]", activity.getComponentName().getClassName()));
+
             activity.bindService(new Intent(activity, NLUpnpCastService.class), mUpnpCastServiceConnection, Service.BIND_AUTO_CREATE);
         }
     }
@@ -67,6 +70,10 @@ public class NLUpnpCastManager implements IUpnpCast
         if (activity != null)
         {
             activity.unbindService(mUpnpCastServiceConnection);
+
+            mLogger.w(String.format("unbindUpnpCastService[%s]", activity.getComponentName().getClassName()));
+
+            mLogger.i("<<<<<<<<");
         }
     }
 
@@ -75,53 +82,48 @@ public class NLUpnpCastManager implements IUpnpCast
         @Override
         public void onServiceConnected(ComponentName componentName, NLUpnpCastService service)
         {
-            mLogger.i("onServiceConnected:" + componentName.getClassName());
+            mLogger.i(String.format("onServiceConnected [%s]", componentName.getClassName()));
 
             mUpnpCastService = service;
 
-            initUpnpCastService(service);
+            // add registry listener
+            Collection<RegistryListener> collection = service.getRegistry().getListeners();
+
+            if (collection == null || !collection.contains(mNLDeviceRegistryListener))
+            {
+                service.getRegistry().addListener(mNLDeviceRegistryListener);
+            }
+
+            if (mCastControlImp != null)
+            {
+                mCastControlImp.setNLUpnpCastService(service);
+            }
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName)
         {
-            mLogger.w("onServiceDisconnected:" + componentName.getClassName());
+            mLogger.w(String.format("onServiceDisconnected [%s]", componentName.getClassName()));
 
-            resetUpnpCastService(mUpnpCastService);
+            // clear registry listener
+            if (mUpnpCastService != null)
+            {
+                Collection<RegistryListener> collection = mUpnpCastService.getRegistry().getListeners();
+
+                if (collection != null && collection.contains(mNLDeviceRegistryListener))
+                {
+                    mUpnpCastService.getRegistry().removeListener(mNLDeviceRegistryListener);
+                }
+            }
+
+            if (mCastControlImp != null)
+            {
+                mCastControlImp.setNLUpnpCastService(null);
+            }
 
             mUpnpCastService = null;
         }
     };
-
-    private void initUpnpCastService(@NonNull NLUpnpCastService service)
-    {
-        Collection<RegistryListener> collection = service.getRegistry().getListeners();
-
-        if (collection == null || !collection.contains(mNLDeviceRegistryListener))
-        {
-            service.getRegistry().addListener(mNLDeviceRegistryListener);
-        }
-
-        if (mCastControlImp != null)
-        {
-            mCastControlImp.setNLUpnpCastService(service);
-
-            mCastControlImp.syncCasting();
-        }
-    }
-
-    private void resetUpnpCastService(NLUpnpCastService service)
-    {
-        if (service != null)
-        {
-            Collection<RegistryListener> collection = service.getRegistry().getListeners();
-
-            if (collection != null && collection.contains(mNLDeviceRegistryListener))
-            {
-                service.getRegistry().removeListener(mNLDeviceRegistryListener);
-            }
-        }
-    }
 
     public void addRegistryDeviceListener(OnRegistryDeviceListener listener)
     {
@@ -155,9 +157,9 @@ public class NLUpnpCastManager implements IUpnpCast
         }
     }
 
-    private ICastControlListener mControlListener;
+    private ICastEventListener mControlListener;
 
-    public void setOnControlListener(ICastControlListener listener)
+    public void setOnControlListener(ICastEventListener listener)
     {
         mControlListener = listener;
     }
@@ -173,6 +175,15 @@ public class NLUpnpCastManager implements IUpnpCast
         }
 
         mCastControlImp.connect(castDevice);
+    }
+
+    @Override
+    public void disconnect()
+    {
+        if (mCastControlImp != null)
+        {
+            mCastControlImp.disconnect();
+        }
     }
 
     @Override
@@ -226,6 +237,15 @@ public class NLUpnpCastManager implements IUpnpCast
         if (mCastControlImp != null)
         {
             mCastControlImp.setVolume(percent);
+        }
+    }
+
+    @Override
+    public void setBrightness(int percent)
+    {
+        if (mCastControlImp != null)
+        {
+            mCastControlImp.setBrightness(percent);
         }
     }
 

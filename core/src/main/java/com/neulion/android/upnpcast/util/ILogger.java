@@ -2,6 +2,8 @@ package com.neulion.android.upnpcast.util;
 
 import android.util.Log;
 
+import com.neulion.android.upnpcast.Constants;
+
 /**
  * User: liuwei(wei.liu@neulion.com.com)
  * Date: 2018-07-02
@@ -17,7 +19,7 @@ public interface ILogger
 
     void e(String msg);
 
-    //boolean enable();
+    boolean enable();
 
     class DefaultLoggerImpl implements ILogger
     {
@@ -28,7 +30,7 @@ public interface ILogger
 
         public DefaultLoggerImpl(String tag)
         {
-            this(tag, true);//FIXME
+            this(tag, Constants.DEBUG);
         }
 
         public DefaultLoggerImpl(String tag, boolean log)
@@ -73,10 +75,10 @@ public interface ILogger
             }
         }
 
-        //        @Override
-        //        public boolean enable()
-        //        {
-        //            return DEBUG;
-        //        }
+        @Override
+        public boolean enable()
+        {
+            return DEBUG;
+        }
     }
 }

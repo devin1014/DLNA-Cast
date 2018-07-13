@@ -14,7 +14,8 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        tools:ignore="RelativeOverlap">
 
         <TextView
             android:id="@+id/device_name"
@@ -36,7 +37,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:enabled="false" />
+        android:layout_centerVertical="true" />
 
 </RelativeLayout>

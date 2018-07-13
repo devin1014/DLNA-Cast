@@ -2,6 +2,9 @@ package com.neulion.android.upnpcast.controller;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.CallSuper;
+import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import com.neulion.android.upnpcast.util.CastUtils;
 import com.neulion.android.upnpcast.util.ILogger;
@@ -14,10 +17,12 @@ import org.fourthline.cling.model.message.UpnpResponse;
 import org.fourthline.cling.model.meta.Service;
 import org.fourthline.cling.support.avtransport.lastchange.AVTransportLastChangeParser;
 import org.fourthline.cling.support.avtransport.lastchange.AVTransportVariable;
+import org.fourthline.cling.support.avtransport.lastchange.AVTransportVariable.RelativeTimePosition;
 import org.fourthline.cling.support.lastchange.LastChange;
+import org.fourthline.cling.support.lastchange.LastChangeParser;
 import org.fourthline.cling.support.model.TransportState;
 import org.fourthline.cling.support.renderingcontrol.lastchange.RenderingControlLastChangeParser;
-import org.fourthline.cling.support.renderingcontrol.lastchange.RenderingControlVariable;
+import org.fourthline.cling.support.renderingcontrol.lastchange.RenderingControlVariable.Volume;
 
 import java.util.Map;
 
@@ -26,7 +31,7 @@ import java.util.Map;
  * Date: 2018-07-04
  * Time: 15:47
  */
-public class BaseCastEventSubscription extends SubscriptionCallback
+public abstract class BaseCastEventSubscription extends SubscriptionCallback
 {
     protected ILogger mLogger;
 
@@ -46,31 +51,76 @@ public class BaseCastEventSubscription extends SubscriptionCallback
     @Override
     protected void failed(GENASubscription subscription, UpnpResponse responseStatus, Exception exception, String defaultMsg)
     {
-        mLogger.e("failed:" + defaultMsg);
+        mLogger.e(String.format("[failed] [%s][%s]", subscription, defaultMsg));
     }
 
     @Override
     protected void established(GENASubscription subscription)
     {
-        mLogger.w("established:" + subscription);
+        mLogger.i(String.format("[established] [%s]", subscription));
     }
 
     @Override
     protected void ended(GENASubscription subscription, CancelReason reason, UpnpResponse responseStatus)
     {
-        mLogger.w("end:" + subscription);
+        mLogger.i(String.format("[ended] [%s][%s][%s]", subscription, reason, responseStatus));
     }
 
     @Override
     protected void eventReceived(GENASubscription subscription)
     {
-        mLogger.i("eventReceived:" + subscription);
+        mLogger.d(String.format("[eventReceived] [%s]", subscription));
+
+        mLogger.d(String.format("\r[currentValues] [%s]", subscription.getCurrentValues().keySet()));
+
+        String lastChange = parseLastChange(subscription);
+
+        if (!TextUtils.isEmpty(lastChange))
+        {
+            LastChange action = null;
+
+            try
+            {
+                action = new LastChange(getLastChangeParser(), lastChange);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+
+                mLogger.e(e.getMessage());
+            }
+
+            if (action != null)
+            {
+                processLastChange(action);
+            }
+        }
+    }
+
+    @CallSuper
+    protected void processLastChange(@NonNull LastChange lastChange)
+    {
+        mLogger.d("\r" + lastChange.toString());
     }
 
     @Override
     protected void eventsMissed(GENASubscription subscription, int numberOfMissedEvents)
     {
-        mLogger.i("eventsMissed:" + subscription);
+        mLogger.d(String.format("[eventsMissed] [%s][%s]", subscription, numberOfMissedEvents));
+    }
+
+    protected abstract LastChangeParser getLastChangeParser();
+
+    protected String parseLastChange(GENASubscription subscription)
+    {
+        Map currentValues = subscription.getCurrentValues();
+
+        if (currentValues != null && currentValues.containsKey("LastChange"))
+        {
+            return currentValues.get("LastChange").toString();
+        }
+
+        return null;
     }
 
     void notifyCallback(Runnable runnable)
@@ -90,38 +140,25 @@ public class BaseCastEventSubscription extends SubscriptionCallback
     // -------------------------------------------------------------------------------------------
     public static class AvTransportSubscription extends BaseCastEventSubscription
     {
+        private LastChangeParser mLastChangeParser;
+
         AvTransportSubscription(Service service, ICastControlListener listener)
         {
             super(service, listener);
+
+            mLastChangeParser = new AVTransportLastChangeParser();
         }
 
         @Override
-        protected void eventReceived(GENASubscription subscription)
+        protected LastChangeParser getLastChangeParser()
         {
-            super.eventReceived(subscription);
-
-            mLogger.i("currentValues:" + subscription.getCurrentValues());
-
-            Map currentValues = subscription.getCurrentValues();
-
-            if (currentValues != null && currentValues.containsKey("LastChange"))
-            {
-                String lastChange = currentValues.get("LastChange").toString();
-
-                try
-                {
-                    doAVTransportChange(lastChange);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            }
+            return mLastChangeParser;
         }
 
-        private void doAVTransportChange(String value) throws Exception
+        @Override
+        protected void processLastChange(@NonNull LastChange lastChange)
         {
-            LastChange lastChange = new LastChange(new AVTransportLastChangeParser(), value);
+            super.processLastChange(lastChange);
 
             //Parse TransportState value.
             AVTransportVariable.TransportState transportState = lastChange.getEventedValue(0, AVTransportVariable.TransportState.class);
@@ -163,10 +200,6 @@ public class BaseCastEventSubscription extends SubscriptionCallback
                         }
                     });
                 }
-                else if (ts == TransportState.TRANSITIONING)
-                {
-                    //TODO:
-                }
 
                 return;
             }
@@ -174,11 +207,11 @@ public class BaseCastEventSubscription extends SubscriptionCallback
             //RelativeTimePosition
             String position;
 
-            AVTransportVariable.RelativeTimePosition relativeTimePosition = lastChange.getEventedValue(0, AVTransportVariable.RelativeTimePosition.class);
+            RelativeTimePosition relativeTimePosition = lastChange.getEventedValue(0, RelativeTimePosition.class);
 
             if (relativeTimePosition != null)
             {
-                position = lastChange.getEventedValue(0, AVTransportVariable.RelativeTimePosition.class).getValue();
+                position = lastChange.getEventedValue(0, RelativeTimePosition.class).getValue();
 
                 final long intTime = CastUtils.getIntTime(position);
 
@@ -196,53 +229,38 @@ public class BaseCastEventSubscription extends SubscriptionCallback
 
     public static class RenderSubscription extends BaseCastEventSubscription
     {
+        private LastChangeParser mLastChangeParser;
+
         RenderSubscription(Service service, ICastControlListener listener)
         {
             super(service, listener);
+
+            mLastChangeParser = new RenderingControlLastChangeParser();
         }
 
         @Override
-        protected void eventReceived(GENASubscription subscription)
+        protected LastChangeParser getLastChangeParser()
         {
-            super.eventReceived(subscription);
+            return mLastChangeParser;
+        }
 
-            mLogger.i("currentValues:" + subscription.getCurrentValues());
+        @Override
+        protected void processLastChange(@NonNull LastChange lastChange)
+        {
+            super.processLastChange(lastChange);
 
-            Map currentValues = subscription.getCurrentValues();
+            final Volume volume = lastChange.getEventedValue(0, Volume.class);
 
-            if (currentValues != null)
+            if (volume != null)
             {
-                if (currentValues.containsKey("LastChange"))
+                notifyCallback(new Runnable()
                 {
-                    String lastChangeValue = currentValues.get("LastChange").toString();
-
-                    mLogger.d("LastChange:" + lastChangeValue);
-
-                    LastChange lastChange;
-
-                    try
+                    @Override
+                    public void run()
                     {
-                        lastChange = new LastChange(new RenderingControlLastChangeParser(), lastChangeValue);
-                        //获取音量 volume
-                        if (lastChange.getEventedValue(0, RenderingControlVariable.Volume.class) != null)
-                        {
-                            final int volume = lastChange.getEventedValue(0, RenderingControlVariable.Volume.class).getValue().getVolume();
-
-                            notifyCallback(new Runnable()
-                            {
-                                @Override
-                                public void run()
-                                {
-                                    mControlListener.onVolume(volume);
-                                }
-                            });
-                        }
+                        mControlListener.onVolume(volume.getValue().getVolume());
                     }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
+                });
             }
         }
     }

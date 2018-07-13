@@ -5,6 +5,8 @@ import android.os.Looper;
 
 import com.neulion.android.upnpcast.controller.BaseCastEventSubscription.AvTransportSubscription;
 import com.neulion.android.upnpcast.controller.BaseCastEventSubscription.RenderSubscription;
+import com.neulion.android.upnpcast.controller.action.GetBrightness;
+import com.neulion.android.upnpcast.controller.action.SetBrightness;
 import com.neulion.android.upnpcast.util.CastUtils;
 import com.neulion.android.upnpcast.util.ILogger;
 import com.neulion.android.upnpcast.util.ILogger.DefaultLoggerImpl;
@@ -13,14 +15,12 @@ import org.fourthline.cling.controlpoint.SubscriptionCallback;
 import org.fourthline.cling.model.action.ActionInvocation;
 import org.fourthline.cling.model.message.UpnpResponse;
 import org.fourthline.cling.model.meta.Service;
-import org.fourthline.cling.support.avtransport.callback.GetMediaInfo;
 import org.fourthline.cling.support.avtransport.callback.GetPositionInfo;
 import org.fourthline.cling.support.avtransport.callback.Pause;
 import org.fourthline.cling.support.avtransport.callback.Play;
 import org.fourthline.cling.support.avtransport.callback.Seek;
 import org.fourthline.cling.support.avtransport.callback.SetAVTransportURI;
 import org.fourthline.cling.support.avtransport.callback.Stop;
-import org.fourthline.cling.support.model.MediaInfo;
 import org.fourthline.cling.support.model.PositionInfo;
 import org.fourthline.cling.support.renderingcontrol.callback.GetMute;
 import org.fourthline.cling.support.renderingcontrol.callback.GetVolume;
@@ -33,21 +33,21 @@ import org.fourthline.cling.support.renderingcontrol.callback.SetVolume;
  * Date: 2018-07-03
  * Time: 15:18
  */
-class CastControlActionHelper
+class CastCallbackActionHelper
 {
-    private ILogger mLogger = new DefaultLoggerImpl(CastControlActionHelper.class.getSimpleName());
+    private ILogger mLogger = new DefaultLoggerImpl(getClass().getSimpleName());
 
     private Handler mHandler = new Handler(Looper.getMainLooper());
 
-    private ICastControlListener mControlListener;
+    private ICastEventListener mCastEventListener;
 
     private Service mAVTransportService;
 
     private Service mRenderControlService;
 
-    CastControlActionHelper(ICastControlListener listener)
+    CastCallbackActionHelper(ICastEventListener listener)
     {
-        mControlListener = listener;
+        mCastEventListener = listener;
     }
 
     public void setAVTransportService(Service castService)
@@ -72,10 +72,7 @@ class CastControlActionHelper
                     @Override
                     public void run()
                     {
-                        if (mControlListener != null)
-                        {
-                            mControlListener.onOpen(url);
-                        }
+                        mCastEventListener.onOpen(url);
                     }
                 });
             }
@@ -83,17 +80,14 @@ class CastControlActionHelper
             @Override
             public void failure(ActionInvocation invocation, UpnpResponse operation, final String defaultMsg)
             {
-                mLogger.w(getClass().getSimpleName() + String.format(" [%s]", defaultMsg));
+                logErrorMsg(invocation, operation, defaultMsg);
 
                 notifyCallback(new Runnable()
                 {
                     @Override
                     public void run()
                     {
-                        if (mControlListener != null)
-                        {
-                            mControlListener.onError(defaultMsg);
-                        }
+                        mCastEventListener.onError(defaultMsg);
                     }
                 });
             }
@@ -112,10 +106,7 @@ class CastControlActionHelper
                     @Override
                     public void run()
                     {
-                        if (mControlListener != null)
-                        {
-                            mControlListener.onStart();
-                        }
+                        mCastEventListener.onStart();
                     }
                 });
             }
@@ -123,7 +114,7 @@ class CastControlActionHelper
             @Override
             public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
             {
-                mLogger.w(getClass().getSimpleName() + String.format(" [%s]", defaultMsg));
+                logErrorMsg(invocation, operation, defaultMsg);
             }
         };
     }
@@ -140,10 +131,7 @@ class CastControlActionHelper
                     @Override
                     public void run()
                     {
-                        if (mControlListener != null)
-                        {
-                            mControlListener.onPause();
-                        }
+                        mCastEventListener.onPause();
                     }
                 });
             }
@@ -151,7 +139,7 @@ class CastControlActionHelper
             @Override
             public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
             {
-                mLogger.w(getClass().getSimpleName() + String.format(" [%s]", defaultMsg));
+                logErrorMsg(invocation, operation, defaultMsg);
             }
         };
     }
@@ -168,10 +156,7 @@ class CastControlActionHelper
                     @Override
                     public void run()
                     {
-                        if (mControlListener != null)
-                        {
-                            mControlListener.onStop();
-                        }
+                        mCastEventListener.onStop();
                     }
                 });
             }
@@ -179,7 +164,7 @@ class CastControlActionHelper
             @Override
             public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
             {
-                mLogger.w(getClass().getSimpleName() + String.format(" [%s]", defaultMsg));
+                logErrorMsg(invocation, operation, defaultMsg);
             }
         };
     }
@@ -196,7 +181,7 @@ class CastControlActionHelper
                     @Override
                     public void run()
                     {
-                        mControlListener.onSeekTo(position);
+                        mCastEventListener.onSeekTo(position);
                     }
                 });
             }
@@ -204,12 +189,12 @@ class CastControlActionHelper
             @Override
             public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
             {
-                mLogger.w(getClass().getSimpleName() + String.format(" [%s]", defaultMsg));
+                logErrorMsg(invocation, operation, defaultMsg);
             }
         };
     }
 
-    public SetVolume setVolumeAction(final long volume)
+    public SetVolume setVolumeAction(final int volume)
     {
         return new SetVolume(mRenderControlService, volume)
         {
@@ -221,10 +206,7 @@ class CastControlActionHelper
                     @Override
                     public void run()
                     {
-                        if (mControlListener != null)
-                        {
-                            mControlListener.onVolume(volume);
-                        }
+                        mCastEventListener.onVolume(volume);
                     }
                 });
             }
@@ -232,7 +214,32 @@ class CastControlActionHelper
             @Override
             public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
             {
-                mLogger.w(getClass().getSimpleName() + String.format(" [%s]", defaultMsg));
+                logErrorMsg(invocation, operation, defaultMsg);
+            }
+        };
+    }
+
+    public SetBrightness setBrightnessAction(final int percent)
+    {
+        return new SetBrightness(mRenderControlService, percent)
+        {
+            @Override
+            public void success(final ActionInvocation invocation)
+            {
+                notifyCallback(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        mCastEventListener.onBrightness(percent);
+                    }
+                });
+            }
+
+            @Override
+            public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
+            {
+                logErrorMsg(invocation, operation, defaultMsg);
             }
         };
     }
@@ -244,7 +251,7 @@ class CastControlActionHelper
             @Override
             public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
             {
-                mLogger.w(getClass().getSimpleName() + String.format(" [%s]", defaultMsg));
+                logErrorMsg(invocation, operation, defaultMsg);
             }
         };
     }
@@ -261,10 +268,7 @@ class CastControlActionHelper
                     @Override
                     public void run()
                     {
-                        if (mControlListener != null && currentMute)
-                        {
-                            mControlListener.onVolume(0);
-                        }
+                        mCastEventListener.onVolume(0);
                     }
                 });
             }
@@ -272,7 +276,7 @@ class CastControlActionHelper
             @Override
             public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
             {
-                mLogger.w(getClass().getSimpleName() + String.format(" [%s]", defaultMsg));
+                logErrorMsg(invocation, operation, defaultMsg);
             }
         };
     }
@@ -289,10 +293,7 @@ class CastControlActionHelper
                     @Override
                     public void run()
                     {
-                        if (mControlListener != null)
-                        {
-                            mControlListener.onVolume(currentVolume);
-                        }
+                        mCastEventListener.onVolume(currentVolume);
                     }
                 });
             }
@@ -300,22 +301,52 @@ class CastControlActionHelper
             @Override
             public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
             {
-                mLogger.w(getClass().getSimpleName() + String.format(" [%s]", defaultMsg));
+                logErrorMsg(invocation, operation, defaultMsg);
             }
         };
     }
 
-    public GetMediaInfo getMediaInfo()
+    public GetBrightness getBrightnessAction()
     {
-        return new GetMediaInfo(mAVTransportService)
+        return new GetBrightness(mRenderControlService)
         {
             @Override
-            public void received(ActionInvocation invocation, final MediaInfo mediaInfo)
+            public void received(ActionInvocation actionInvocation, final int brightness)
             {
-                if (mediaInfo != null)
+                notifyCallback(new Runnable()
                 {
-                    mLogger.i("getMediaInfo:" + mediaInfo.getCurrentURI() + "\nmetadata:" + mediaInfo.getCurrentURIMetaData() + "\nduration:" + mediaInfo
-                            .getMediaDuration());
+                    @Override
+                    public void run()
+                    {
+                        mCastEventListener.onBrightness(brightness);
+                    }
+                });
+            }
+
+            @Override
+            public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
+            {
+                logErrorMsg(invocation, operation, defaultMsg);
+            }
+        };
+    }
+
+    private int mTrackIndex = 0;
+
+    public GetPositionInfo getPositionInfoAction()
+    {
+        return new GetPositionInfo(mAVTransportService)
+        {
+            @Override
+            public void received(ActionInvocation invocation, final PositionInfo positionInfo)
+            {
+                mTrackIndex++;
+
+                if (mTrackIndex % 10 == 0)
+                {
+                    mTrackIndex = 0;
+
+                    mLogger.d(String.format("[%s][%s/%s]", invocation.getAction().getName(), positionInfo.getRelTime(), positionInfo.getTrackDuration()));
                 }
 
                 notifyCallback(new Runnable()
@@ -323,10 +354,7 @@ class CastControlActionHelper
                     @Override
                     public void run()
                     {
-                        if (mControlListener != null)
-                        {
-                            mControlListener.onSyncMediaInfo(null, mediaInfo);
-                        }
+                        mCastEventListener.onUpdatePositionInfo(positionInfo);
                     }
                 });
             }
@@ -334,76 +362,46 @@ class CastControlActionHelper
             @Override
             public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
             {
-                mLogger.w(getClass().getSimpleName() + String.format(" [%s]", defaultMsg));
-
-                notifyCallback(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        if (mControlListener != null)
-                        {
-                            mControlListener.onSyncMediaInfo(null, null);
-                        }
-                    }
-                });
+                logErrorMsg(invocation, operation, defaultMsg);
             }
         };
     }
 
-    public GetPositionInfo getPositionInfo()
+    public SubscriptionCallback getAVTransportSubscription(ICastEventListener listener)
     {
-        return new GetPositionInfo(mAVTransportService)
-        {
-            @Override
-            public void received(ActionInvocation invocation, final PositionInfo positionInfo)
-            {
-                mLogger.d("GetPositionInfo:" + positionInfo);
-
-                notifyCallback(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        if (mControlListener != null)
-                        {
-                            mControlListener.onMediaPositionInfo(positionInfo);
-                        }
-                    }
-                });
-            }
-
-            @Override
-            public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
-            {
-                mLogger.w("seek failure:" + defaultMsg);
-            }
-        };
+        return new AvTransportSubscription(mAVTransportService, new CastControlListenerWrapper(listener));
     }
 
-    public SubscriptionCallback getAVTransportSubscription()
+    public SubscriptionCallback getRenderSubscription(ICastEventListener listener)
     {
-        return new AvTransportSubscription(mAVTransportService, mControlListener);
+        return new RenderSubscription(mRenderControlService, new CastControlListenerWrapper(listener));
     }
 
-    public SubscriptionCallback getRenderSubscription()
+    public int getCastStatus()
     {
-        return new RenderSubscription(mRenderControlService, mControlListener);
+        return ((CastControlListenerWrapper) mCastEventListener).getCastStatus();
     }
 
     private void notifyCallback(Runnable runnable)
     {
-        if (Thread.currentThread() != Looper.getMainLooper().getThread())
+        if (mCastEventListener != null)
         {
-            if (mHandler != null && mControlListener != null)
+            if (Thread.currentThread() != Looper.getMainLooper().getThread())
             {
-                mHandler.post(runnable);
+                if (mHandler != null && mCastEventListener != null)
+                {
+                    mHandler.post(runnable);
+                }
             }
-        }
-        else
-        {
-            runnable.run();
+            else
+            {
+                runnable.run();
+            }
         }
     }
 
+    private void logErrorMsg(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
+    {
+        mLogger.w(String.format("[%s][%s][%s]", invocation.getAction().getName(), operation, defaultMsg));
+    }
 }

@@ -21,55 +21,34 @@
             android:layout_height="wrap_content" />
 
         <TextView
-            android:id="@+id/cast_info"
+            android:id="@+id/cast_device_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:padding="4dp"
-            android:text="当前连接设备："
+            android:text="设备信息："
+            android:textColor="#000000"
             android:textSize="14dp" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:background="#888888" />
-
-        <LinearLayout
+        <TextView
+            android:id="@+id/cast_media_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:gravity="center_vertical"
+            android:padding="4dp"
+            android:text="视频信息："
+            android:textColor="#000000"
+            android:textSize="14dp" />
 
-            <Button
-                android:id="@+id/btn_search"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="搜索" />
-
-            <Button
-                android:id="@+id/btn_cast"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="投射" />
-
-            <Button
-                android:id="@+id/btn_cast_resume"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="播放" />
-
-            <Button
-                android:id="@+id/btn_cast_pause"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="暂停" />
-
-            <Button
-                android:id="@+id/btn_cast_stop"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="停止" />
-
-        </LinearLayout>
+        <TextView
+            android:id="@+id/cast_status_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:padding="4dp"
+            android:text="连接信息："
+            android:textColor="#000000"
+            android:textSize="14dp" />
 
         <View
             android:layout_width="match_parent"
@@ -79,8 +58,38 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="播放进度"
+            android:padding="4dp"
+            android:text="播放控制"
             android:textSize="14dp" />
+
+        <include layout="@layout/layout_control" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="#888888" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="4dp"
+                android:text="播放进度"
+                android:textSize="14dp" />
+
+            <TextView
+                android:id="@+id/cast_position"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="4dp"
+                android:textSize="14dp" />
+
+        </LinearLayout>
 
         <SeekBar
             android:id="@+id/seek_cast_duration"
@@ -96,6 +105,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="4dp"
             android:text="音量设置"
             android:textSize="14dp" />
 
@@ -104,6 +114,24 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="4dp" />
+
+        <!--<View-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="1px"-->
+        <!--android:background="#888888" />-->
+
+        <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:padding="4dp"-->
+        <!--android:text="屏幕亮度"-->
+        <!--android:textSize="14dp" />-->
+
+        <!--<SeekBar-->
+        <!--android:id="@+id/seek_cast_brightness"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:padding="4dp" />-->
 
     </LinearLayout>
 

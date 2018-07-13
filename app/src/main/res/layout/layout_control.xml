@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    tools:ignore="HardcodedText,SpUsage">
+
+    <Button
+        android:id="@+id/btn_cast"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="投射"
+        android:textSize="12dp" />
+
+    <View
+        android:layout_width="1px"
+        android:layout_height="24dp"
+        android:background="#888888" />
+
+    <Button
+        android:id="@+id/btn_cast_stop"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="停止"
+        android:textSize="12dp" />
+
+    <View
+        android:layout_width="1px"
+        android:layout_height="24dp"
+        android:background="#888888" />
+
+    <Button
+        android:id="@+id/btn_cast_resume"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="播放"
+        android:textSize="12dp" />
+
+    <View
+        android:layout_width="1px"
+        android:layout_height="24dp"
+        android:background="#888888" />
+
+    <Button
+        android:id="@+id/btn_cast_pause"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="暂停"
+        android:textSize="12dp" />
+
+</LinearLayout>

@@ -1,8 +1,5 @@
 package com.neulion.android.upnpcast.controller;
 
-import com.neulion.android.upnpcast.device.CastDevice;
-
-import org.fourthline.cling.support.model.MediaInfo;
 import org.fourthline.cling.support.model.PositionInfo;
 
 /**
@@ -24,9 +21,9 @@ public interface ICastControlListener
 
     void onError(String errorMsg);
 
-    void onVolume(long volume);
+    void onVolume(int volume);
 
-    void onSyncMediaInfo(CastDevice castDevice, MediaInfo mediaInfo);
+    void onBrightness(int brightness);
 
-    void onMediaPositionInfo(PositionInfo positionInfo);
+    void onUpdatePositionInfo(PositionInfo positionInfo);
 }

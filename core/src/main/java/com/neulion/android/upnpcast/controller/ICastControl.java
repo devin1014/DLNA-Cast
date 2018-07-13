@@ -2,6 +2,7 @@ package com.neulion.android.upnpcast.controller;
 
 import com.neulion.android.upnpcast.controller.CastControlImp.CastStatus;
 import com.neulion.android.upnpcast.device.CastDevice;
+import com.neulion.android.upnpcast.service.NLUpnpCastService;
 
 /**
  * User: liuwei(wei.liu@neulion.com.com)
@@ -11,6 +12,8 @@ import com.neulion.android.upnpcast.device.CastDevice;
 public interface ICastControl
 {
     void connect(CastDevice castDevice);
+
+    void disconnect();
 
     void cast(CastObject castObject);
 
@@ -23,6 +26,8 @@ public interface ICastControl
     void seekTo(int position);
 
     void setVolume(int percent);
+
+    void setBrightness(int percent);
 
     @CastStatus
     int getCastStatus();
