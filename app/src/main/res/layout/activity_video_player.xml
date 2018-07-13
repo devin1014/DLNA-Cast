@@ -1,0 +1,29 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.neulion.android.demo.player.PlayerActivity">
+
+    <com.neulion.media.control.impl.CommonVideoView
+        android:id="@+id/d_video_view"
+        xmlns:neulion="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="270dp"
+        neulion:m_fullScreen="false"
+        neulion:m_fullScreenOrientation="landscape"
+        neulion:m_fullScreenSystemUiSupported="true">
+
+        <include
+            android:id="@+id/d_video_controller"
+            layout="@layout/m_controller" />
+
+    </com.neulion.media.control.impl.CommonVideoView>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="NeuLion Player DLNA Cast Test" />
+
+</LinearLayout>

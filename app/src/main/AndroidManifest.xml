@@ -9,6 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <!--dlna cast-->
         <activity
             android:name="com.neulion.android.demo.upnpcast.MainActivity"
             android:launchMode="singleTop">
@@ -18,6 +20,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="com.neulion.android.demo.player.PlayerActivity"
+            android:configChanges="screenSize|orientation"
+            android:screenOrientation="user" />
+
     </application>
 
 </manifest>

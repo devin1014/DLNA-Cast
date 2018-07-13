@@ -54,6 +54,8 @@ public class MainActivity extends AppCompatActivity
     {
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
 
+        getSupportActionBar().setTitle("DLNACast");
+
         mCastDeviceInfo = findViewById(R.id.cast_device_info);
         mCastMediaInfo = findViewById(R.id.cast_media_info);
         mCastStatusInfo = findViewById(R.id.cast_status_info);
@@ -162,7 +164,7 @@ public class MainActivity extends AppCompatActivity
 
     private static final String CAST_URL_LOCAL_TEST = "http://172.16.0.107:8506/clear/teststage/t594_hd_apptv.m3u8";
     private static final String CAST_URL_IPHONE_SAMPLE = "http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8";
-    private static final String CAST_URL = CAST_URL_IPHONE_SAMPLE;
+    public static final String CAST_URL = CAST_URL_IPHONE_SAMPLE;
 
     private static final String CAST_ID = "101";
 
