@@ -24,7 +24,7 @@ import java.util.List;
  */
 public class NLDeviceRegistryListener extends DefaultRegistryListener
 {
-    private ILogger mLog = new DefaultLoggerImpl(NLDeviceRegistryListener.class.getSimpleName(), Constants.DEBUG);
+    private ILogger mLog = new DefaultLoggerImpl(NLDeviceRegistryListener.class.getSimpleName());
 
     /* Discovery performance optimization for very slow Android devices! */
     @Override

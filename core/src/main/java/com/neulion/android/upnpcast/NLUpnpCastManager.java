@@ -187,6 +187,12 @@ public class NLUpnpCastManager implements IUpnpCast
     }
 
     @Override
+    public boolean isConnected()
+    {
+        return mCastControlImp != null && mCastControlImp.isConnected();
+    }
+
+    @Override
     public void cast(CastObject castObject)
     {
         if (mCastControlImp != null)

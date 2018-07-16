@@ -11,6 +11,8 @@ import com.neulion.android.upnpcast.Constants;
  */
 public interface ILogger
 {
+    String PREFIX_TAG = "4Droid_";
+
     void d(String msg);
 
     void i(String msg);
@@ -19,13 +21,9 @@ public interface ILogger
 
     void e(String msg);
 
-    boolean enable();
-
     class DefaultLoggerImpl implements ILogger
     {
-        private static final String PREFIX = "4Droid_";
         private final String TAG;
-
         private final boolean DEBUG;
 
         public DefaultLoggerImpl(String tag)
@@ -35,7 +33,7 @@ public interface ILogger
 
         public DefaultLoggerImpl(String tag, boolean log)
         {
-            TAG = PREFIX + tag;
+            TAG = PREFIX_TAG + tag;
             DEBUG = log;
         }
 
@@ -73,12 +71,6 @@ public interface ILogger
             {
                 Log.e(TAG, msg);
             }
-        }
-
-        @Override
-        public boolean enable()
-        {
-            return DEBUG;
         }
     }
 }

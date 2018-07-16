@@ -130,6 +130,12 @@ public class CastControlImp implements ICastControl
     }
 
     @Override
+    public boolean isConnected()
+    {
+        return checkCastObject(); //TODO:
+    }
+
+    @Override
     public void cast(CastObject castObject)
     {
         if (checkCastObject())
