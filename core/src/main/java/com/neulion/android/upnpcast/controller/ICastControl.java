@@ -2,7 +2,6 @@ package com.neulion.android.upnpcast.controller;
 
 import com.neulion.android.upnpcast.controller.CastControlImp.CastStatus;
 import com.neulion.android.upnpcast.device.CastDevice;
-import com.neulion.android.upnpcast.service.NLUpnpCastService;
 
 /**
  * User: liuwei(wei.liu@neulion.com.com)
@@ -11,10 +10,14 @@ import com.neulion.android.upnpcast.service.NLUpnpCastService;
  */
 public interface ICastControl
 {
+    // device control
     void connect(CastDevice castDevice);
 
     void disconnect();
 
+    boolean isConnected();
+
+    // media control
     void cast(CastObject castObject);
 
     void start();
