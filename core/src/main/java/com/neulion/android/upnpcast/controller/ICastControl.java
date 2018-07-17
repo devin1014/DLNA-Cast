@@ -1,7 +1,11 @@
 package com.neulion.android.upnpcast.controller;
 
-import com.neulion.android.upnpcast.controller.CastControlImp.CastStatus;
+import android.support.annotation.IntDef;
+
 import com.neulion.android.upnpcast.device.CastDevice;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * User: liuwei(wei.liu@neulion.com.com)
@@ -10,6 +14,20 @@ import com.neulion.android.upnpcast.device.CastDevice;
  */
 public interface ICastControl
 {
+    int IDLE = 0;
+    int CASTING = 1;
+    int PLAY = 2;
+    int PAUSE = 3;
+    int STOP = 4;
+    int BUFFER = 5;
+    int ERROR = 6;
+
+    @IntDef({IDLE, CASTING, PLAY, PAUSE, STOP, BUFFER, ERROR})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface CastStatus
+    {
+    }
+
     // device control
     void connect(CastDevice castDevice);
 
@@ -26,7 +44,7 @@ public interface ICastControl
 
     void stop();
 
-    void seekTo(int position);
+    void seekTo(long position);
 
     void setVolume(int percent);
 

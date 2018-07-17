@@ -2,7 +2,7 @@ package com.neulion.android.upnpcast.controller;
 
 import android.support.annotation.NonNull;
 
-import com.neulion.android.upnpcast.controller.CastControlImp.CastStatus;
+import com.neulion.android.upnpcast.controller.ICastControl.CastStatus;
 import com.neulion.android.upnpcast.device.CastDevice;
 
 import org.fourthline.cling.support.model.MediaInfo;
@@ -54,13 +54,13 @@ class CastControlListenerWrapper implements ICastEventListener
     }
 
     @Override
-    public void onOpen(String url)
+    public void onCast(CastObject castObject)
     {
         mCastStatus = CastControlImp.CASTING;
 
         if (mListener != null)
         {
-            mListener.onOpen(url);
+            mListener.onCast(castObject);
         }
     }
 

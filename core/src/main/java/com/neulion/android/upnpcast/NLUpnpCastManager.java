@@ -229,7 +229,7 @@ public class NLUpnpCastManager implements IUpnpCast
     }
 
     @Override
-    public void seekTo(int position)
+    public void seekTo(long position)
     {
         if (mCastControlImp != null)
         {

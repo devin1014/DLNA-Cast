@@ -2,6 +2,7 @@ package com.neulion.android.upnpcast.util;
 
 import android.text.TextUtils;
 
+import com.neulion.android.upnpcast.controller.CastObject;
 import com.neulion.android.upnpcast.device.CastDevice;
 
 import org.fourthline.cling.model.meta.Action;
@@ -68,6 +69,20 @@ public class CastUtils
         return 0;
     }
 
+    public static long parseTime(String s)
+    {
+        try
+        {
+            return Long.parseLong(s);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        return 0L;
+    }
+
     private static final String DIDL_LITE_FOOTER = "</DIDL-Lite>";
     private static final String DIDL_LITE_HEADER = "<?xml version=\"1.0\"?>" + "<DIDL-Lite " + "xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\" " +
             "xmlns:dc=\"http://purl.org/dc/elements/1.1/\" " + "xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" " +
@@ -77,17 +92,17 @@ public class CastUtils
     private static final String CAST_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(CAST_DATE_FORMAT, Locale.US);
 
-    public static String getMetadata(String url, String id, String name, int duration)
+    public static String getMetadata(CastObject castObject)
     {
         //TODO,the params!
         long size = 0;
         long bitrate = 0;
-        Res castRes = new Res(new MimeType(ProtocolInfo.WILDCARD, ProtocolInfo.WILDCARD), size, url);
+        Res castRes = new Res(new MimeType(ProtocolInfo.WILDCARD, ProtocolInfo.WILDCARD), size, castObject.url);
         castRes.setBitrate(bitrate);
-        castRes.setDuration(CastUtils.getStringTime(duration));
+        castRes.setDuration(CastUtils.getStringTime(castObject.getDuration()));
 
         String resolution = "description";
-        VideoItem videoItem = new VideoItem(id, CAST_PARENT_ID, name, CAST_CREATOR, castRes);
+        VideoItem videoItem = new VideoItem(castObject.id, CAST_PARENT_ID, castObject.name, CAST_CREATOR, castRes);
         videoItem.setDescription(resolution);
 
         return createItemMetadata(videoItem);

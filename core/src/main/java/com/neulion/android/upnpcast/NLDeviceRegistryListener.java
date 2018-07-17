@@ -82,7 +82,10 @@ public class NLDeviceRegistryListener extends DefaultRegistryListener
 
             for (OnRegistryDeviceListener listener : mOnRegistryDeviceListener)
             {
-                listener.onDeviceAdded(castDevice);
+                if (listener != null) // remove listener empty list now!
+                {
+                    listener.onDeviceAdded(castDevice);
+                }
             }
         }
     }
@@ -93,7 +96,10 @@ public class NLDeviceRegistryListener extends DefaultRegistryListener
 
         for (OnRegistryDeviceListener listener : mOnRegistryDeviceListener)
         {
-            listener.onDeviceRemoved(castDevice);
+            if (listener != null) // remove listener empty list now!
+            {
+                listener.onDeviceRemoved(castDevice);
+            }
         }
     }
 
@@ -111,7 +117,7 @@ public class NLDeviceRegistryListener extends DefaultRegistryListener
 
     public void addRegistryDeviceListener(OnRegistryDeviceListener listener)
     {
-        if (mOnRegistryDeviceListener != null && !mOnRegistryDeviceListener.contains(listener))
+        if (mOnRegistryDeviceListener != null && listener != null && !mOnRegistryDeviceListener.contains(listener))
         {
             mOnRegistryDeviceListener.add(listener);
         }
@@ -119,7 +125,7 @@ public class NLDeviceRegistryListener extends DefaultRegistryListener
 
     public void removeRegistryListener(OnRegistryDeviceListener listener)
     {
-        if (mOnRegistryDeviceListener != null && mOnRegistryDeviceListener.contains(listener))
+        if (mOnRegistryDeviceListener != null && listener != null && mOnRegistryDeviceListener.contains(listener))
         {
             mOnRegistryDeviceListener.remove(listener);
         }

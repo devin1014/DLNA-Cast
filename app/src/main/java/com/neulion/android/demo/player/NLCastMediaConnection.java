@@ -16,13 +16,11 @@ public class NLCastMediaConnection extends AbstractMediaConnection
         super();
 
         mContext = context.getApplicationContext();
-
-        setEnabled(true);//FIXME
     }
 
     @Override
     public RemoteControl getRemoteControl(MediaControl player, MediaRequest request)
     {
-        return new NLCastControl(mContext, this);
+        return new NLCastRemoteControl(mContext, request);
     }
 }

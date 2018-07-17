@@ -9,7 +9,7 @@ import org.fourthline.cling.support.model.PositionInfo;
  */
 public interface ICastControlListener
 {
-    void onOpen(String url);
+    void onCast(CastObject castObject);
 
     void onStart();
 

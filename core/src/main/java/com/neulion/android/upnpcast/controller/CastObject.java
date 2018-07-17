@@ -13,21 +13,49 @@ public class CastObject
 
     public final String name;
 
-    public final int duration;
+    private long position;
 
-    /**
-     * @param duration the total time of video (ms)
-     */
-    public CastObject(String url, String id, String name, int duration)
+    private long duration;
+
+    public CastObject(String url, String id, String name)
     {
         this.url = url;
         this.id = id;
         this.name = name;
-        this.duration = duration;
     }
 
-    public static CastObject newInstance(String url, String id, String name, int duration)
+    public static CastObject newInstance(String url, String id, String name)
     {
-        return new CastObject(url, id, name, duration);
+        return new CastObject(url, id, name);
+    }
+
+    public long getPosition()
+    {
+        return position;
+    }
+
+    public CastObject setPosition(long position)
+    {
+        this.position = position;
+
+        return this;
+    }
+
+    /**
+     * @return the total time of video (ms)
+     */
+    public long getDuration()
+    {
+        return duration;
+    }
+
+    /**
+     * @param duration the total time of video (ms)
+     */
+    public CastObject setDuration(long duration)
+    {
+        this.duration = duration;
+
+        return this;
     }
 }

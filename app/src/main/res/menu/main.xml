@@ -10,10 +10,17 @@
         anroid:ignore="HardcodedText"
         anroid:showAsAction="always" />
 
+    <!--<item-->
+    <!--android:id="@+id/menu_search_stop"-->
+    <!--android:orderInCategory="200"-->
+    <!--android:title="停止搜索"-->
+    <!--anroid:ignore="HardcodedText"-->
+    <!--anroid:showAsAction="ifRoom" />-->
+
     <item
-        android:id="@+id/menu_search_stop"
+        android:id="@+id/menu_nlplayer"
         android:orderInCategory="200"
-        android:title="停止搜索"
+        android:title="播放器"
         anroid:ignore="HardcodedText"
         anroid:showAsAction="ifRoom" />
 

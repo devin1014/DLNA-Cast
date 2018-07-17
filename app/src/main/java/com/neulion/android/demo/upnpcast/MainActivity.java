@@ -1,5 +1,6 @@
 package com.neulion.android.demo.upnpcast;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -17,6 +18,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.neulion.android.demo.player.PlayerActivity;
 import com.neulion.android.demo.upnpcast.DeviceAdapter.OnItemSelectedListener;
 import com.neulion.android.upnpcast.NLUpnpCastManager;
 import com.neulion.android.upnpcast.controller.CastObject;
@@ -77,7 +79,6 @@ public class MainActivity extends AppCompatActivity
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         recyclerView.setAdapter(mDeviceAdapter = new DeviceAdapter(this, mOnClickListener));
 
-        NLUpnpCastManager.getInstance().setOnControlListener(mControlListener);
         NLUpnpCastManager.getInstance().addRegistryDeviceListener(mDeviceAdapter);
     }
 
@@ -86,12 +87,16 @@ public class MainActivity extends AppCompatActivity
     {
         super.onResume();
 
+        NLUpnpCastManager.getInstance().setOnControlListener(mControlListener);
+
         NLUpnpCastManager.getInstance().bindUpnpCastService(this);
     }
 
     @Override
     protected void onPause()
     {
+        NLUpnpCastManager.getInstance().setOnControlListener(null);
+
         NLUpnpCastManager.getInstance().unbindUpnpCastService(this);
 
         super.onPause();
@@ -100,9 +105,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onDestroy()
     {
+        NLUpnpCastManager.getInstance().disconnect();
+
         NLUpnpCastManager.getInstance().removeRegistryListener(mDeviceAdapter);
 
-        NLUpnpCastManager.getInstance().disconnect();
+        NLUpnpCastManager.getInstance().setOnControlListener(null);
 
         super.onDestroy();
     }
@@ -128,9 +135,11 @@ public class MainActivity extends AppCompatActivity
 
                 break;
 
-            case R.id.menu_search_stop:
+            case R.id.menu_nlplayer:
 
-                //todo: stop search here.
+                Toast.makeText(this, "打开播放器", Toast.LENGTH_SHORT).show();
+
+                startActivity(new Intent(this, PlayerActivity.class));
 
                 break;
         }
@@ -162,16 +171,6 @@ public class MainActivity extends AppCompatActivity
         }
     };
 
-    private static final String CAST_URL_LOCAL_TEST = "http://172.16.0.107:8506/clear/teststage/t594_hd_apptv.m3u8";
-    private static final String CAST_URL_IPHONE_SAMPLE = "http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8";
-    public static final String CAST_URL = CAST_URL_IPHONE_SAMPLE;
-
-    private static final String CAST_ID = "101";
-
-    private static final String CAST_NAME = "castDemo";
-
-    private static final int CAST_VIDEO_DURATION = 30 * 60 * 1000;
-
     private OnClickListener mControlClickListener = new OnClickListener()
     {
         @Override
@@ -181,7 +180,7 @@ public class MainActivity extends AppCompatActivity
             {
                 case R.id.btn_cast:
 
-                    NLUpnpCastManager.getInstance().cast(CastObject.newInstance(CAST_URL, CAST_ID, CAST_NAME, CAST_VIDEO_DURATION));
+                    NLUpnpCastManager.getInstance().cast(Constants.CAST_OBJECT.setDuration(Constants.CAST_VIDEO_DURATION));
 
                     break;
 
@@ -231,17 +230,11 @@ public class MainActivity extends AppCompatActivity
 
                 case R.id.seek_cast_duration:
 
-                    int position = (int) ((seekBar.getProgress() * 1f / seekBar.getMax()) * CAST_VIDEO_DURATION);
+                    int position = (int) ((seekBar.getProgress() * 1f / seekBar.getMax()) * Constants.CAST_VIDEO_DURATION);
 
                     NLUpnpCastManager.getInstance().seekTo(position);
 
                     break;
-
-                //case R.id.seek_cast_brightness:
-                //
-                //NLUpnpCastManager.getInstance().setBrightness(seekBar.getProgress() * 100 / seekBar.getMax());
-                //
-                //break;
             }
         }
     };
@@ -284,9 +277,9 @@ public class MainActivity extends AppCompatActivity
         }
 
         @Override
-        public void onOpen(String url)
+        public void onCast(CastObject castObject)
         {
-            Toast.makeText(MainActivity.this, "开始投射 " + url, Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "开始投射 " + castObject.url, Toast.LENGTH_SHORT).show();
         }
 
         @Override

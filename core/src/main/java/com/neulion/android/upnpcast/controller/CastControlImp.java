@@ -2,12 +2,10 @@ package com.neulion.android.upnpcast.controller;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.IntDef;
 
 import com.neulion.android.upnpcast.NLUpnpCastManager;
 import com.neulion.android.upnpcast.device.CastDevice;
 import com.neulion.android.upnpcast.service.NLUpnpCastService;
-import com.neulion.android.upnpcast.util.CastUtils;
 import com.neulion.android.upnpcast.util.ILogger;
 import com.neulion.android.upnpcast.util.ILogger.DefaultLoggerImpl;
 
@@ -22,8 +20,6 @@ import org.fourthline.cling.support.model.MediaInfo;
 import org.fourthline.cling.support.model.TransportInfo;
 import org.fourthline.cling.support.model.TransportState;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -34,20 +30,6 @@ import java.util.TimerTask;
  */
 public class CastControlImp implements ICastControl
 {
-    public static final int IDLE = 0;
-    public static final int CASTING = 1;
-    public static final int PLAY = 2;
-    public static final int PAUSE = 3;
-    public static final int STOP = 4;
-    public static final int BUFFER = 5;
-    public static final int ERROR = 6;
-
-    @IntDef({IDLE, CASTING, PLAY, PAUSE, STOP, BUFFER, ERROR})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface CastStatus
-    {
-    }
-
     private static final int POSITION_INTERVAL = 500;
 
     private ILogger mLogger = new DefaultLoggerImpl(getClass().getSimpleName());
@@ -116,17 +98,19 @@ public class CastControlImp implements ICastControl
             mLogger.w(String.format("####disconnect [%s@%s]", mCastDevice.getName(), Integer.toHexString(mCastDevice.hashCode())));
         }
 
+        final CastDevice device = mCastDevice;
+
+        mCastDevice = null;
+
         unregisterCastSubscription();
 
         if (mCastEventListener != null)
         {
-            if (mCastDevice != null)
+            if (device != null)
             {
                 mCastEventListener.onDisconnect();
             }
         }
-
-        mCastDevice = null;
     }
 
     @Override
@@ -140,9 +124,7 @@ public class CastControlImp implements ICastControl
     {
         if (checkCastObject())
         {
-            String metadata = CastUtils.getMetadata(castObject.url, castObject.id, castObject.name, castObject.duration);
-
-            mControlPoint.execute(mCallbackActionHelper.setAvTransportAction(castObject.url, metadata));
+            mControlPoint.execute(mCallbackActionHelper.setAvTransportAction(castObject));
         }
     }
 
@@ -174,7 +156,7 @@ public class CastControlImp implements ICastControl
     }
 
     @Override
-    public void seekTo(int position)
+    public void seekTo(long position)
     {
         if (checkCastObject())
         {
@@ -441,9 +423,9 @@ public class CastControlImp implements ICastControl
         }
 
         @Override
-        public void onOpen(String url)
+        public void onCast(CastObject castObject)
         {
-            super.onOpen(url);
+            super.onCast(castObject);
 
             registerCastSubscription();
         }

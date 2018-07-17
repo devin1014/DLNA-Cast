@@ -14,10 +14,10 @@ import org.fourthline.cling.support.model.TransportInfo;
  * Date: 2018-07-12
  * Time: 15:23
  */
-class CastControlDefaultListener implements ICastEventListener
+public class DefaultCastEventListener implements ICastEventListener
 {
     @Override
-    public void onOpen(String url)
+    public void onCast(CastObject castObject)
     {
     }
 

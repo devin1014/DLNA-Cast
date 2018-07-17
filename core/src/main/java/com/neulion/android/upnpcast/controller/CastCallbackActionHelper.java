@@ -60,9 +60,9 @@ class CastCallbackActionHelper
         mRenderControlService = renderControlService;
     }
 
-    public SetAVTransportURI setAvTransportAction(final String url, String metadata)
+    public SetAVTransportURI setAvTransportAction(final CastObject castObject)
     {
-        return new SetAVTransportURI(mAVTransportService, url, metadata)
+        return new SetAVTransportURI(mAVTransportService, castObject.url, CastUtils.getMetadata(castObject))
         {
             @Override
             public void success(ActionInvocation invocation)
@@ -72,7 +72,7 @@ class CastCallbackActionHelper
                     @Override
                     public void run()
                     {
-                        mCastEventListener.onOpen(url);
+                        mCastEventListener.onCast(castObject);
                     }
                 });
             }
@@ -169,7 +169,7 @@ class CastCallbackActionHelper
         };
     }
 
-    public Seek setSeekAction(final int position)
+    public Seek setSeekAction(final long position)
     {
         return new Seek(mAVTransportService, CastUtils.getStringTime(position))
         {
