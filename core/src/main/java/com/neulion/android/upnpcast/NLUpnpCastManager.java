@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.IBinder;
 
 import com.neulion.android.upnpcast.NLDeviceRegistryListener.OnRegistryDeviceListener;
 import com.neulion.android.upnpcast.controller.CastControlImp;
@@ -11,7 +13,7 @@ import com.neulion.android.upnpcast.controller.CastObject;
 import com.neulion.android.upnpcast.controller.ICastEventListener;
 import com.neulion.android.upnpcast.device.CastDevice;
 import com.neulion.android.upnpcast.service.NLUpnpCastService;
-import com.neulion.android.upnpcast.service.UpnpCastServiceConnection;
+import com.neulion.android.upnpcast.service.NLUpnpCastService.NLUpnpCastBinder;
 import com.neulion.android.upnpcast.util.ILogger;
 import com.neulion.android.upnpcast.util.ILogger.DefaultLoggerImpl;
 
@@ -41,7 +43,6 @@ public class NLUpnpCastManager implements IUpnpCast
     }
 
     public static final DeviceType DEVICE_TYPE_DMR = new UDADeviceType("MediaRenderer");
-    //    public static final ServiceType CONTENT_DIRECTORY_SERVICE = new UDAServiceType("ContentDirectory");
     public static final ServiceType SERVICE_AV_TRANSPORT = new UDAServiceType("AVTransport");
     public static final ServiceType SERVICE_RENDERING_CONTROL = new UDAServiceType("RenderingControl");
 
@@ -57,11 +58,11 @@ public class NLUpnpCastManager implements IUpnpCast
     {
         if (activity != null)
         {
-            mLogger.i(">>>>>>>>>");
+            mLogger.i(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 
             mLogger.i(String.format("bindUpnpCastService[%s]", activity.getComponentName().getClassName()));
 
-            activity.bindService(new Intent(activity, NLUpnpCastService.class), mUpnpCastServiceConnection, Service.BIND_AUTO_CREATE);
+            activity.getApplication().bindService(new Intent(activity, NLUpnpCastService.class), mUpnpCastServiceConnection, Service.BIND_AUTO_CREATE);
         }
     }
 
@@ -69,20 +70,24 @@ public class NLUpnpCastManager implements IUpnpCast
     {
         if (activity != null)
         {
-            activity.unbindService(mUpnpCastServiceConnection);
+            activity.getApplication().unbindService(mUpnpCastServiceConnection);
 
             mLogger.w(String.format("unbindUpnpCastService[%s]", activity.getComponentName().getClassName()));
 
-            mLogger.i("<<<<<<<<");
+            mLogger.i("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+
+            mUpnpCastServiceConnection.onServiceDisconnected(null);
         }
     }
 
-    private UpnpCastServiceConnection mUpnpCastServiceConnection = new UpnpCastServiceConnection()
+    private ServiceConnection mUpnpCastServiceConnection = new ServiceConnection()
     {
         @Override
-        public void onServiceConnected(ComponentName componentName, NLUpnpCastService service)
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder)
         {
             mLogger.i(String.format("onServiceConnected [%s]", componentName.getClassName()));
+
+            NLUpnpCastService service = ((NLUpnpCastBinder) iBinder).getService();
 
             mUpnpCastService = service;
 
@@ -96,14 +101,14 @@ public class NLUpnpCastManager implements IUpnpCast
 
             if (mCastControlImp != null)
             {
-                mCastControlImp.setNLUpnpCastService(service);
+                mCastControlImp.bindNLUpnpCastService(service);
             }
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName)
         {
-            mLogger.w(String.format("onServiceDisconnected [%s]", componentName.getClassName()));
+            mLogger.w(String.format("onServiceDisconnected [%s]", componentName != null ? componentName.getClassName() : "NULL"));
 
             // clear registry listener
             if (mUpnpCastService != null)
@@ -118,10 +123,16 @@ public class NLUpnpCastManager implements IUpnpCast
 
             if (mCastControlImp != null)
             {
-                mCastControlImp.setNLUpnpCastService(null);
+                mCastControlImp.unbindNLUpnpCastService();
             }
 
             mUpnpCastService = null;
+        }
+
+        @Override
+        public void onBindingDied(ComponentName componentName)
+        {
+            mLogger.e(String.format("onBindingDied [%s]", componentName.getClassName()));
         }
     };
 

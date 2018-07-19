@@ -115,7 +115,6 @@ public class PlayerActivity extends AppCompatActivity
     {
         super.onStart();
 
-
         NLUpnpCastManager.getInstance().bindUpnpCastService(PlayerActivity.this);
 
         NLUpnpCastManager.getInstance().setOnControlListener(mControlListener);
@@ -126,10 +125,6 @@ public class PlayerActivity extends AppCompatActivity
     @Override
     protected void onStop()
     {
-        NLUpnpCastManager.getInstance().unbindUpnpCastService(this);
-
-        NLUpnpCastManager.getInstance().setOnControlListener(null);
-
         NLUpnpCastManager.getInstance().removeRegistryListener(mDeviceAdapter);
 
         super.onStop();
@@ -141,6 +136,8 @@ public class PlayerActivity extends AppCompatActivity
         mController.releaseMedia();
 
         mController.setMediaConnection(null);
+
+        NLUpnpCastManager.getInstance().setOnControlListener(null);
 
         super.onDestroy();
     }

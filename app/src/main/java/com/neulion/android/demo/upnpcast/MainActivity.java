@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         recyclerView.setAdapter(mDeviceAdapter = new DeviceAdapter(this, mOnClickListener));
 
+        NLUpnpCastManager.getInstance().setOnControlListener(mControlListener);
         NLUpnpCastManager.getInstance().addRegistryDeviceListener(mDeviceAdapter);
     }
 
@@ -87,17 +88,13 @@ public class MainActivity extends AppCompatActivity
     {
         super.onResume();
 
-        NLUpnpCastManager.getInstance().setOnControlListener(mControlListener);
-
         NLUpnpCastManager.getInstance().bindUpnpCastService(this);
     }
 
     @Override
     protected void onPause()
     {
-        NLUpnpCastManager.getInstance().setOnControlListener(null);
-
-        NLUpnpCastManager.getInstance().unbindUpnpCastService(this);
+        //NLUpnpCastManager.getInstance().unbindUpnpCastService(this);
 
         super.onPause();
     }

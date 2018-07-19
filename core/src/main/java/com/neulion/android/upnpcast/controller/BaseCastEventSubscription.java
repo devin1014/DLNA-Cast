@@ -33,37 +33,57 @@ import java.util.Map;
  */
 public abstract class BaseCastEventSubscription extends SubscriptionCallback
 {
-    protected ILogger mLogger;
+    protected Handler mHandler = new Handler(Looper.getMainLooper());
+
+    protected ILogger mLogger = new DefaultLoggerImpl(getClass().getSimpleName() + Integer.toHexString(getClass().hashCode()));
 
     protected ICastControlListener mControlListener;
 
-    protected Handler mHandler = new Handler(Looper.getMainLooper());
+    protected EventCallbackListener mEventCallback;
 
-    BaseCastEventSubscription(Service service, ICastControlListener listener)
+    public interface EventCallbackListener
+    {
+        void established(GENASubscription subscription);
+
+        void ended(GENASubscription subscription, CancelReason reason, UpnpResponse responseStatus);
+
+        void failed(GENASubscription subscription, UpnpResponse responseStatus, Exception exception, String defaultMsg);
+    }
+
+    BaseCastEventSubscription(Service service, ICastControlListener listener, EventCallbackListener eventCallback)
     {
         super(service);
 
         mControlListener = listener;
 
-        mLogger = new DefaultLoggerImpl(getClass().getSimpleName());
+        mEventCallback = eventCallback;
     }
 
     @Override
+    @CallSuper
     protected void failed(GENASubscription subscription, UpnpResponse responseStatus, Exception exception, String defaultMsg)
     {
         mLogger.e(String.format("[failed] [%s][%s]", subscription, defaultMsg));
+
+        mEventCallback.failed(subscription, responseStatus, exception, defaultMsg);
     }
 
     @Override
+    @CallSuper
     protected void established(GENASubscription subscription)
     {
         mLogger.i(String.format("[established] [%s]", subscription));
+
+        mEventCallback.established(subscription);
     }
 
     @Override
+    @CallSuper
     protected void ended(GENASubscription subscription, CancelReason reason, UpnpResponse responseStatus)
     {
         mLogger.i(String.format("[ended] [%s][%s][%s]", subscription, reason, responseStatus));
+
+        mEventCallback.ended(subscription, reason, responseStatus);
     }
 
     @Override
@@ -142,9 +162,9 @@ public abstract class BaseCastEventSubscription extends SubscriptionCallback
     {
         private LastChangeParser mLastChangeParser;
 
-        AvTransportSubscription(Service service, ICastControlListener listener)
+        public AvTransportSubscription(Service service, ICastControlListener listener, EventCallbackListener eventCallback)
         {
-            super(service, listener);
+            super(service, listener, eventCallback);
 
             mLastChangeParser = new AVTransportLastChangeParser();
         }
@@ -231,9 +251,9 @@ public abstract class BaseCastEventSubscription extends SubscriptionCallback
     {
         private LastChangeParser mLastChangeParser;
 
-        RenderSubscription(Service service, ICastControlListener listener)
+        public RenderSubscription(Service service, ICastControlListener listener, EventCallbackListener eventCallback)
         {
-            super(service, listener);
+            super(service, listener, eventCallback);
 
             mLastChangeParser = new RenderingControlLastChangeParser();
         }

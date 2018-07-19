@@ -30,7 +30,7 @@ public class NLDeviceRegistryListener extends DefaultRegistryListener
     @Override
     public void remoteDeviceDiscoveryStarted(Registry registry, RemoteDevice device)
     {
-        mLog.i("remoteDeviceDiscoveryStarted:" + DeviceUtil.parseDevice(device));
+        mLog.d("remoteDeviceDiscoveryStarted:" + DeviceUtil.parseDevice(device));
     }
 
     @Override
@@ -61,7 +61,7 @@ public class NLDeviceRegistryListener extends DefaultRegistryListener
     @Override
     public void localDeviceAdded(Registry registry, LocalDevice device)
     {
-        mLog.i("localDeviceAdded:" + DeviceUtil.parseDevice(device));
+        mLog.d("localDeviceAdded:" + DeviceUtil.parseDevice(device));
         //        deviceAdded(device); // 本地设备 已加入
     }
 

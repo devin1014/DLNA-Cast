@@ -24,7 +24,7 @@ public interface ICastControl
 
     @IntDef({IDLE, CASTING, PLAY, PAUSE, STOP, BUFFER, ERROR})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface CastStatus
+    @interface CastStatus
     {
     }
 

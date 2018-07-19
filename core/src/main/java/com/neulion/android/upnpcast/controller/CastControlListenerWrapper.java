@@ -2,7 +2,6 @@ package com.neulion.android.upnpcast.controller;
 
 import android.support.annotation.NonNull;
 
-import com.neulion.android.upnpcast.controller.ICastControl.CastStatus;
 import com.neulion.android.upnpcast.device.CastDevice;
 
 import org.fourthline.cling.support.model.MediaInfo;
@@ -16,9 +15,6 @@ import org.fourthline.cling.support.model.TransportInfo;
  */
 class CastControlListenerWrapper implements ICastEventListener
 {
-    @CastStatus
-    private int mCastStatus = CastControlImp.IDLE;
-
     private ICastEventListener mListener;
 
     CastControlListenerWrapper(ICastEventListener listener)
@@ -56,8 +52,6 @@ class CastControlListenerWrapper implements ICastEventListener
     @Override
     public void onCast(CastObject castObject)
     {
-        mCastStatus = CastControlImp.CASTING;
-
         if (mListener != null)
         {
             mListener.onCast(castObject);
@@ -67,8 +61,6 @@ class CastControlListenerWrapper implements ICastEventListener
     @Override
     public void onStart()
     {
-        mCastStatus = CastControlImp.PLAY;
-
         if (mListener != null)
         {
             mListener.onStart();
@@ -78,8 +70,6 @@ class CastControlListenerWrapper implements ICastEventListener
     @Override
     public void onPause()
     {
-        mCastStatus = CastControlImp.PAUSE;
-
         if (mListener != null)
         {
             mListener.onPause();
@@ -89,8 +79,6 @@ class CastControlListenerWrapper implements ICastEventListener
     @Override
     public void onStop()
     {
-        mCastStatus = CastControlImp.STOP;
-
         if (mListener != null)
         {
             mListener.onStop();
@@ -109,8 +97,6 @@ class CastControlListenerWrapper implements ICastEventListener
     @Override
     public void onError(String errorMsg)
     {
-        mCastStatus = CastControlImp.ERROR;
-
         if (mListener != null)
         {
             mListener.onError(errorMsg);
@@ -142,11 +128,5 @@ class CastControlListenerWrapper implements ICastEventListener
         {
             mListener.onUpdatePositionInfo(positionInfo);
         }
-    }
-
-    @CastStatus
-    public int getCastStatus()
-    {
-        return mCastStatus;
     }
 }

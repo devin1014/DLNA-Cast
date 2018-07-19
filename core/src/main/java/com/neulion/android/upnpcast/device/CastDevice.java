@@ -3,7 +3,6 @@ package com.neulion.android.upnpcast.device;
 import android.support.annotation.NonNull;
 
 import org.fourthline.cling.model.meta.Device;
-import org.fourthline.cling.model.meta.RemoteDevice;
 
 /**
  * User: liuwei(wei.liu@neulion.com.com)
@@ -43,10 +42,10 @@ public class CastDevice implements ICastDevice<Device>
     {
         String result = String.format("[%s]", mDevice.getIdentity().getUdn().toString());
 
-        if (mDevice instanceof RemoteDevice)
-        {
-            result += "\n" + String.format("[%s]", mDevice.getDetails().getBaseURL());
-        }
+        //        if (mDevice instanceof RemoteDevice)
+        //        {
+        //            result += "\n" + String.format("[%s]", mDevice.getDetails().getBaseURL());
+        //        }
 
         return result;
     }

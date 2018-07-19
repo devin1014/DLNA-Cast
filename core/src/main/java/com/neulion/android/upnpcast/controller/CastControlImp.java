@@ -1,27 +1,22 @@
 package com.neulion.android.upnpcast.controller;
 
-import android.os.Handler;
-import android.os.Looper;
-
-import com.neulion.android.upnpcast.NLUpnpCastManager;
+import com.neulion.android.upnpcast.controller.ConnectSession.ConnectSessionCallback;
+import com.neulion.android.upnpcast.controller.action.ActionCallbackListener;
+import com.neulion.android.upnpcast.controller.action.ICastActionFactory;
+import com.neulion.android.upnpcast.controller.action.ICastActionFactory.CastActionFactory;
 import com.neulion.android.upnpcast.device.CastDevice;
 import com.neulion.android.upnpcast.service.NLUpnpCastService;
+import com.neulion.android.upnpcast.util.CastUtils;
 import com.neulion.android.upnpcast.util.ILogger;
 import com.neulion.android.upnpcast.util.ILogger.DefaultLoggerImpl;
 
+import org.fourthline.cling.controlpoint.ActionCallback;
 import org.fourthline.cling.controlpoint.ControlPoint;
-import org.fourthline.cling.controlpoint.SubscriptionCallback;
 import org.fourthline.cling.model.action.ActionInvocation;
 import org.fourthline.cling.model.message.UpnpResponse;
-import org.fourthline.cling.model.meta.Service;
-import org.fourthline.cling.support.avtransport.callback.GetMediaInfo;
-import org.fourthline.cling.support.avtransport.callback.GetTransportInfo;
 import org.fourthline.cling.support.model.MediaInfo;
 import org.fourthline.cling.support.model.TransportInfo;
 import org.fourthline.cling.support.model.TransportState;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * User: liuwei(wei.liu@neulion.com.com)
@@ -30,23 +25,19 @@ import java.util.TimerTask;
  */
 public class CastControlImp implements ICastControl
 {
-    private static final int POSITION_INTERVAL = 500;
-
     private ILogger mLogger = new DefaultLoggerImpl(getClass().getSimpleName());
 
     private ControlPoint mControlPoint;
 
-    private CastCallbackActionHelper mCallbackActionHelper;
-
-    private CastDevice mCastDevice;
-
-    private SubscriptionCallback mAvTransportSubscription;
-
-    private SubscriptionCallback mRenderSubscription;
-
-    private Timer mTimer;
+    private ICastActionFactory mCastActionFactory;
 
     private ICastEventListener mCastEventListener;
+
+    private ICastSession mMediaSession;
+
+    private ICastSession mConnectSession;
+
+    private CastDevice mCastDevice;
 
     public CastControlImp(NLUpnpCastService service, ICastEventListener listener)
     {
@@ -54,22 +45,39 @@ public class CastControlImp implements ICastControl
 
         mControlPoint = service.getControlPoint();
 
-        mCallbackActionHelper = new CastCallbackActionHelper(mCastEventListener = new CastControlListener(listener));
+        mCastEventListener = new CastEventListener(listener);
     }
 
-    public void setNLUpnpCastService(NLUpnpCastService service)
+    public void bindNLUpnpCastService(NLUpnpCastService service)
     {
-        if (service != null)
-        {
-            mControlPoint = service.getControlPoint();
+        mControlPoint = service.getControlPoint();
 
-            syncInfo();
-        }
-        else
+        if (isConnected())
         {
-            unregisterCastSubscription();
+            if (mConnectSession == null)
+            {
+                mConnectSession = new ConnectSession(mControlPoint, mCastActionFactory, mConnectSessionCallback);
+            }
+
+            mConnectSession.start();
         }
     }
+
+    public void unbindNLUpnpCastService()
+    {
+        endMediaSession();
+
+        if (mConnectSession != null)
+        {
+            mConnectSession.stop();
+        }
+
+        mConnectSession = null;
+
+        mControlPoint = null;
+    }
+
+    private boolean mConnected = false;
 
     @Override
     public void connect(CastDevice castDevice)
@@ -79,345 +87,264 @@ public class CastControlImp implements ICastControl
             disconnect();
         }
 
-        mLogger.d(String.format("####connect [%s@%s]", castDevice.getName(), Integer.toHexString(castDevice.hashCode())));
+        mLogger.i(String.format("############ connect [%s@%s]", castDevice.getName(), Integer.toHexString(castDevice.hashCode())));
 
         mCastDevice = castDevice;
 
-        mCallbackActionHelper.setAVTransportService(getCastAVService());
+        mCastEventListener.onConnecting(mCastDevice);
 
-        mCallbackActionHelper.setRenderControlService(getCastRenderService());
+        mCastActionFactory = new CastActionFactory(castDevice);
 
-        syncInfo();
+        mConnectSession = new ConnectSession(mControlPoint, mCastActionFactory, mConnectSessionCallback);
+
+        mConnectSession.start();
     }
 
     @Override
     public void disconnect()
     {
-        if (mCastDevice != null)
-        {
-            mLogger.w(String.format("####disconnect [%s@%s]", mCastDevice.getName(), Integer.toHexString(mCastDevice.hashCode())));
-        }
-
         final CastDevice device = mCastDevice;
 
         mCastDevice = null;
 
-        unregisterCastSubscription();
+        mConnected = false;
 
-        if (mCastEventListener != null)
+        if (device != null)
         {
-            if (device != null)
+            mLogger.w(String.format("############ disconnect [%s@%s]", device.getName(), Integer.toHexString(device.hashCode())));
+
+            endMediaSession();
+
+            if (mConnectSession != null)
             {
-                mCastEventListener.onDisconnect();
+                mConnectSession.stop();
             }
+
+            mCastEventListener.onDisconnect();
         }
     }
+
+    private ConnectSessionCallback mConnectSessionCallback = new ConnectSessionCallback()
+    {
+        @Override
+        public void onCastSession(TransportInfo transportInfo, MediaInfo mediaInfo)
+        {
+            if (!mConnected)
+            {
+                mCastEventListener.onConnected(mCastDevice, transportInfo, mediaInfo);
+            }
+
+            mConnected = true;
+
+            if (TransportState.PLAYING.getValue().equals(transportInfo.getCurrentTransportState().getValue()) ||
+                    TransportState.PAUSED_PLAYBACK.getValue().equals(transportInfo.getCurrentTransportState().getValue()))
+            {
+                if (mMediaSession == null || !mMediaSession.isRunning())
+                {
+                    startMediaSession();
+                }
+            }
+            else
+            {
+                endMediaSession();
+            }
+        }
+
+        @Override
+        public void onCastSessionTimeout()
+        {
+            disconnect();
+        }
+    };
 
     @Override
     public boolean isConnected()
     {
-        return checkCastObject(); //TODO:
+        return checkConnection();
     }
 
+    // ------------------------------------------------------------------------------------------------
+    // control
+    // ------------------------------------------------------------------------------------------------
     @Override
-    public void cast(CastObject castObject)
+    public void cast(final CastObject castObject)
     {
-        if (checkCastObject())
+        if (checkConnection())
         {
-            mControlPoint.execute(mCallbackActionHelper.setAvTransportAction(castObject));
+            ActionCallback action = mCastActionFactory.getAvService().setCastAction(new ActionCallbackListener()
+            {
+                @Override
+                public void success(ActionInvocation invocation, Object... received)
+                {
+                    mCastEventListener.onCast(castObject);
+
+                    startMediaSession();
+                }
+
+                @Override
+                public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
+                {
+                    endMediaSession();
+
+                    mCastEventListener.onError(defaultMsg);
+                }
+
+            }, castObject.url, CastUtils.getMetadata(castObject));
+
+            mControlPoint.execute(action);
         }
     }
 
     @Override
     public void start()
     {
-        if (checkCastObject())
+        if (checkConnection())
         {
-            mControlPoint.execute(mCallbackActionHelper.setPlayAction());
+            ActionCallback action = mCastActionFactory.getAvService().playAction(new ActionCallbackListener()
+            {
+                @Override
+                public void success(ActionInvocation invocation, Object... received)
+                {
+                    mCastEventListener.onStart();
+                }
+            });
+
+            mControlPoint.execute(action);
         }
     }
 
     @Override
     public void pause()
     {
-        if (checkCastObject())
+        if (checkConnection())
         {
-            mControlPoint.execute(mCallbackActionHelper.setPauseAction());
+            ActionCallback action = mCastActionFactory.getAvService().pauseAction(new ActionCallbackListener()
+            {
+                @Override
+                public void success(ActionInvocation invocation, Object... received)
+                {
+                    mCastEventListener.onPause();
+                }
+            });
+
+            mControlPoint.execute(action);
         }
     }
 
     @Override
     public void stop()
     {
-        if (checkCastObject())
+        if (checkConnection())
         {
-            mControlPoint.execute(mCallbackActionHelper.setStopAction());
+            ActionCallback action = mCastActionFactory.getAvService().stopAction(new ActionCallbackListener()
+            {
+                @Override
+                public void success(ActionInvocation invocation, Object... received)
+                {
+                    mCastEventListener.onStop();
+                }
+            });
+
+            mControlPoint.execute(action);
         }
     }
 
     @Override
     public void seekTo(long position)
     {
-        if (checkCastObject())
+        if (checkConnection())
         {
-            mControlPoint.execute(mCallbackActionHelper.setSeekAction(position));
+            ActionCallback action = mCastActionFactory.getAvService().seekAction(new ActionCallbackListener()
+            {
+                @Override
+                public void success(ActionInvocation invocation, Object... received)
+                {
+                    mCastEventListener.onSeekTo((long) (received[0]));
+                }
+            }, position);
+
+            mControlPoint.execute(action);
         }
     }
 
     @Override
     public void setVolume(int percent)
     {
-        if (checkCastObject())
+        if (checkConnection())
         {
-            mControlPoint.execute(mCallbackActionHelper.setVolumeAction(percent));
+            ActionCallback action = mCastActionFactory.getRenderService().setVolumeAction(new ActionCallbackListener()
+            {
+                @Override
+                public void success(ActionInvocation invocation, Object... received)
+                {
+                    mCastEventListener.onVolume((int) (received[0]));
+                }
+            }, percent);
+
+            mControlPoint.execute(action);
         }
     }
 
     @Override
     public void setBrightness(int percent)
     {
-        if (checkCastObject())
+        if (checkConnection())
         {
-            mControlPoint.execute(mCallbackActionHelper.setBrightnessAction(percent));
+            ActionCallback action = mCastActionFactory.getRenderService().setBrightnessAction(new ActionCallbackListener()
+            {
+                @Override
+                public void success(ActionInvocation invocation, Object... received)
+                {
+                    mCastEventListener.onBrightness((int) (received[0]));
+                }
+            }, percent);
+
+            mControlPoint.execute(action);
         }
     }
 
     @Override
     public int getCastStatus()
     {
-        return mCallbackActionHelper.getCastStatus();
+        return mCastStatus;
     }
 
-    private void syncInfo()
-    {
-        if (checkCastObject())
-        {
-            if (mCastEventListener != null)
-            {
-                mCastEventListener.onConnecting(mCastDevice);
-            }
-
-            checkTransportInfo();
-        }
-    }
-
-    private void checkTransportInfo()
-    {
-        mControlPoint.execute(new GetTransportInfo(getCastAVService())
-        {
-            @Override
-            public void received(ActionInvocation invocation, final TransportInfo transportInfo)
-            {
-                mLogger.d(String.format("[%s][%s][%s]",
-                        actionInvocation.getAction().getName(), transportInfo.getCurrentTransportStatus().getValue(), transportInfo.getCurrentTransportState().getValue()));
-
-                if (TransportState.PLAYING.getValue().equals(transportInfo.getCurrentTransportState().getValue()) ||
-                        TransportState.PAUSED_PLAYBACK.getValue().equals(transportInfo.getCurrentTransportState().getValue()))
-                {
-                    if (checkCastObject())
-                    {
-                        registerCastSubscription();
-
-                        checkMediaInfo(transportInfo);
-
-                        mControlPoint.execute(mCallbackActionHelper.getVolumeAction());
-                    }
-                }
-                else
-                {
-                    notifyCallback(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            if (mCastEventListener != null)
-                            {
-                                mCastEventListener.onConnected(mCastDevice, transportInfo, null);
-                            }
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
-            {
-                notifyCallback(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        if (mCastEventListener != null)
-                        {
-                            mCastEventListener.onDisconnect();
-                        }
-                    }
-                });
-            }
-        });
-    }
-
-    private void checkMediaInfo(final TransportInfo transportInfo)
-    {
-        if (checkCastObject())
-        {
-            mControlPoint.execute(new GetMediaInfo(getCastAVService())
-            {
-                @Override
-                public void received(ActionInvocation invocation, final MediaInfo mediaInfo)
-                {
-                    mLogger.d(String.format("[%s][%s][%s][%s]",
-                            actionInvocation.getAction().getName(), mediaInfo.getCurrentURI(), mediaInfo.getMediaDuration(), mediaInfo.getCurrentURIMetaData()));
-
-                    notifyCallback(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            if (mCastEventListener != null)
-                            {
-                                mCastEventListener.onConnected(mCastDevice, transportInfo, mediaInfo);
-                            }
-                        }
-                    });
-                }
-
-                @Override
-                public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
-                {
-                    mLogger.w(String.format("[%s][%s][%s]", invocation.getAction().getName(), operation, defaultMsg));
-
-                    notifyCallback(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            if (mCastEventListener != null)
-                            {
-                                mCastEventListener.onConnected(mCastDevice, transportInfo, null);
-                            }
-                        }
-                    });
-                }
-            });
-        }
-    }
-
-    private boolean checkCastObject()
+    private boolean checkConnection()
     {
         return mCastDevice != null && mControlPoint != null;
     }
 
-    private Service getCastAVService()
+    private void startMediaSession()
     {
-        return mCastDevice.getDevice().findService(NLUpnpCastManager.SERVICE_AV_TRANSPORT);
-    }
-
-    private Service getCastRenderService()
-    {
-        return mCastDevice.getDevice().findService(NLUpnpCastManager.SERVICE_RENDERING_CONTROL);
-    }
-
-    private void updateMediaPosition()
-    {
-        if (checkCastObject())
+        if (mMediaSession != null)
         {
-            mControlPoint.execute(mCallbackActionHelper.getPositionInfoAction());
-        }
-    }
-
-    private Handler mHandler = new Handler(Looper.getMainLooper());
-
-    private void notifyCallback(Runnable runnable)
-    {
-        if (mCastEventListener != null)
-        {
-            if (Thread.currentThread() != Looper.getMainLooper().getThread())
-            {
-                if (mHandler != null && mCastEventListener != null)
-                {
-                    mHandler.post(runnable);
-                }
-            }
-            else
-            {
-                runnable.run();
-            }
-        }
-    }
-
-    private void registerCastSubscription()
-    {
-        unregisterCastSubscription(); //FIXME,add retry register
-
-        //av transport
-        mAvTransportSubscription = mCallbackActionHelper.getAVTransportSubscription(mCastEventListener);
-
-        mControlPoint.execute(mAvTransportSubscription);
-
-        //render
-        mRenderSubscription = mCallbackActionHelper.getRenderSubscription(mCastEventListener);
-
-        mControlPoint.execute(mRenderSubscription);
-
-        startTimer();
-    }
-
-    private void unregisterCastSubscription()
-    {
-        stopTimer();
-
-        if (mAvTransportSubscription != null)
-        {
-            mAvTransportSubscription.end();
-
-            mAvTransportSubscription = null;
+            mMediaSession.stop();
         }
 
-        if (mRenderSubscription != null)
-        {
-            mRenderSubscription.end();
+        mMediaSession = new MediaSession(mControlPoint, mCastActionFactory, mCastEventListener);
 
-            mRenderSubscription = null;
+        mMediaSession.start();
+    }
+
+    private void endMediaSession()
+    {
+        if (mMediaSession != null)
+        {
+            mMediaSession.stop();
         }
+
+        mMediaSession = null;
     }
 
-    private void startTimer()
+    @CastStatus
+    private int mCastStatus = CastControlImp.IDLE;
+
+    // --------------------------------------------------------------------------------------------------------
+    // Event listener wrapper
+    // --------------------------------------------------------------------------------------------------------
+    private class CastEventListener extends CastControlListenerWrapper
     {
-        stopTimer();
-
-        mTimer = new Timer();
-
-        mTimer.scheduleAtFixedRate(new TimerTask()
-        {
-            @Override
-            public void run()
-            {
-                updateMediaPosition();
-            }
-        }, POSITION_INTERVAL, POSITION_INTERVAL);
-
-        mLogger.i("startTimer");
-    }
-
-    private void stopTimer()
-    {
-        if (mTimer != null)
-        {
-            mTimer.cancel();
-
-            mLogger.i("stopTimer");
-
-            mTimer = null;
-        }
-    }
-
-    // --------------------------------------------------------------------------------
-    // control listener
-    // --------------------------------------------------------------------------------
-    class CastControlListener extends CastControlListenerWrapper
-    {
-        CastControlListener(ICastEventListener listener)
+        CastEventListener(ICastEventListener listener)
         {
             super(listener);
         }
@@ -425,25 +352,45 @@ public class CastControlImp implements ICastControl
         @Override
         public void onCast(CastObject castObject)
         {
-            super.onCast(castObject);
+            mCastStatus = CastControlImp.CASTING;
 
-            registerCastSubscription();
+            super.onCast(castObject);
+        }
+
+        @Override
+        public void onStart()
+        {
+            mCastStatus = CastControlImp.PLAY;
+
+            super.onStart();
+        }
+
+        @Override
+        public void onPause()
+        {
+            mCastStatus = CastControlImp.PAUSE;
+
+            super.onPause();
         }
 
         @Override
         public void onStop()
         {
+            mCastStatus = CastControlImp.STOP;
+
             super.onStop();
 
-            unregisterCastSubscription();
+            endMediaSession();
         }
 
         @Override
         public void onError(String errorMsg)
         {
+            mCastStatus = CastControlImp.ERROR;
+
             super.onError(errorMsg);
 
-            unregisterCastSubscription();
+            endMediaSession();
         }
     }
 }
