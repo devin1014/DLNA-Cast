@@ -51,6 +51,10 @@ public class PlayerActivity extends AppCompatActivity
 
         initComponent();
 
+        NLUpnpCastManager.getInstance().addCastEventListener(mControlListener);
+
+        NLUpnpCastManager.getInstance().addRegistryDeviceListener(mDeviceAdapter = new DeviceAdapter(this, mOnItemSelectedListener));
+
         openMedia(Constants.CAST_URL, 0L);
     }
 
@@ -69,6 +73,8 @@ public class PlayerActivity extends AppCompatActivity
         mController.setMediaConnection(mCastMediaConnection = new NLCastMediaConnection(this));
 
         mController.setOnRequestRestartListener(mOnRequestRestartListener);
+
+        mCastMediaConnection.setEnabled(NLUpnpCastManager.getInstance().isConnected());
 
         ViewGroup viewGroup = mController.findViewById(R.id.m_controller_fit_system_windows_panel);
 
@@ -111,33 +117,24 @@ public class PlayerActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onStart()
+    protected void onResume()
     {
-        super.onStart();
+        super.onResume();
 
         NLUpnpCastManager.getInstance().bindUpnpCastService(PlayerActivity.this);
-
-        NLUpnpCastManager.getInstance().setOnControlListener(mControlListener);
-
-        NLUpnpCastManager.getInstance().addRegistryDeviceListener(mDeviceAdapter = new DeviceAdapter(this, mOnItemSelectedListener));
-    }
-
-    @Override
-    protected void onStop()
-    {
-        NLUpnpCastManager.getInstance().removeRegistryListener(mDeviceAdapter);
-
-        super.onStop();
     }
 
     @Override
     public void onDestroy()
     {
-        mController.releaseMedia();
+        NLUpnpCastManager.getInstance().removeCastEventListener(mControlListener);
 
-        mController.setMediaConnection(null);
+        NLUpnpCastManager.getInstance().removeRegistryListener(mDeviceAdapter);
 
-        NLUpnpCastManager.getInstance().setOnControlListener(null);
+        if (!NLUpnpCastManager.getInstance().isConnected())
+        {
+            mController.releaseMedia();
+        }
 
         super.onDestroy();
     }
@@ -151,7 +148,7 @@ public class PlayerActivity extends AppCompatActivity
 
             boolean connected = NLUpnpCastManager.getInstance().isConnected();
 
-            //mCastingView.setVisibility(connected ? View.VISIBLE : View.GONE);
+            mCastingView.setVisibility(connected ? View.VISIBLE : View.GONE);
 
             mController.releaseMedia();
 
@@ -262,8 +259,6 @@ public class PlayerActivity extends AppCompatActivity
         public void onStop()
         {
             Toast.makeText(getApplication(), "停止投射", Toast.LENGTH_SHORT).show();
-
-            NLUpnpCastManager.getInstance().disconnect();
         }
 
         @Override

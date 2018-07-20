@@ -26,6 +26,8 @@ public class NLDeviceRegistryListener extends DefaultRegistryListener
 {
     private ILogger mLog = new DefaultLoggerImpl(NLDeviceRegistryListener.class.getSimpleName());
 
+    private List<CastDevice> mDeviceList = new ArrayList<>();
+
     /* Discovery performance optimization for very slow Android devices! */
     @Override
     public void remoteDeviceDiscoveryStarted(Registry registry, RemoteDevice device)
@@ -80,6 +82,8 @@ public class NLDeviceRegistryListener extends DefaultRegistryListener
 
             CastDevice castDevice = new CastDevice(device);
 
+            mDeviceList.add(castDevice);
+
             for (OnRegistryDeviceListener listener : mOnRegistryDeviceListener)
             {
                 if (listener != null) // remove listener empty list now!
@@ -93,6 +97,8 @@ public class NLDeviceRegistryListener extends DefaultRegistryListener
     private void deviceRemoved(Device device)
     {
         CastDevice castDevice = new CastDevice(device);
+
+        mDeviceList.remove(castDevice);
 
         for (OnRegistryDeviceListener listener : mOnRegistryDeviceListener)
         {
@@ -120,6 +126,14 @@ public class NLDeviceRegistryListener extends DefaultRegistryListener
         if (mOnRegistryDeviceListener != null && listener != null && !mOnRegistryDeviceListener.contains(listener))
         {
             mOnRegistryDeviceListener.add(listener);
+        }
+
+        if (listener != null)
+        {
+            for (CastDevice device : mDeviceList)
+            {
+                listener.onDeviceAdded(device);
+            }
         }
     }
 

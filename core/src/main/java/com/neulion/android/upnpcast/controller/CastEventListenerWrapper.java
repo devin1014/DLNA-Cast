@@ -13,11 +13,11 @@ import org.fourthline.cling.support.model.TransportInfo;
  * Date: 2018-07-11
  * Time: 17:05
  */
-class CastControlListenerWrapper implements ICastEventListener
+public class CastEventListenerWrapper implements ICastEventListener
 {
     private ICastEventListener mListener;
 
-    CastControlListenerWrapper(ICastEventListener listener)
+    public CastEventListenerWrapper(ICastEventListener listener)
     {
         mListener = listener;
     }

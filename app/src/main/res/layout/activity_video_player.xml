@@ -23,7 +23,6 @@
             android:id="@+id/d_video_cast_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#cc000000"
             android:gravity="center"
             android:text="正在投屏"
             android:textColor="#ffffff"

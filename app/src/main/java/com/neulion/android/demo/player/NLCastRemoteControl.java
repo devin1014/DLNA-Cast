@@ -5,11 +5,15 @@ import android.content.Context;
 import com.neulion.android.upnpcast.Constants.Key;
 import com.neulion.android.upnpcast.NLUpnpCastManager;
 import com.neulion.android.upnpcast.controller.CastObject;
+import com.neulion.android.upnpcast.controller.DefaultCastEventListener;
 import com.neulion.android.upnpcast.util.CastUtils;
 import com.neulion.android.upnpcast.util.ILogger;
 import com.neulion.android.upnpcast.util.ILogger.DefaultLoggerImpl;
 import com.neulion.media.control.MediaConnection.AbstractRemoteControl;
 import com.neulion.media.control.MediaRequest;
+
+import org.fourthline.cling.support.model.MediaInfo;
+import org.fourthline.cling.support.model.PositionInfo;
 
 
 public class NLCastRemoteControl extends AbstractRemoteControl
@@ -33,7 +37,25 @@ public class NLCastRemoteControl extends AbstractRemoteControl
     public void prepareAsync()
     {
         mLogger.d("prepareAsync");
-        NLUpnpCastManager.getInstance().cast(mCastObject);
+        mCastManager.addCastEventListener(mCastEventListener);
+
+        boolean casting = false;
+
+        if (mCastManager.isConnected())
+        {
+            MediaInfo mediaInfo = mCastManager.getMedia();
+
+            if (mediaInfo != null && mediaInfo.getCurrentURI().equals(mCastObject.url))
+            {
+                casting = true;
+            }
+        }
+
+        if (!casting)
+        {
+            mCastManager.cast(mCastObject);
+        }
+
         onPrepared();
     }
 
@@ -62,7 +84,7 @@ public class NLCastRemoteControl extends AbstractRemoteControl
     {
         mLogger.d("stop");
 
-        mCastManager.stop();
+        //mCastManager.stop();
 
         onStatusUpdated();
     }
@@ -72,7 +94,9 @@ public class NLCastRemoteControl extends AbstractRemoteControl
     {
         mLogger.d("release");
 
-        mCastManager.stop();
+        mCastManager.removeCastEventListener(mCastEventListener);
+
+        //mCastManager.stop();
 
         onStatusUpdated();
     }
@@ -134,12 +158,59 @@ public class NLCastRemoteControl extends AbstractRemoteControl
     @Override
     public long getDuration()
     {
-        return 0;
+        PositionInfo positionInfo = mCastManager.getPosition();
+
+        return CastUtils.getIntTime(positionInfo != null ? positionInfo.getTrackDuration() : null);
     }
 
     @Override
     public long getCurrentPosition()
     {
-        return 0;
+        PositionInfo positionInfo = mCastManager.getPosition();
+
+        return CastUtils.getIntTime(positionInfo != null ? positionInfo.getRelTime() : null);
     }
+
+    private DefaultCastEventListener mCastEventListener = new DefaultCastEventListener()
+    {
+        @Override
+        public void onCast(CastObject castObject)
+        {
+            super.onCast(castObject);
+
+            onStatusUpdated();
+        }
+
+        @Override
+        public void onStart()
+        {
+            super.onStart();
+
+            onStatusUpdated();
+        }
+
+        @Override
+        public void onPause()
+        {
+            super.onPause();
+
+            onStatusUpdated();
+        }
+
+        @Override
+        public void onStop()
+        {
+            super.onStop();
+
+            onStatusUpdated();
+        }
+
+        @Override
+        public void onError(String errorMsg)
+        {
+            super.onError(errorMsg);
+
+            onStatusUpdated();
+        }
+    };
 }

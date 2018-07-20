@@ -15,6 +15,7 @@ import org.fourthline.cling.controlpoint.ControlPoint;
 import org.fourthline.cling.model.action.ActionInvocation;
 import org.fourthline.cling.model.message.UpnpResponse;
 import org.fourthline.cling.support.model.MediaInfo;
+import org.fourthline.cling.support.model.PositionInfo;
 import org.fourthline.cling.support.model.TransportInfo;
 import org.fourthline.cling.support.model.TransportState;
 
@@ -124,11 +125,15 @@ public class CastControlImp implements ICastControl
         }
     }
 
+    private MediaInfo mMediaInfo;
+
     private ConnectSessionCallback mConnectSessionCallback = new ConnectSessionCallback()
     {
         @Override
         public void onCastSession(TransportInfo transportInfo, MediaInfo mediaInfo)
         {
+            mMediaInfo = mediaInfo;
+
             if (!mConnected)
             {
                 mCastEventListener.onConnected(mCastDevice, transportInfo, mediaInfo);
@@ -309,6 +314,18 @@ public class CastControlImp implements ICastControl
         return mCastStatus;
     }
 
+    @Override
+    public PositionInfo getPosition()
+    {
+        return mPositionInfo;
+    }
+
+    @Override
+    public MediaInfo getMedia()
+    {
+        return mMediaInfo;
+    }
+
     private boolean checkConnection()
     {
         return mCastDevice != null && mControlPoint != null;
@@ -334,15 +351,19 @@ public class CastControlImp implements ICastControl
         }
 
         mMediaSession = null;
+
+        mPositionInfo = null;
     }
 
     @CastStatus
     private int mCastStatus = CastControlImp.IDLE;
 
+    private PositionInfo mPositionInfo;
+
     // --------------------------------------------------------------------------------------------------------
     // Event listener wrapper
     // --------------------------------------------------------------------------------------------------------
-    private class CastEventListener extends CastControlListenerWrapper
+    private class CastEventListener extends CastEventListenerWrapper
     {
         CastEventListener(ICastEventListener listener)
         {
@@ -391,6 +412,14 @@ public class CastControlImp implements ICastControl
             super.onError(errorMsg);
 
             endMediaSession();
+        }
+
+        @Override
+        public void onUpdatePositionInfo(PositionInfo positionInfo)
+        {
+            mPositionInfo = positionInfo;
+
+            super.onUpdatePositionInfo(positionInfo);
         }
     }
 }

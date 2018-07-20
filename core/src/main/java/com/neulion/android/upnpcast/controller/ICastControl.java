@@ -4,6 +4,9 @@ import android.support.annotation.IntDef;
 
 import com.neulion.android.upnpcast.device.CastDevice;
 
+import org.fourthline.cling.support.model.MediaInfo;
+import org.fourthline.cling.support.model.PositionInfo;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -52,4 +55,8 @@ public interface ICastControl
 
     @CastStatus
     int getCastStatus();
+
+    PositionInfo getPosition();
+
+    MediaInfo getMedia();
 }

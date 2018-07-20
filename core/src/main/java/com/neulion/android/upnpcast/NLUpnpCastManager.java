@@ -9,6 +9,7 @@ import android.os.IBinder;
 
 import com.neulion.android.upnpcast.NLDeviceRegistryListener.OnRegistryDeviceListener;
 import com.neulion.android.upnpcast.controller.CastControlImp;
+import com.neulion.android.upnpcast.controller.CastEventListenerListWrapper;
 import com.neulion.android.upnpcast.controller.CastObject;
 import com.neulion.android.upnpcast.controller.ICastEventListener;
 import com.neulion.android.upnpcast.device.CastDevice;
@@ -22,8 +23,12 @@ import org.fourthline.cling.model.types.ServiceType;
 import org.fourthline.cling.model.types.UDADeviceType;
 import org.fourthline.cling.model.types.UDAServiceType;
 import org.fourthline.cling.registry.RegistryListener;
+import org.fourthline.cling.support.model.MediaInfo;
+import org.fourthline.cling.support.model.PositionInfo;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * User: liuwei(wei.liu@neulion.com.com)
@@ -148,6 +153,21 @@ public class NLUpnpCastManager implements IUpnpCast
 
     private NLDeviceRegistryListener mNLDeviceRegistryListener = new NLDeviceRegistryListener();
 
+    private List<ICastEventListener> mListeners = new ArrayList<>();
+
+    public void addCastEventListener(ICastEventListener listener)
+    {
+        if (!mListeners.contains(listener))
+        {
+            mListeners.add(listener);
+        }
+    }
+
+    public void removeCastEventListener(ICastEventListener listener)
+    {
+        mListeners.remove(listener);
+    }
+
     // ------------------------------------------------------------------------------------------
     // control
     // ------------------------------------------------------------------------------------------
@@ -168,13 +188,6 @@ public class NLUpnpCastManager implements IUpnpCast
         }
     }
 
-    private ICastEventListener mControlListener;
-
-    public void setOnControlListener(ICastEventListener listener)
-    {
-        mControlListener = listener;
-    }
-
     private CastControlImp mCastControlImp;
 
     @Override
@@ -182,7 +195,7 @@ public class NLUpnpCastManager implements IUpnpCast
     {
         if (mCastControlImp == null)
         {
-            mCastControlImp = new CastControlImp(mUpnpCastService, mControlListener);
+            mCastControlImp = new CastControlImp(mUpnpCastService, new CastEventListenerListWrapper(mListeners));
         }
 
         mCastControlImp.connect(castDevice);
@@ -276,4 +289,27 @@ public class NLUpnpCastManager implements IUpnpCast
 
         return CastControlImp.IDLE;
     }
+
+    @Override
+    public PositionInfo getPosition()
+    {
+        if (mCastControlImp != null)
+        {
+            return mCastControlImp.getPosition();
+        }
+
+        return null;
+    }
+
+    @Override
+    public MediaInfo getMedia()
+    {
+        if (mCastControlImp != null)
+        {
+            return mCastControlImp.getMedia();
+        }
+
+        return null;
+    }
+
 }

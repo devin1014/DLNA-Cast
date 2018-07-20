@@ -35,7 +35,7 @@ public abstract class BaseCastEventSubscription extends SubscriptionCallback
 {
     protected Handler mHandler = new Handler(Looper.getMainLooper());
 
-    protected ILogger mLogger = new DefaultLoggerImpl(getClass().getSimpleName() + Integer.toHexString(getClass().hashCode()));
+    protected ILogger mLogger = new DefaultLoggerImpl(getClass().getSimpleName() + "@" + Integer.toHexString(getClass().hashCode()));
 
     protected ICastControlListener mControlListener;
 
@@ -106,6 +106,8 @@ public abstract class BaseCastEventSubscription extends SubscriptionCallback
             catch (Exception e)
             {
                 e.printStackTrace();
+
+                mLogger.e(String.format("lastChanged={%s}", lastChange));
 
                 mLogger.e(e.getMessage());
             }
