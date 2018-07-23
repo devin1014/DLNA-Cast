@@ -1,5 +1,7 @@
 package com.neulion.android.upnpcast;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 
 import com.neulion.android.upnpcast.device.CastDevice;
@@ -24,8 +26,8 @@ import java.util.List;
  */
 public class NLDeviceRegistryListener extends DefaultRegistryListener
 {
-    private ILogger mLog = new DefaultLoggerImpl(NLDeviceRegistryListener.class.getSimpleName());
-
+    private ILogger mLog = new DefaultLoggerImpl(this);
+    private Handler mHandler = new Handler(Looper.getMainLooper());
     private List<CastDevice> mDeviceList = new ArrayList<>();
 
     /* Discovery performance optimization for very slow Android devices! */
@@ -64,49 +66,63 @@ public class NLDeviceRegistryListener extends DefaultRegistryListener
     public void localDeviceAdded(Registry registry, LocalDevice device)
     {
         mLog.d("localDeviceAdded:" + DeviceUtil.parseDevice(device));
-        //        deviceAdded(device); // 本地设备 已加入
+        //  deviceAdded(device); // 本地设备 已加入
     }
 
     @Override
     public void localDeviceRemoved(Registry registry, LocalDevice device)
     {
         mLog.w("localDeviceRemoved:" + DeviceUtil.parseDevice(device));
-        //        deviceRemoved(device); // 本地设备 已移除
+        // deviceRemoved(device); // 本地设备 已移除
     }
 
-    private void deviceAdded(Device device)
+    private void deviceAdded(final Device device)
     {
         if (device.getType().equals(mSearchDeviceType))
         {
             //mLog.w(String.format("[%s][%s] device type not matched.", device.getType(), device.getDisplayString()));
 
-            CastDevice castDevice = new CastDevice(device);
-
-            mDeviceList.add(castDevice);
-
-            for (OnRegistryDeviceListener listener : mOnRegistryDeviceListener)
+            mHandler.post(new Runnable()
             {
-                if (listener != null) // remove listener empty list now!
+                @Override
+                public void run()
                 {
-                    listener.onDeviceAdded(castDevice);
+                    CastDevice castDevice = new CastDevice(device);
+
+                    mDeviceList.add(castDevice);
+
+                    for (OnRegistryDeviceListener listener : mOnRegistryDeviceListener)
+                    {
+                        if (listener != null) // remove listener empty list now!
+                        {
+                            listener.onDeviceAdded(castDevice);
+                        }
+                    }
                 }
-            }
+            });
         }
     }
 
-    private void deviceRemoved(Device device)
+    private void deviceRemoved(final Device device)
     {
-        CastDevice castDevice = new CastDevice(device);
-
-        mDeviceList.remove(castDevice);
-
-        for (OnRegistryDeviceListener listener : mOnRegistryDeviceListener)
+        mHandler.post(new Runnable()
         {
-            if (listener != null) // remove listener empty list now!
+            @Override
+            public void run()
             {
-                listener.onDeviceRemoved(castDevice);
+                CastDevice castDevice = new CastDevice(device);
+
+                mDeviceList.remove(castDevice);
+
+                for (OnRegistryDeviceListener listener : mOnRegistryDeviceListener)
+                {
+                    if (listener != null) // remove listener empty list now!
+                    {
+                        listener.onDeviceRemoved(castDevice);
+                    }
+                }
             }
-        }
+        });
     }
 
     private DeviceType mSearchDeviceType = NLUpnpCastManager.DEVICE_TYPE_DMR;

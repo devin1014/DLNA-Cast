@@ -16,7 +16,7 @@ import java.util.TimerTask;
  */
 public abstract class BaseSession implements ICastSession
 {
-    protected final ILogger mLogger = new DefaultLoggerImpl(getClass().getSimpleName());
+    protected final ILogger mLogger = new DefaultLoggerImpl(this);
 
     private Handler mHandler = new Handler(Looper.getMainLooper());
 

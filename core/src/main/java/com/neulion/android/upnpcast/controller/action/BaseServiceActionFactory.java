@@ -17,7 +17,7 @@ import org.fourthline.cling.model.message.UpnpResponse;
  */
 public abstract class BaseServiceActionFactory
 {
-    private ILogger mLogger = new DefaultLoggerImpl(getClass().getSimpleName());
+    private ILogger mLogger = new DefaultLoggerImpl(this);
     private Handler mHandler = new Handler(Looper.getMainLooper());
 
     protected final void notifySuccess(final ActionCallbackListener listener, final ActionInvocation invocation, final Object... received)

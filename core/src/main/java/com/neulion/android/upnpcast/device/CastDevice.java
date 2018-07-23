@@ -40,14 +40,7 @@ public class CastDevice implements ICastDevice<Device>
     @Override
     public String getDescription()
     {
-        String result = String.format("[%s]", mDevice.getIdentity().getUdn().toString());
-
-        //        if (mDevice instanceof RemoteDevice)
-        //        {
-        //            result += "\n" + String.format("[%s]", mDevice.getDetails().getBaseURL());
-        //        }
-
-        return result;
+        return String.format("[%s]", mDevice.getIdentity().getUdn().toString());
     }
 
     @Override
@@ -59,5 +52,11 @@ public class CastDevice implements ICastDevice<Device>
         }
 
         return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return mDevice.hashCode();
     }
 }

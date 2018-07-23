@@ -42,7 +42,7 @@ public class ConnectSession extends BaseSession
 
         mListener = listener;
 
-        mLogger.d("created");
+        mLogger.d(getClass().getSimpleName() + " created:@" + Integer.toHexString(hashCode()));
     }
 
     @Override
@@ -62,7 +62,7 @@ public class ConnectSession extends BaseSession
     {
         mCountDownLatch = new CountDownLatch(TASK_COUNT);
 
-        checkConnection();
+        getTransportInfo();
 
         getMediaInfo();
 
@@ -88,6 +88,8 @@ public class ConnectSession extends BaseSession
                 }
                 else
                 {
+                    mLogger.w("onCastSessionTimeout");
+
                     mListener.onCastSessionTimeout();
                 }
             }
@@ -96,7 +98,9 @@ public class ConnectSession extends BaseSession
 
     private TransportInfo mTransportInfo = null;
 
-    private void checkConnection()
+    private int mTransportRetry = 3;
+
+    private void getTransportInfo()
     {
         ActionCallback action = mCastActionFactory.getAvService().getTransportInfo(new ActionCallbackListener()
         {
@@ -110,16 +114,27 @@ public class ConnectSession extends BaseSession
                 mLogger.d(String.format("getTransportInfo:[%s][%s]", transportInfo.getCurrentTransportStatus().getValue(), transportInfo.getCurrentTransportState().getValue()));
 
                 mCountDownLatch.countDown();
+
+                mTransportRetry = 3;
             }
 
             @Override
             public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
             {
-                mTransportInfo = null;
+                mTransportRetry--;
 
-                mLogger.e(String.format("[%s][%s][%s]", invocation.getAction().getName(), operation != null ? operation.getStatusMessage() : "", defaultMsg));
+                if (mTransportRetry > 0)
+                {
+                    getTransportInfo();
+                }
+                else
+                {
+                    mTransportInfo = null;
 
-                mCountDownLatch.countDown();
+                    mCountDownLatch.countDown();
+
+                    mTransportRetry = 3;
+                }
             }
         });
 
@@ -148,8 +163,6 @@ public class ConnectSession extends BaseSession
             public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
             {
                 mMediaInfo = null;
-
-                mLogger.e(String.format("[%s][%s][%s]", invocation.getAction().getName(), operation != null ? operation.getStatusMessage() : "", defaultMsg));
 
                 mCountDownLatch.countDown();
             }
@@ -180,8 +193,6 @@ public class ConnectSession extends BaseSession
             public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
             {
                 mCurrentVolume = -1;
-
-                mLogger.e(String.format("[%s][%s][%s]", invocation.getAction().getName(), operation != null ? operation.getStatusMessage() : "", defaultMsg));
 
                 mCountDownLatch.countDown();
             }

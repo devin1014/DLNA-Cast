@@ -47,7 +47,7 @@ public class MediaSession extends BaseSession
 
     public void start()
     {
-        stop();
+        stopTimer();
 
         startTimer(POSITION_INTERVAL, POSITION_INTERVAL);
     }
@@ -106,12 +106,6 @@ public class MediaSession extends BaseSession
                     {
                         //TODO
                     }
-                }
-
-                @Override
-                public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
-                {
-                    mLogger.e(String.format("[%s][%s][%s]", invocation.getAction().getName(), operation != null ? operation.getStatusMessage() : "", defaultMsg));
                 }
             });
 

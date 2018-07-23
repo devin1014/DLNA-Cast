@@ -18,7 +18,7 @@ import org.fourthline.cling.support.model.PositionInfo;
 
 public class NLCastRemoteControl extends AbstractRemoteControl
 {
-    private ILogger mLogger = new DefaultLoggerImpl(getClass().getSimpleName());
+    private ILogger mLogger = new DefaultLoggerImpl(this);
     private NLUpnpCastManager mCastManager;
     private final CastObject mCastObject;
 

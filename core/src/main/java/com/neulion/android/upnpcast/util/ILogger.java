@@ -26,6 +26,11 @@ public interface ILogger
         private final String TAG;
         private final boolean DEBUG;
 
+        public DefaultLoggerImpl(Object object)
+        {
+            this(object.getClass().getSimpleName() + "@" + Integer.toHexString(object.hashCode()));
+        }
+
         public DefaultLoggerImpl(String tag)
         {
             this(tag, Constants.DEBUG);

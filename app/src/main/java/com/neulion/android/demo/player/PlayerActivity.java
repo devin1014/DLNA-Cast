@@ -36,7 +36,7 @@ import org.fourthline.cling.support.model.TransportInfo;
 
 public class PlayerActivity extends AppCompatActivity
 {
-    private ILogger mLogger = new DefaultLoggerImpl(getClass().getSimpleName());
+    private ILogger mLogger = new DefaultLoggerImpl(this);
     private CommonVideoController mController;
     private DeviceAdapter mDeviceAdapter;
     private NLCastMediaConnection mCastMediaConnection;

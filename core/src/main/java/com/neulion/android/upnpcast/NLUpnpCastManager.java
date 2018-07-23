@@ -53,7 +53,7 @@ public class NLUpnpCastManager implements IUpnpCast
 
     private NLUpnpCastService mUpnpCastService;
 
-    private ILogger mLogger = new DefaultLoggerImpl(getClass().getSimpleName());
+    private ILogger mLogger = new DefaultLoggerImpl(this);
 
     private NLUpnpCastManager()
     {
@@ -195,7 +195,7 @@ public class NLUpnpCastManager implements IUpnpCast
     {
         if (mCastControlImp == null)
         {
-            mCastControlImp = new CastControlImp(mUpnpCastService, new CastEventListenerListWrapper(mListeners));
+            mCastControlImp = new CastControlImp(mUpnpCastService, mNLDeviceRegistryListener, new CastEventListenerListWrapper(mListeners));
         }
 
         mCastControlImp.connect(castDevice);

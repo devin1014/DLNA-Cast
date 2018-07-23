@@ -25,6 +25,7 @@ import org.fourthline.cling.support.renderingcontrol.lastchange.RenderingControl
 import org.fourthline.cling.support.renderingcontrol.lastchange.RenderingControlVariable.Volume;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * User: liuwei(wei.liu@neulion.com.com)
@@ -35,7 +36,7 @@ public abstract class BaseCastEventSubscription extends SubscriptionCallback
 {
     protected Handler mHandler = new Handler(Looper.getMainLooper());
 
-    protected ILogger mLogger = new DefaultLoggerImpl(getClass().getSimpleName() + "@" + Integer.toHexString(getClass().hashCode()));
+    protected final ILogger mLogger = new DefaultLoggerImpl(this);
 
     protected ICastControlListener mControlListener;
 
@@ -57,6 +58,8 @@ public abstract class BaseCastEventSubscription extends SubscriptionCallback
         mControlListener = listener;
 
         mEventCallback = eventCallback;
+
+        mLogger.d(String.format("new %s()@%s", getClass().getSimpleName(), Integer.toHexString(hashCode())));
     }
 
     @Override
@@ -81,7 +84,7 @@ public abstract class BaseCastEventSubscription extends SubscriptionCallback
     @CallSuper
     protected void ended(GENASubscription subscription, CancelReason reason, UpnpResponse responseStatus)
     {
-        mLogger.i(String.format("[ended] [%s][%s][%s]", subscription, reason, responseStatus));
+        mLogger.i(String.format("[ended] [subscription=%s][CancelReason=%s][UpnpResponse=%s]", subscription, reason, responseStatus));
 
         mEventCallback.ended(subscription, reason, responseStatus);
     }
@@ -91,7 +94,14 @@ public abstract class BaseCastEventSubscription extends SubscriptionCallback
     {
         mLogger.d(String.format("[eventReceived] [%s]", subscription));
 
-        mLogger.d(String.format("\r[currentValues] [%s]", subscription.getCurrentValues().keySet()));
+        Set<String> sets = subscription.getCurrentValues().keySet();
+
+        for (String key : sets)
+        {
+            String event = subscription.getCurrentValues().get(key).toString();
+
+            mLogger.i(String.format("{%s=%s}", key, event));
+        }
 
         String lastChange = parseLastChange(subscription);
 
@@ -107,8 +117,6 @@ public abstract class BaseCastEventSubscription extends SubscriptionCallback
             {
                 e.printStackTrace();
 
-                mLogger.e(String.format("lastChanged={%s}", lastChange));
-
                 mLogger.e(e.getMessage());
             }
 
@@ -122,13 +130,13 @@ public abstract class BaseCastEventSubscription extends SubscriptionCallback
     @CallSuper
     protected void processLastChange(@NonNull LastChange lastChange)
     {
-        mLogger.d("\r" + lastChange.toString());
+        //mLogger.d("\r" + lastChange.toString());
     }
 
     @Override
     protected void eventsMissed(GENASubscription subscription, int numberOfMissedEvents)
     {
-        mLogger.d(String.format("[eventsMissed] [%s][%s]", subscription, numberOfMissedEvents));
+        mLogger.w(String.format("[eventsMissed] [%s][%s]", subscription, numberOfMissedEvents));
     }
 
     protected abstract LastChangeParser getLastChangeParser();

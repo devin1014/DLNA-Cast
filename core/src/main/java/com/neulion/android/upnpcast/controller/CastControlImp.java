@@ -1,5 +1,7 @@
 package com.neulion.android.upnpcast.controller;
 
+import com.neulion.android.upnpcast.NLDeviceRegistryListener;
+import com.neulion.android.upnpcast.NLDeviceRegistryListener.OnRegistryDeviceListener;
 import com.neulion.android.upnpcast.controller.ConnectSession.ConnectSessionCallback;
 import com.neulion.android.upnpcast.controller.action.ActionCallbackListener;
 import com.neulion.android.upnpcast.controller.action.ICastActionFactory;
@@ -24,9 +26,9 @@ import org.fourthline.cling.support.model.TransportState;
  * Date: 2018-07-03
  * Time: 11:33
  */
-public class CastControlImp implements ICastControl
+public class CastControlImp implements ICastControl, OnRegistryDeviceListener
 {
-    private ILogger mLogger = new DefaultLoggerImpl(getClass().getSimpleName());
+    private ILogger mLogger = new DefaultLoggerImpl(this);
 
     private ControlPoint mControlPoint;
 
@@ -40,13 +42,15 @@ public class CastControlImp implements ICastControl
 
     private CastDevice mCastDevice;
 
-    public CastControlImp(NLUpnpCastService service, ICastEventListener listener)
+    public CastControlImp(NLUpnpCastService service, NLDeviceRegistryListener registryListener, ICastEventListener listener)
     {
         mLogger.d("new CastControlImp()");
 
         mControlPoint = service.getControlPoint();
 
         mCastEventListener = new CastEventListener(listener);
+
+        registryListener.addRegistryDeviceListener(this);
     }
 
     public void bindNLUpnpCastService(NLUpnpCastService service)
@@ -99,6 +103,8 @@ public class CastControlImp implements ICastControl
         mConnectSession = new ConnectSession(mControlPoint, mCastActionFactory, mConnectSessionCallback);
 
         mConnectSession.start();
+
+        mSessionTimeoutDevice = null;
     }
 
     @Override
@@ -125,7 +131,29 @@ public class CastControlImp implements ICastControl
         }
     }
 
+    @Override
+    public void onDeviceAdded(CastDevice device)
+    {
+        if (mSessionTimeoutDevice != null && mSessionTimeoutDevice.equals(device))
+        {
+            connect(device);
+        }
+    }
+
+    @Override
+    public void onDeviceRemoved(CastDevice device)
+    {
+        if (isConnected() && mCastDevice.equals(device))
+        {
+            mSessionTimeoutDevice = device;
+
+            disconnect();
+        }
+    }
+
     private MediaInfo mMediaInfo;
+
+    private CastDevice mSessionTimeoutDevice;
 
     private ConnectSessionCallback mConnectSessionCallback = new ConnectSessionCallback()
     {
@@ -158,6 +186,8 @@ public class CastControlImp implements ICastControl
         @Override
         public void onCastSessionTimeout()
         {
+            mSessionTimeoutDevice = mCastDevice;
+
             disconnect();
         }
     };
@@ -166,6 +196,11 @@ public class CastControlImp implements ICastControl
     public boolean isConnected()
     {
         return checkConnection();
+    }
+
+    public CastDevice getCastDevice()
+    {
+        return mCastDevice;
     }
 
     // ------------------------------------------------------------------------------------------------
