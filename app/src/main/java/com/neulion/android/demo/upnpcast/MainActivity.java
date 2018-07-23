@@ -250,13 +250,15 @@ public class MainActivity extends AppCompatActivity
         }
 
         @Override
-        public void onConnected(@NonNull CastDevice castDevice, @NonNull TransportInfo transportInfo, @Nullable MediaInfo mediaInfo)
+        public void onConnected(@NonNull CastDevice castDevice, @NonNull TransportInfo transportInfo, @Nullable MediaInfo mediaInfo, int volume)
         {
             mCastDeviceInfo.setText(String.format("设备状态: [%s] [已连接]", castDevice.getName()));
 
             mCastStatusInfo.setText(String.format("播放状态: [%s]", transportInfo.getCurrentTransportState().getValue()));
 
             mCastMediaInfo.setText(String.format("视频信息: [%s]", mediaInfo != null ? mediaInfo.getCurrentURI() : "NULL"));
+
+            mVolumeBar.setProgress(volume);
 
             mDeviceAdapter.setSelectedDevice(castDevice);
 

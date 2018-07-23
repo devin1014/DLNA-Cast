@@ -86,18 +86,25 @@ public class MediaSession extends BaseSession
                 @Override
                 public void success(ActionInvocation invocation, Object... received)
                 {
-                    PositionInfo positionInfo = (PositionInfo) received[0];
+                    final PositionInfo positionInfo = (PositionInfo) received[0];
 
                     if (index % 10 == 0)
                     {
                         mLogger.d(positionInfo.toString());
                     }
 
-                    mControlListener.onUpdatePositionInfo(positionInfo);
+                    notifyRunnable(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            mControlListener.onUpdatePositionInfo(positionInfo);
+                        }
+                    });
 
                     if (!mSubscriptionCallback)
                     {
-
+                        //TODO
                     }
                 }
 

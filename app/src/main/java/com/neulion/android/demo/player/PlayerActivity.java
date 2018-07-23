@@ -144,7 +144,9 @@ public class PlayerActivity extends AppCompatActivity
         @Override
         public boolean onRequestRestart(Long seekPosition)
         {
-            mLogger.e(String.format("onRequestRestart: [%s ms]", seekPosition));
+            mLogger.w("----------------------------------------------------------------------------");
+            mLogger.w(String.format("onRequestRestart: [%s ms]", seekPosition != null ? seekPosition : 0));
+            mLogger.w("----------------------------------------------------------------------------");
 
             boolean connected = NLUpnpCastManager.getInstance().isConnected();
 
@@ -215,7 +217,7 @@ public class PlayerActivity extends AppCompatActivity
         }
 
         @Override
-        public void onConnected(@NonNull CastDevice castDevice, @NonNull TransportInfo transportInfo, @Nullable MediaInfo mediaInfo)
+        public void onConnected(@NonNull CastDevice castDevice, @NonNull TransportInfo transportInfo, @Nullable MediaInfo mediaInfo, int volume)
         {
             mCastMediaConnection.setEnabled(true);
 

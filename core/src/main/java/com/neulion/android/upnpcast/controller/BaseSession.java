@@ -1,5 +1,8 @@
 package com.neulion.android.upnpcast.controller;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import com.neulion.android.upnpcast.util.ILogger;
 import com.neulion.android.upnpcast.util.ILogger.DefaultLoggerImpl;
 
@@ -14,6 +17,8 @@ import java.util.TimerTask;
 public abstract class BaseSession implements ICastSession
 {
     protected final ILogger mLogger = new DefaultLoggerImpl(getClass().getSimpleName());
+
+    private Handler mHandler = new Handler(Looper.getMainLooper());
 
     private Timer mTimer;
 
@@ -53,6 +58,18 @@ public abstract class BaseSession implements ICastSession
         mTimer = null;
 
         mIndex = 0;
+    }
+
+    protected final void notifyRunnable(Runnable r)
+    {
+        if (Looper.myLooper() == Looper.getMainLooper())
+        {
+            r.run();
+        }
+        else
+        {
+            mHandler.post(r);
+        }
     }
 
     @Override

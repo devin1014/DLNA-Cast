@@ -32,11 +32,11 @@ public class CastEventListenerWrapper implements ICastEventListener
     }
 
     @Override
-    public void onConnected(@NonNull CastDevice castDevice, @NonNull TransportInfo transportInfo, MediaInfo mediaInfo)
+    public void onConnected(@NonNull CastDevice castDevice, @NonNull TransportInfo transportInfo, MediaInfo mediaInfo, int volume)
     {
         if (mListener != null)
         {
-            mListener.onConnected(castDevice, transportInfo, mediaInfo);
+            mListener.onConnected(castDevice, transportInfo, mediaInfo, volume);
         }
     }
 

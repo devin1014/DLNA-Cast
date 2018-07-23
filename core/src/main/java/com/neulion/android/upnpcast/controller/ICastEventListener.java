@@ -17,7 +17,7 @@ public interface ICastEventListener extends ICastControlListener
 {
     void onConnecting(@NonNull CastDevice castDevice);
 
-    void onConnected(@NonNull CastDevice castDevice, @NonNull TransportInfo transportInfo, @Nullable MediaInfo mediaInfo);
+    void onConnected(@NonNull CastDevice castDevice, @NonNull TransportInfo transportInfo, @Nullable MediaInfo mediaInfo, int volume);
 
     void onDisconnect();
 }

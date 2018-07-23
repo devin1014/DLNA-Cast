@@ -9,10 +9,9 @@ import org.fourthline.cling.model.action.ActionInvocation;
 import org.fourthline.cling.model.message.UpnpResponse;
 import org.fourthline.cling.support.model.MediaInfo;
 import org.fourthline.cling.support.model.TransportInfo;
-import org.fourthline.cling.support.model.TransportState;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * User: liuwei(wei.liu@neulion.com.com)
@@ -21,15 +20,16 @@ import java.util.TimerTask;
  */
 public class ConnectSession extends BaseSession
 {
+    private static final int TASK_COUNT = 3;
     private static final int POSITION_INTERVAL = 60 * 1000; // 1min
     private ControlPoint mControlPoint;
     private ICastActionFactory mCastActionFactory;
     private ConnectSessionCallback mListener;
-    private Timer mConnectRetryTimer;
+    private CountDownLatch mCountDownLatch;
 
     public interface ConnectSessionCallback
     {
-        void onCastSession(TransportInfo transportInfo, MediaInfo mediaInfo);
+        void onCastSession(TransportInfo transportInfo, MediaInfo mediaInfo, int volume);
 
         void onCastSessionTimeout();
     }
@@ -60,10 +60,41 @@ public class ConnectSession extends BaseSession
     @Override
     protected void onInterval(int index)
     {
+        mCountDownLatch = new CountDownLatch(TASK_COUNT);
+
         checkConnection();
+
+        getMediaInfo();
+
+        getVolume();
+
+        try
+        {
+            mCountDownLatch.await(5, TimeUnit.SECONDS);
+        }
+        catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
+
+        notifyRunnable(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                if (mTransportInfo != null)
+                {
+                    mListener.onCastSession(mTransportInfo, mMediaInfo, mCurrentVolume);
+                }
+                else
+                {
+                    mListener.onCastSessionTimeout();
+                }
+            }
+        });
     }
 
-    private int mConnectErrorCount = 0;
+    private TransportInfo mTransportInfo = null;
 
     private void checkConnection()
     {
@@ -74,57 +105,30 @@ public class ConnectSession extends BaseSession
             {
                 TransportInfo transportInfo = (TransportInfo) received[0];
 
+                mTransportInfo = transportInfo;
+
                 mLogger.d(String.format("getTransportInfo:[%s][%s]", transportInfo.getCurrentTransportStatus().getValue(), transportInfo.getCurrentTransportState().getValue()));
 
-                if (TransportState.PLAYING.getValue().equals(transportInfo.getCurrentTransportState().getValue()) ||
-                        TransportState.PAUSED_PLAYBACK.getValue().equals(transportInfo.getCurrentTransportState().getValue()))
-                {
-                    getMediaInfo(transportInfo);
-                }
-                else
-                {
-                    mListener.onCastSession(transportInfo, null);
-                }
-
-                if (mConnectRetryTimer != null)
-                {
-                    mConnectRetryTimer.cancel();
-
-                    mConnectRetryTimer = null;
-                }
-
-                mConnectErrorCount = 0;
+                mCountDownLatch.countDown();
             }
 
             @Override
             public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
             {
+                mTransportInfo = null;
+
                 mLogger.e(String.format("[%s][%s][%s]", invocation.getAction().getName(), operation != null ? operation.getStatusMessage() : "", defaultMsg));
 
-                mConnectErrorCount++;
-
-                if (mConnectRetryTimer != null)
-                {
-                    mConnectRetryTimer.cancel();
-                }
-
-                if (mConnectErrorCount >= 3)
-                {
-                    mListener.onCastSessionTimeout();
-                }
-                else
-                {
-                    mConnectRetryTimer = new Timer();
-
-                    mConnectRetryTimer.schedule(mTimerTask, 3 * 1000);
-                }
+                mCountDownLatch.countDown();
             }
         });
 
         mControlPoint.execute(action);
     }
 
-    private void getMediaInfo(final TransportInfo transportInfo)
+    private MediaInfo mMediaInfo = null;
+
+    private void getMediaInfo()
     {
         ActionCallback action = mCastActionFactory.getAvService().getMediaInfo(new ActionCallbackListener()
         {
@@ -133,29 +137,56 @@ public class ConnectSession extends BaseSession
             {
                 MediaInfo mediaInfo = (MediaInfo) received[0];
 
+                mMediaInfo = mediaInfo;
+
                 mLogger.d(String.format("getMediaInfo:[%s][%s]", mediaInfo.getCurrentURI(), mediaInfo.getMediaDuration()));
 
-                mListener.onCastSession(transportInfo, mediaInfo);
+                mCountDownLatch.countDown();
             }
 
             @Override
             public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
             {
+                mMediaInfo = null;
+
                 mLogger.e(String.format("[%s][%s][%s]", invocation.getAction().getName(), operation != null ? operation.getStatusMessage() : "", defaultMsg));
 
-                mListener.onCastSession(transportInfo, null);
+                mCountDownLatch.countDown();
             }
         });
 
         mControlPoint.execute(action);
     }
 
-    private TimerTask mTimerTask = new TimerTask()
+    private int mCurrentVolume = -1;
+
+    private void getVolume()
     {
-        @Override
-        public void run()
+        ActionCallback action = mCastActionFactory.getRenderService().getVolumeAction(new ActionCallbackListener()
         {
-            checkConnection();
-        }
-    };
+            @Override
+            public void success(ActionInvocation invocation, Object... received)
+            {
+                int volume = (int) received[0];
+
+                mCurrentVolume = volume;
+
+                mLogger.d(String.format("getVolume:[%s]", volume));
+
+                mCountDownLatch.countDown();
+            }
+
+            @Override
+            public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
+            {
+                mCurrentVolume = -1;
+
+                mLogger.e(String.format("[%s][%s][%s]", invocation.getAction().getName(), operation != null ? operation.getStatusMessage() : "", defaultMsg));
+
+                mCountDownLatch.countDown();
+            }
+        });
+
+        mControlPoint.execute(action);
+    }
 }

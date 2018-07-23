@@ -130,13 +130,13 @@ public class CastControlImp implements ICastControl
     private ConnectSessionCallback mConnectSessionCallback = new ConnectSessionCallback()
     {
         @Override
-        public void onCastSession(TransportInfo transportInfo, MediaInfo mediaInfo)
+        public void onCastSession(TransportInfo transportInfo, MediaInfo mediaInfo, int volume)
         {
             mMediaInfo = mediaInfo;
 
             if (!mConnected)
             {
-                mCastEventListener.onConnected(mCastDevice, transportInfo, mediaInfo);
+                mCastEventListener.onConnected(mCastDevice, transportInfo, mediaInfo, volume);
             }
 
             mConnected = true;

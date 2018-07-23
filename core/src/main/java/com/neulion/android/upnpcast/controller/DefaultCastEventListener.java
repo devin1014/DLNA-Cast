@@ -67,7 +67,7 @@ public class DefaultCastEventListener implements ICastEventListener
     }
 
     @Override
-    public void onConnected(@NonNull CastDevice castDevice, @NonNull TransportInfo transportInfo, @Nullable MediaInfo mediaInfo)
+    public void onConnected(@NonNull CastDevice castDevice, @NonNull TransportInfo transportInfo, @Nullable MediaInfo mediaInfo, int volume)
     {
     }
 
