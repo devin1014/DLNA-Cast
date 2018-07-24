@@ -13,7 +13,8 @@
         <!--dlna cast-->
         <activity
             android:name="com.neulion.android.demo.upnpcast.MainActivity"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
