@@ -26,31 +26,6 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".player.NLCastVideoPlayerActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:launchMode="singleTop"
-            android:theme="@style/PlayerTheme" />
-
-        <!--service-->
-        <service android:name=".NLUpnpRendererService" />
-
-        <!--receiver-->
-        <receiver android:name=".receiver.CastServiceKeepReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
-            </intent-filter>
-
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
-                <action android:name="android.net.wifi.STATE_CHANGE" />
-            </intent-filter>
-        </receiver>
-
     </application>
 
 </manifest>

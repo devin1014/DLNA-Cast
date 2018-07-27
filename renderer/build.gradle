@@ -28,24 +28,12 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
+    implementation project(':core_renderer')
+
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:design:27.1.1'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-
-    // NeuPlayer
-    implementation("com.neulion.android.media:NeuPlayer:5.5.3") {
-        exclude group: 'com.android.support'
-    }
-
-    // Cling library
-    implementation 'org.fourthline.cling:cling-core:2.1.1'
-    implementation 'org.fourthline.cling:cling-support:2.1.1'
-
-    // Jetty library
-    implementation 'org.eclipse.jetty:jetty-server:8.1.18.v20150929'
-    implementation 'org.eclipse.jetty:jetty-servlet:8.1.18.v20150929'
-    implementation 'org.eclipse.jetty:jetty-client:8.1.18.v20150929'
 }

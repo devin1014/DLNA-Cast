@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
+import com.neulion.android.upnpcast.renderer.NLUpnpRendererService;
+
 /**
  * User: liuwei(wei.liu@neulion.com.com)
  * Date: 2018-07-25

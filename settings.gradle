@@ -1,1 +1,1 @@
-include ':app', ':core', ':renderer'
+include ':app', ':core', ':renderer', ':core_renderer'

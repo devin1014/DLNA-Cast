@@ -2,8 +2,4 @@
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar" />
 
-    <style name="PlayerTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:windowFullscreen">true</item>
-    </style>
-
 </resources>

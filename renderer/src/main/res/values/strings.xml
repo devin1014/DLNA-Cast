@@ -2,47 +2,5 @@
 <resources>
 
     <string name="app_name">Media Renderer</string>
-    <string name="selectmode">Select Mode</string>
-    <string name="running_label">Media Renderer</string>
-    <string name="running_summary_stopped">Toggle the state of the renderer</string>
-    <string name="running_summary_started">Server running</string>
-    <string name="running_summary_failed">Failed to start the Media renderer, not connected to the local network (wifi or ethernet)?</string>
-    <string name="select_label">Select Media</string>
-    <string name="select_summary">Click to select media.</string>
-    <string name="running_select_summary">Please stop the server before, You can select media.</string>
-    <string name="settings_label">Settings</string>
-    <string name="portnumber_label">Device Name</string>
-    <string name="acceptwifi_label">Accept connection from wifi</string>
-    <string name="extra_label">Extra</string>
-    <string name="help_label">Help...</string>
-    <string name="about_label">About...</string>
-    <string name="help_dlg_title">Media Renderer Help</string>
-    <string name="help_dlg_message">\
-Thanks for using Media Server (App Media Renderer)!\n\n\
-\
-This application allows you to run media renderer on your android device. This means that any
-program can access the media files on your device while the Media server is running.\n\n
-\
-If something is not working the way you expect it to, please report it to Kak App.
-(catalogx@gmail.com).\n\n\</string>
-    <string name="about_dlg_title">Media Renderer About</string>
-    <string name="about_dlg_message"><b>Description: </b> Media Renderer (App Media Renderer) allows you to run an media renderer on your android device.\n\n\ <b>License: </b>  GNU General Public License v3.0\n\n</string>
-    <string name="notif_server_starting">Starting at %s</string>
-    <string name="notif_title">Media Renderer is running</string>
-    <string name="notif_text">at %s</string>
-    <string name="notif_stop_text">Stop Renderer</string>
-    <string name="nsd_servername_postfix">Media Renderer</string>
-    <string name="cant_get_url">Can\'t retrieve url</string>
-    <string name="ok">OK</string>
-    <string name="wifi_state_receiver_label">WifiStateReceiver</string>
-    <string name="pst_connecting">connecting</string>
-    <string name="pst_connected">connected</string>
-    <string name="pst_failed">failed</string>
-    <string name="pst_unreachable">unreachable</string>
-    <string name="pst_disconnected">disconnected</string>
-    <string name="storage_warning">Warning: storage is not available. You may want to unmount it.</string>
-    <string name="widget_name">Media Renderer Widget</string>
-    <string name="value_version">2.0</string>
-    <string name="version">App version</string>
 
 </resources>
