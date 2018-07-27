@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:name="com.neulion.android.demo.render.RendererApplication"
@@ -17,11 +18,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
 
-        <activity
-            android:name=".MainActivity"
-            android:configChanges="orientation|keyboardHidden"
-            android:exported="true"
-            android:screenOrientation="portrait">
+        <activity android:name=".MainActivity2">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -30,36 +27,27 @@
         </activity>
 
         <activity
-            android:name=".MediaRendererActivity"
+            android:name=".player.NLCastVideoPlayerActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:launchMode="singleTask"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
-        </activity>
+            android:launchMode="singleTop"
+            android:theme="@style/PlayerTheme" />
 
-        <service android:name=".MediaRendererService" />
+        <!--service-->
+        <service android:name=".NLUpnpRendererService" />
 
-        <receiver android:name=".NetworkStateChangeReceiver">
+        <!--receiver-->
+        <receiver android:name=".receiver.CastServiceKeepReceiver">
             <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
                 <action android:name="android.net.wifi.STATE_CHANGE" />
-                <action android:name="android.net.wifi.supplicant.CONNECTION_CHANGE" />
-            </intent-filter>
-        </receiver>
-
-        <receiver
-            android:name=".MediaNotificationReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="RENDER_STARTED" />
-                <action android:name="RENDER_STOPPED" />
-            </intent-filter>
-        </receiver>
-
-        <receiver
-            android:name=".ServiceStartStopReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="ACTION_START_RENDER" />
-                <action android:name="ACTION_STOP_RENDER" />
             </intent-filter>
         </receiver>
 

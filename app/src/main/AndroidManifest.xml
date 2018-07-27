@@ -25,7 +25,13 @@
         <activity
             android:name="com.neulion.android.demo.player.PlayerActivity"
             android:configChanges="screenSize|orientation"
-            android:screenOrientation="user" />
+            android:screenOrientation="user">
+            <intent-filter>
+                <action android:name="android.intent.action.DLNA_CAST" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="http|https" />
+            </intent-filter>
+        </activity>
 
     </application>
 

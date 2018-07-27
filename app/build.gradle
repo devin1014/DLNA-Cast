@@ -35,11 +35,6 @@ dependencies {
     implementation "com.android.support:recyclerview-v7:27.1.1"
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
 
-    // Google Cast
-    //implementation "com.android.support:mediarouter-v7:27.1.1"
-    //implementation "com.google.android.gms:play-services-cast-framework:11.8.0"
-    //implementation 'com.googlecode.android-query:android-query:0.25.9'
-
     // NeuPlayer
     implementation("com.neulion.android.media:NeuPlayer:5.5.3") {
         exclude group: 'com.android.support'

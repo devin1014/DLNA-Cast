@@ -1,14 +1,12 @@
 package com.neulion.android.demo.render.upnp;
 
-import com.neulion.android.upnpcast.util.ILogger.DefaultLoggerImpl;
-
 import org.fourthline.cling.support.connectionmanager.ConnectionManagerService;
 import org.fourthline.cling.support.model.Protocol;
 import org.fourthline.cling.support.model.ProtocolInfo;
 
-public class DefConnectionManagerService extends ConnectionManagerService
+public class RendererConnectionManagerService extends ConnectionManagerService
 {
-    public DefConnectionManagerService()
+    public RendererConnectionManagerService()
     {
         try
         {
@@ -17,7 +15,7 @@ public class DefConnectionManagerService extends ConnectionManagerService
         }
         catch (IllegalArgumentException ex)
         {
-            new DefaultLoggerImpl(this).e(ex.getMessage());
+            ex.printStackTrace();
         }
     }
 }
