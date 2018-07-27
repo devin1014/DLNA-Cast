@@ -58,7 +58,7 @@ public class NLCastVideoPlayerActivity extends AppCompatActivity
 
     private CommonVideoController mVideoController;
 
-    private CastControlImp mCastControlImp;
+    private NLCastVideoPlayerControlImp mCastControlImp;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
@@ -179,7 +179,7 @@ public class NLCastVideoPlayerActivity extends AppCompatActivity
 
             mRendererService = ((RendererServiceBinder) service).getRendererService();
 
-            mRendererService.registerControlBridge(mCastControlImp = new CastControlImp(NLCastVideoPlayerActivity.this, mRendererService, mVideoController));
+            mRendererService.registerControlBridge(mCastControlImp = new NLCastVideoPlayerControlImp(NLCastVideoPlayerActivity.this, mRendererService, mVideoController));
 
             //TODO
             {

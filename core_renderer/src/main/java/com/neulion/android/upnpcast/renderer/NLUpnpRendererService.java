@@ -64,16 +64,18 @@ public class NLUpnpRendererService extends AndroidUpnpServiceImpl
 
     private RendererServiceBinder mBinder = new RendererServiceBinder();
 
-    private CastControlListener mCastControlListener = new CastControlListener();
+    private CastControlListener mCastControlListener;
 
     private LocalDevice mLocalDevice;
 
     @Override
     public void onCreate()
     {
-        mLogger.i("onCreate");
+        mLogger.i("NLUpnpRendererService onCreate");
 
         super.onCreate();
+
+        mCastControlListener = new CastControlListener(getApplication());
 
         mAVTransportControls = new ConcurrentHashMap<>(1);
 
@@ -110,9 +112,9 @@ public class NLUpnpRendererService extends AndroidUpnpServiceImpl
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-        mLogger.i(String.format("onStartCommand[%s,%s,%s]", intent, flags, startId));
+        mLogger.i(String.format("NLUpnpRendererService onStartCommand[%s]", intent));
 
-        return super.onStartCommand(intent, flags, startId);
+        return START_STICKY;
     }
 
     @Override
@@ -142,7 +144,7 @@ public class NLUpnpRendererService extends AndroidUpnpServiceImpl
     @Override
     public void onDestroy()
     {
-        mLogger.w("onDestroy");
+        mLogger.w("NLUpnpRendererService onDestroy!!!");
 
         if (mLocalDevice != null)
         {
@@ -269,11 +271,6 @@ public class NLUpnpRendererService extends AndroidUpnpServiceImpl
     public Map<UnsignedIntegerFourBytes, IAVTransport> getAVTransportControls()
     {
         return mAVTransportControls;
-    }
-
-    public Map<UnsignedIntegerFourBytes, IAudioControl> getAudioControls()
-    {
-        return mAudioControls;
     }
 
     public void registerControlBridge(ICastControl bridge)

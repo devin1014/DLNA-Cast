@@ -35,11 +35,11 @@ public class AVTransportControlImp implements IAVTransport
 
     private final UnsignedIntegerFourBytes mInstanceId;
 
-    private volatile TransportInfo currentTransportInfo = new TransportInfo();
+    private volatile TransportInfo mTransportInfo = new TransportInfo();
 
-    private PositionInfo currentPositionInfo = new PositionInfo();
+    private PositionInfo mPositionInfo = new PositionInfo();
 
-    private MediaInfo currentMediaInfo = new MediaInfo();
+    private MediaInfo mMediaInfo = new MediaInfo();
 
     private TransportSettings mTransportSettings = new TransportSettings();
 
@@ -63,9 +63,9 @@ public class AVTransportControlImp implements IAVTransport
 
     public synchronized TransportAction[] getCurrentTransportActions()
     {
-        if (currentTransportInfo != null)
+        if (mTransportInfo != null)
         {
-            switch (currentTransportInfo.getCurrentTransportState())
+            switch (mTransportInfo.getCurrentTransportState())
             {
                 case STOPPED:
                     return TRANSPORT_ACTION_STOPPED;
@@ -88,24 +88,45 @@ public class AVTransportControlImp implements IAVTransport
     @Override
     public MediaInfo getMediaInfo()
     {
-        return currentMediaInfo;
+        mLogger.d(String.format("getMediaInfo: currentURI=[%s]", mMediaInfo.getCurrentURI()));
+        mLogger.d(String.format("getMediaInfo: currentURIMetaData=[%s]", mMediaInfo.getCurrentURIMetaData()));
+        mLogger.d(String.format("getMediaInfo: mediaDuration=[%s]", mMediaInfo.getMediaDuration()));
+        mLogger.d(String.format("getMediaInfo: nextURI=[%s]", mMediaInfo.getNextURI()));
+        mLogger.d(String.format("getMediaInfo: nextURIMetaData=[%s]", mMediaInfo.getNextURIMetaData()));
+
+        return mMediaInfo;
     }
+
+    private int mCountIndex = 0;
 
     @Override
     public PositionInfo getPositionInfo()
     {
-        return currentPositionInfo;
+        if (mCountIndex % 10 == 0)
+        {
+            mCountIndex = 0;
+
+            mLogger.d(String.format("getPositionInfo: %s", mPositionInfo));
+        }
+
+        mCountIndex++;
+
+        return mPositionInfo;
     }
 
     @Override
     public TransportInfo getTransportInfo()
     {
-        return currentTransportInfo;
+        mLogger.d(String.format("getTransportInfo: [%s][%s]", mTransportInfo.getCurrentTransportStatus(), mTransportInfo.getCurrentTransportState()));
+
+        return mTransportInfo;
     }
 
     @Override
     public TransportSettings getTransportSettings()
     {
+        mLogger.d(String.format("getTransportSettings: [%s][%s]", mTransportSettings.getPlayMode(), mTransportSettings.getRecQualityMode()));
+
         return mTransportSettings;
     }
 
@@ -141,9 +162,9 @@ public class AVTransportControlImp implements IAVTransport
         //            throw new AVTransportException(ErrorCode.INVALID_ARGS, "Only HTTP and file: resource identifiers are supported");
         //        }
 
-        currentMediaInfo = new MediaInfo(currentURI, currentURIMetaData, getInstanceId(), "", StorageMedium.NETWORK);
+        mMediaInfo = new MediaInfo(currentURI, currentURIMetaData, getInstanceId(), "", StorageMedium.NETWORK);
 
-        currentPositionInfo = new PositionInfo(1, currentURIMetaData, currentURI);
+        mPositionInfo = new PositionInfo(1, currentURIMetaData, currentURI);
 
         if (mApplicationContext != null)
         {
@@ -238,12 +259,12 @@ public class AVTransportControlImp implements IAVTransport
     @Override
     public void setCurrentPosition(long position)
     {
-        currentPositionInfo.setRelTime(CastUtils.getStringTime(position));
+        mPositionInfo.setRelTime(CastUtils.getStringTime(position));
     }
 
     @Override
     public void setDuration(long duration)
     {
-        currentPositionInfo.setTrackDuration(CastUtils.getStringTime(duration));
+        mPositionInfo.setTrackDuration(CastUtils.getStringTime(duration));
     }
 }
