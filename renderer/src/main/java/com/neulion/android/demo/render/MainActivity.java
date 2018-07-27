@@ -12,14 +12,14 @@ import com.neulion.android.upnpcast.renderer.NLUpnpRendererService;
  * Date: 2018-07-25
  * Time: 16:15
  */
-public class MainActivity2 extends AppCompatActivity
+public class MainActivity extends AppCompatActivity
 {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_main_2);
+        setContentView(R.layout.activity_main);
 
         startService(new Intent(this, NLUpnpRendererService.class));
     }
