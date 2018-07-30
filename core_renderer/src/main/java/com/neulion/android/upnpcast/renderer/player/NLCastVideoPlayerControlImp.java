@@ -166,25 +166,6 @@ class NLCastVideoPlayerControlImp implements ICastControl
         private ILogger mILogger = new DefaultLoggerImpl(this);
 
         @Override
-        public void onOpen(MediaRequest request)
-        {
-            super.onOpen(request);
-        }
-
-        //        private synchronized void transportStateChanged(TransportState newState)
-        //        {
-        //            TransportState oldState = currentTransportInfo.getCurrentTransportState();
-        //
-        //            mLogger.d(String.format("transportStateChanged:[%s]->[%s]", oldState, newState));
-        //
-        //            currentTransportInfo = new TransportInfo(newState);
-        //
-        //            mAvTransportLastChange.setEventedValue(getInstanceId(), new AVTransportVariable.TransportState(newState),
-        //
-        //                    new AVTransportVariable.CurrentTransportActions(getCurrentTransportActions()));
-        //        }
-
-        @Override
         public void onPreparing(MediaRequest request)
         {
             mILogger.d("onPreparing: " + request.getDataSource());
@@ -197,12 +178,16 @@ class NLCastVideoPlayerControlImp implements ICastControl
             {
                 e.printStackTrace();
             }
+
+            updateMediaState(MediaControl.STATE_PREPARING);
         }
 
         @Override
         public void onPrepared()
         {
             mILogger.d("onPrepared");
+
+           updateMediaState(MediaControl.STATE_PREPARED);
 
             if (mAvTransportLastChange != null)
             {
@@ -215,6 +200,8 @@ class NLCastVideoPlayerControlImp implements ICastControl
         {
             mILogger.d("onResume: " + fromPause);
 
+            updateMediaState(MediaControl.STATE_PLAYING);
+
             if (mAvTransportLastChange != null)
             {
                 mAvTransportLastChange.setEventedValue(INSTANCE_ID, new AVTransportVariable.TransportState(TransportState.PLAYING));
@@ -226,6 +213,8 @@ class NLCastVideoPlayerControlImp implements ICastControl
         {
             mILogger.d("onPause: " + fromResume);
 
+            updateMediaState(MediaControl.STATE_PAUSED);
+
             if (mAvTransportLastChange != null)
             {
                 mAvTransportLastChange.setEventedValue(INSTANCE_ID, new AVTransportVariable.TransportState(TransportState.PAUSED_PLAYBACK));
@@ -236,6 +225,8 @@ class NLCastVideoPlayerControlImp implements ICastControl
         public void onCompletion()
         {
             mILogger.d("onCompletion");
+
+            updateMediaState(MediaControl.STATE_COMPLETED);
 
             if (mAvTransportLastChange != null)
             {
@@ -249,6 +240,8 @@ class NLCastVideoPlayerControlImp implements ICastControl
         public void onError(CharSequence errorMessage)
         {
             mILogger.d("onError: " + errorMessage);
+
+            updateMediaState(MediaControl.STATE_ERROR);
 
             if (mAvTransportLastChange != null)
             {
@@ -265,6 +258,8 @@ class NLCastVideoPlayerControlImp implements ICastControl
 
             if (!openingMedia)
             {
+                updateMediaState(MediaControl.STATE_IDLE);
+
                 if (mAvTransportLastChange != null)
                 {
                     mAvTransportLastChange.setEventedValue(INSTANCE_ID, new AVTransportVariable.TransportState(TransportState.STOPPED));
@@ -279,9 +274,19 @@ class NLCastVideoPlayerControlImp implements ICastControl
             {
                 IAVTransport avTransport = mRendererService.getAVTransportControls().get(id);
 
-                avTransport.setCurrentPosition(currentPosition);
+                avTransport.updateMediaCurrentPosition(currentPosition);
 
-                avTransport.setDuration(mMediaControl.getDuration());
+                avTransport.updateMediaDuration(mMediaControl.getDuration());
+            }
+        }
+
+        private void updateMediaState(int state)
+        {
+            for (UnsignedIntegerFourBytes id : mRendererService.getAVTransportControls().keySet())
+            {
+                IAVTransport avTransport = mRendererService.getAVTransportControls().get(id);
+
+                avTransport.updateMediaState(state);
             }
         }
     }

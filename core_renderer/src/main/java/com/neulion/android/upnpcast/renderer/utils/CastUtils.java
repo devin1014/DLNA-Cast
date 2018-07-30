@@ -3,6 +3,11 @@ package com.neulion.android.upnpcast.renderer.utils;
 import android.net.Uri;
 import android.text.TextUtils;
 
+import com.neulion.media.control.MediaControl;
+
+import org.fourthline.cling.support.model.TransportInfo;
+import org.fourthline.cling.support.model.TransportState;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Formatter;
@@ -94,5 +99,32 @@ public class CastUtils
         }
 
         return 0L;
+    }
+
+    public static TransportInfo getTransportInfo(int state)
+    {
+        switch (state)
+        {
+            case MediaControl.STATE_PREPARING:
+
+                return new TransportInfo(TransportState.TRANSITIONING);
+
+            case MediaControl.STATE_PREPARED:
+            case MediaControl.STATE_PLAYING:
+
+                return new TransportInfo(TransportState.PLAYING);
+
+            case MediaControl.STATE_PAUSED:
+
+                return new TransportInfo(TransportState.PAUSED_PLAYBACK);
+
+            case MediaControl.STATE_COMPLETED:
+            case MediaControl.STATE_ERROR:
+
+                return new TransportInfo(TransportState.STOPPED);
+
+        }
+
+        return new TransportInfo(TransportState.NO_MEDIA_PRESENT);
     }
 }

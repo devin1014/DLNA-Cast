@@ -58,9 +58,11 @@ public interface IRendererInterface
 
     interface IAVTransportUpdate
     {
-        void setCurrentPosition(long position);
+        void updateMediaCurrentPosition(long position);
 
-        void setDuration(long duration);
+        void updateMediaDuration(long duration);
+
+        void updateMediaState(int state);
     }
 
     interface IAVTransport extends IAVTransportControl, IAVTransportUpdate

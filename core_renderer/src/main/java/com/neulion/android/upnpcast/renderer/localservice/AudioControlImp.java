@@ -27,7 +27,7 @@ public class AudioControlImp implements IAudioControl
 
     private UnsignedIntegerTwoBytes mCurrentVolume;
 
-    private ICastControl mControlBridge;
+    private ICastControl mControlListener;
 
     @SuppressWarnings("ConstantConditions")
     public AudioControlImp(Context context, UnsignedIntegerFourBytes instanceId, ICastControl listener)
@@ -44,7 +44,7 @@ public class AudioControlImp implements IAudioControl
 
         mLastVolume = new UnsignedIntegerTwoBytes(volume * 100 / MAX_MUSIC);
 
-        mControlBridge = listener;
+        mControlListener = listener;
     }
 
     public UnsignedIntegerFourBytes getInstanceId()
@@ -84,7 +84,7 @@ public class AudioControlImp implements IAudioControl
 
         mCurrentVolume = desiredVolume;
 
-        mControlBridge.setVolume(volume);
+        mControlListener.setVolume(volume);
     }
 
     @Override

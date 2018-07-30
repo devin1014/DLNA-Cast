@@ -1,6 +1,7 @@
 package com.neulion.android.upnpcast.renderer.localservice;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.neulion.android.upnpcast.renderer.localservice.IRendererInterface.IAVTransport;
 import com.neulion.android.upnpcast.renderer.player.ICastControl;
@@ -257,14 +258,35 @@ public class AVTransportControlImp implements IAVTransport
     // - Update
     // ----------------------------------------------------------------------------------------------------------------
     @Override
-    public void setCurrentPosition(long position)
+    public void updateMediaCurrentPosition(long position)
     {
         mPositionInfo.setRelTime(CastUtils.getStringTime(position));
     }
 
     @Override
-    public void setDuration(long duration)
+    public void updateMediaDuration(long duration)
     {
+        if (TextUtils.isEmpty(mMediaInfo.getMediaDuration()))
+        {
+            mMediaInfo = new MediaInfo(
+                    mMediaInfo.getCurrentURI(),
+                    mMediaInfo.getCurrentURIMetaData(),
+                    getInstanceId(),
+                    CastUtils.getStringTime(duration),
+                    StorageMedium.NETWORK);
+        }
+
         mPositionInfo.setTrackDuration(CastUtils.getStringTime(duration));
+    }
+
+    @Override
+    public void updateMediaState(int state)
+    {
+        final TransportInfo oldInfo = mTransportInfo;
+
+        mTransportInfo = CastUtils.getTransportInfo(state);
+
+        mLogger.d(String.format("transportStateChanged:[%s]->[%s]", oldInfo.getCurrentTransportState(), mTransportInfo.getCurrentTransportState()));
+
     }
 }

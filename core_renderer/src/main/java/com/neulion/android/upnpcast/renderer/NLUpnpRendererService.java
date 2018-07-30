@@ -42,6 +42,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -52,6 +54,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class NLUpnpRendererService extends AndroidUpnpServiceImpl
 {
+    private static final int INTERVAL = 30 * 1000;
+
     private ILogger mLogger = new DefaultLoggerImpl(this);
 
     private Map<UnsignedIntegerFourBytes, IAVTransport> mAVTransportControls;
@@ -67,6 +71,8 @@ public class NLUpnpRendererService extends AndroidUpnpServiceImpl
     private CastControlListener mCastControlListener;
 
     private LocalDevice mLocalDevice;
+
+    private Timer mTimer;
 
     @Override
     public void onCreate()
@@ -107,6 +113,20 @@ public class NLUpnpRendererService extends AndroidUpnpServiceImpl
         {
             e.printStackTrace();
         }
+
+        mTimer = new Timer();
+
+        mTimer.schedule(new TimerTask()
+        {
+            @Override
+            public void run()
+            {
+                if (upnpService != null && mLocalDevice != null)
+                {
+                    upnpService.getRegistry().addDevice(mLocalDevice);
+                }
+            }
+        }, INTERVAL, INTERVAL);
     }
 
     @Override
