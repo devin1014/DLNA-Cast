@@ -4,7 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.neulion.android.upnpcast.renderer.localservice.IRendererInterface.IAVTransport;
-import com.neulion.android.upnpcast.renderer.player.ICastControl;
+import com.neulion.android.upnpcast.renderer.player.ICastMediaControl;
 import com.neulion.android.upnpcast.renderer.player.NLCastVideoPlayerActivity;
 import com.neulion.android.upnpcast.renderer.utils.CastUtils;
 import com.neulion.android.upnpcast.renderer.utils.ILogger;
@@ -46,9 +46,9 @@ public class AVTransportControlImp implements IAVTransport
 
     private Context mApplicationContext;
 
-    private ICastControl mControlListener;
+    private ICastMediaControl mControlListener;
 
-    public AVTransportControlImp(Context context, UnsignedIntegerFourBytes instanceId, ICastControl listener)
+    public AVTransportControlImp(Context context, UnsignedIntegerFourBytes instanceId, ICastMediaControl listener)
     {
         mApplicationContext = context.getApplicationContext();
 

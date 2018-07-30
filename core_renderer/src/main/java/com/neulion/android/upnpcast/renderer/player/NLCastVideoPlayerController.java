@@ -34,7 +34,7 @@ import java.net.URISyntaxException;
  * Date: 2018-07-26
  * Time: 18:30
  */
-class NLCastVideoPlayerControlImp implements ICastControl
+class NLCastVideoPlayerController implements ICastMediaControl
 {
     private MediaControl mMediaControl;
 
@@ -50,7 +50,7 @@ class NLCastVideoPlayerControlImp implements ICastControl
 
     private AudioManager mAudioManager;
 
-    NLCastVideoPlayerControlImp(Activity activity, NLUpnpRendererService service, CommonVideoController controller)
+    NLCastVideoPlayerController(Activity activity, NLUpnpRendererService service, CommonVideoController controller)
     {
         mActivity = activity;
 

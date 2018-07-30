@@ -4,9 +4,9 @@ import org.fourthline.cling.support.connectionmanager.ConnectionManagerService;
 import org.fourthline.cling.support.model.Protocol;
 import org.fourthline.cling.support.model.ProtocolInfo;
 
-public class RendererConnectionManagerService extends ConnectionManagerService
+public class RendererConnectionService extends ConnectionManagerService
 {
-    public RendererConnectionManagerService()
+    public RendererConnectionService()
     {
         try
         {

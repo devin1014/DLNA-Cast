@@ -3,7 +3,8 @@ package com.neulion.android.upnpcast.renderer.localservice;
 import android.content.Context;
 import android.media.AudioManager;
 
-import com.neulion.android.upnpcast.renderer.player.ICastControl;
+import com.neulion.android.upnpcast.renderer.localservice.IRendererInterface.IAudioControl;
+import com.neulion.android.upnpcast.renderer.player.ICastMediaControl;
 import com.neulion.android.upnpcast.renderer.utils.ILogger;
 import com.neulion.android.upnpcast.renderer.utils.ILogger.DefaultLoggerImpl;
 
@@ -27,10 +28,10 @@ public class AudioControlImp implements IAudioControl
 
     private UnsignedIntegerTwoBytes mCurrentVolume;
 
-    private ICastControl mControlListener;
+    private ICastMediaControl mControlListener;
 
     @SuppressWarnings("ConstantConditions")
-    public AudioControlImp(Context context, UnsignedIntegerFourBytes instanceId, ICastControl listener)
+    public AudioControlImp(Context context, UnsignedIntegerFourBytes instanceId, ICastMediaControl listener)
     {
         mInstanceId = instanceId;
 

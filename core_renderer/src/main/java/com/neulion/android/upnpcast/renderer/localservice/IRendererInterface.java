@@ -1,6 +1,7 @@
 package com.neulion.android.upnpcast.renderer.localservice;
 
 import org.fourthline.cling.binding.annotations.UpnpInputArgument;
+import org.fourthline.cling.model.types.UnsignedIntegerTwoBytes;
 import org.fourthline.cling.support.avtransport.AVTransportException;
 import org.fourthline.cling.support.model.DeviceCapabilities;
 import org.fourthline.cling.support.model.MediaInfo;
@@ -16,6 +17,9 @@ import org.fourthline.cling.support.model.TransportSettings;
  */
 public interface IRendererInterface
 {
+    // -------------------------------------------------------------------------------------------
+    // - AvTransport
+    // -------------------------------------------------------------------------------------------
     interface IAVTransportControl
     {
         void setAVTransportURI(@UpnpInputArgument(name = "CurrentURI", stateVariable = "AVTransportURI") String currentURI,
@@ -67,5 +71,19 @@ public interface IRendererInterface
 
     interface IAVTransport extends IAVTransportControl, IAVTransportUpdate
     {
+    }
+
+    // -------------------------------------------------------------------------------------------
+    // - Audio
+    // -------------------------------------------------------------------------------------------
+    interface IAudioControl
+    {
+        void setMute(String channelName, boolean desiredMute);
+
+        boolean getMute(String channelName);
+
+        void setVolume(String channelName, UnsignedIntegerTwoBytes desiredVolume);
+
+        UnsignedIntegerTwoBytes getVolume(String channelName);
     }
 }

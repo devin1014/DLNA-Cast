@@ -38,7 +38,7 @@ abstract class RendererThread extends Thread
     @Override
     public void run()
     {
-        mLogger.i("RenderThread running!");
+        mLogger.i(getClass().getSimpleName() + " running!");
 
         if (mRendererService != null)
         {
@@ -58,7 +58,7 @@ abstract class RendererThread extends Thread
             mLogger.w("NLUpnpRendererService is NULL!");
         }
 
-        mLogger.w("RenderThread exit!");
+        mLogger.w(getClass().getSimpleName() + " exit!");
 
         mActivity = null;
 
@@ -68,6 +68,12 @@ abstract class RendererThread extends Thread
     }
 
     public abstract void running(LocalDevice localDevice);
+
+    protected boolean isActivityAlive()
+    {
+        return mActivity != null && !mActivity.isActivityDestroy();
+    }
+
 
     // ---------------------------------------------------------------------------------------------------
     // - AvControl
@@ -94,7 +100,7 @@ abstract class RendererThread extends Thread
                 }
             }
 
-            while (mRendererService != null && mActivity != null && !mActivity.isDestroy())
+            while (mRendererService != null && isActivityAlive())
             {
                 try
                 {
@@ -135,7 +141,7 @@ abstract class RendererThread extends Thread
                 }
             }
 
-            while (mRendererService != null && mActivity != null && !mActivity.isDestroy())
+            while (mRendererService != null && isActivityAlive())
             {
                 try
                 {

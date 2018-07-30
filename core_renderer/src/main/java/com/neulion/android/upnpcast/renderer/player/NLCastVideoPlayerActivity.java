@@ -58,7 +58,7 @@ public class NLCastVideoPlayerActivity extends AppCompatActivity
 
     private CommonVideoController mVideoController;
 
-    private NLCastVideoPlayerControlImp mCastControlImp;
+    private NLCastVideoPlayerController mCastControlImp;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
@@ -141,7 +141,7 @@ public class NLCastVideoPlayerActivity extends AppCompatActivity
 
     private boolean mDestroy = false;
 
-    public boolean isDestroy()
+    public boolean isActivityDestroy()
     {
         return mDestroy;
     }
@@ -179,14 +179,12 @@ public class NLCastVideoPlayerActivity extends AppCompatActivity
 
             mRendererService = ((RendererServiceBinder) service).getRendererService();
 
-            mRendererService.registerControlBridge(mCastControlImp = new NLCastVideoPlayerControlImp(NLCastVideoPlayerActivity.this, mRendererService, mVideoController));
+            mRendererService.registerControlBridge(mCastControlImp = new NLCastVideoPlayerController(NLCastVideoPlayerActivity.this, mRendererService, mVideoController));
 
-            //TODO
-            {
-                new AvControlThread(NLCastVideoPlayerActivity.this, mRendererService, mVideoController).start();
+            //TODO: service maybe bind more than once!
+            new AvControlThread(NLCastVideoPlayerActivity.this, mRendererService, mVideoController).start();
 
-                new AudioControlThread(NLCastVideoPlayerActivity.this, mRendererService, mVideoController).start();
-            }
+            new AudioControlThread(NLCastVideoPlayerActivity.this, mRendererService, mVideoController).start();
         }
 
         @Override

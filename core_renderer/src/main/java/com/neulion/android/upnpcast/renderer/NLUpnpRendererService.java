@@ -8,13 +8,13 @@ import android.os.IBinder;
 
 import com.neulion.android.upnpcast.renderer.localservice.AVTransportControlImp;
 import com.neulion.android.upnpcast.renderer.localservice.AudioControlImp;
-import com.neulion.android.upnpcast.renderer.localservice.IAudioControl;
 import com.neulion.android.upnpcast.renderer.localservice.IRendererInterface.IAVTransport;
+import com.neulion.android.upnpcast.renderer.localservice.IRendererInterface.IAudioControl;
 import com.neulion.android.upnpcast.renderer.localservice.RendererAVTransportService;
 import com.neulion.android.upnpcast.renderer.localservice.RendererAudioControlService;
-import com.neulion.android.upnpcast.renderer.localservice.RendererConnectionManagerService;
-import com.neulion.android.upnpcast.renderer.player.CastControlListener;
-import com.neulion.android.upnpcast.renderer.player.ICastControl;
+import com.neulion.android.upnpcast.renderer.localservice.RendererConnectionService;
+import com.neulion.android.upnpcast.renderer.player.ICastMediaControl;
+import com.neulion.android.upnpcast.renderer.player.ICastMediaControl.CastMediaControlListener;
 import com.neulion.android.upnpcast.renderer.utils.ILogger;
 import com.neulion.android.upnpcast.renderer.utils.ILogger.DefaultLoggerImpl;
 
@@ -68,7 +68,7 @@ public class NLUpnpRendererService extends AndroidUpnpServiceImpl
 
     private RendererServiceBinder mBinder = new RendererServiceBinder();
 
-    private CastControlListener mCastControlListener;
+    private CastMediaControlListener mCastControlListener;
 
     private LocalDevice mLocalDevice;
 
@@ -81,7 +81,7 @@ public class NLUpnpRendererService extends AndroidUpnpServiceImpl
 
         super.onCreate();
 
-        mCastControlListener = new CastControlListener(getApplication());
+        mCastControlListener = new CastMediaControlListener(getApplication());
 
         mAVTransportControls = new ConcurrentHashMap<>(1);
 
@@ -166,6 +166,11 @@ public class NLUpnpRendererService extends AndroidUpnpServiceImpl
     {
         mLogger.w("NLUpnpRendererService onDestroy!!!");
 
+        if (mTimer != null)
+        {
+            mTimer.cancel();
+        }
+
         if (mLocalDevice != null)
         {
             upnpService.getRegistry().removeDevice(mLocalDevice);
@@ -218,14 +223,14 @@ public class NLUpnpRendererService extends AndroidUpnpServiceImpl
         final LocalServiceBinder localServiceBinder = new AnnotationLocalServiceBinder();
 
         // connect service
-        LocalService<RendererConnectionManagerService> connectionManagerService = localServiceBinder.read(RendererConnectionManagerService.class);
+        LocalService<RendererConnectionService> connectionManagerService = localServiceBinder.read(RendererConnectionService.class);
 
-        DefaultServiceManager<RendererConnectionManagerService> connectManager = new DefaultServiceManager<RendererConnectionManagerService>(connectionManagerService, RendererConnectionManagerService.class)
+        DefaultServiceManager<RendererConnectionService> connectManager = new DefaultServiceManager<RendererConnectionService>(connectionManagerService, RendererConnectionService.class)
         {
             @Override
-            protected RendererConnectionManagerService createServiceInstance()
+            protected RendererConnectionService createServiceInstance()
             {
-                return new RendererConnectionManagerService();
+                return new RendererConnectionService();
             }
         };
 
@@ -293,12 +298,12 @@ public class NLUpnpRendererService extends AndroidUpnpServiceImpl
         return mAVTransportControls;
     }
 
-    public void registerControlBridge(ICastControl bridge)
+    public void registerControlBridge(ICastMediaControl bridge)
     {
         mCastControlListener.register(bridge);
     }
 
-    public void unregisterControlBridge(ICastControl bridge)
+    public void unregisterControlBridge(ICastMediaControl bridge)
     {
         mCastControlListener.unregister(bridge);
     }

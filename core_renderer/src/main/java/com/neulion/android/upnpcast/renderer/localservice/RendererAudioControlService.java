@@ -1,5 +1,7 @@
 package com.neulion.android.upnpcast.renderer.localservice;
 
+import com.neulion.android.upnpcast.renderer.localservice.IRendererInterface.IAudioControl;
+
 import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
 import org.fourthline.cling.model.types.UnsignedIntegerTwoBytes;
 import org.fourthline.cling.support.lastchange.LastChange;
