@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.IBinder;
+import android.os.SystemClock;
 
 import com.neulion.android.upnpcast.renderer.localservice.AVTransportControlImp;
 import com.neulion.android.upnpcast.renderer.localservice.AudioControlImp;
@@ -18,11 +19,15 @@ import com.neulion.android.upnpcast.renderer.player.ICastMediaControl.CastMediaC
 import com.neulion.android.upnpcast.renderer.utils.ILogger;
 import com.neulion.android.upnpcast.renderer.utils.ILogger.DefaultLoggerImpl;
 
+import org.fourthline.cling.UpnpServiceConfiguration;
+import org.fourthline.cling.android.AndroidUpnpServiceConfiguration;
 import org.fourthline.cling.android.AndroidUpnpServiceImpl;
+import org.fourthline.cling.android.FixedAndroidLogHandler;
 import org.fourthline.cling.binding.LocalServiceBinder;
 import org.fourthline.cling.binding.annotations.AnnotationLocalServiceBinder;
 import org.fourthline.cling.model.DefaultServiceManager;
 import org.fourthline.cling.model.ValidationException;
+import org.fourthline.cling.model.meta.Device;
 import org.fourthline.cling.model.meta.DeviceDetails;
 import org.fourthline.cling.model.meta.DeviceIdentity;
 import org.fourthline.cling.model.meta.Icon;
@@ -30,9 +35,12 @@ import org.fourthline.cling.model.meta.LocalDevice;
 import org.fourthline.cling.model.meta.LocalService;
 import org.fourthline.cling.model.meta.ManufacturerDetails;
 import org.fourthline.cling.model.meta.ModelDetails;
+import org.fourthline.cling.model.meta.RemoteDevice;
 import org.fourthline.cling.model.types.UDADeviceType;
 import org.fourthline.cling.model.types.UDN;
 import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
+import org.fourthline.cling.registry.DefaultRegistryListener;
+import org.fourthline.cling.registry.Registry;
 import org.fourthline.cling.support.avtransport.lastchange.AVTransportLastChangeParser;
 import org.fourthline.cling.support.lastchange.LastChange;
 import org.fourthline.cling.support.lastchange.LastChangeAwareServiceManager;
@@ -41,11 +49,13 @@ import org.fourthline.cling.support.renderingcontrol.lastchange.RenderingControl
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * User: liuwei(wei.liu@neulion.com.com)
@@ -54,8 +64,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class NLUpnpRendererService extends AndroidUpnpServiceImpl
 {
-    private static final int INTERVAL = 30 * 1000;
-
     private ILogger mLogger = new DefaultLoggerImpl(this);
 
     private Map<UnsignedIntegerFourBytes, IAVTransport> mAVTransportControls;
@@ -72,12 +80,30 @@ public class NLUpnpRendererService extends AndroidUpnpServiceImpl
 
     private LocalDevice mLocalDevice;
 
-    private Timer mTimer;
+    @Override
+    protected UpnpServiceConfiguration createConfiguration()
+    {
+        return new AndroidUpnpServiceConfiguration()
+        {
+            @Override
+            public int getAliveIntervalMillis()
+            {
+                return 60 * 1000;
+            }
+        };
+    }
 
     @Override
     public void onCreate()
     {
         mLogger.i("NLUpnpRendererService onCreate");
+
+        org.seamless.util.logging.LoggingUtil.resetRootHandler(new FixedAndroidLogHandler());
+
+        if (Constants.DEBUG)
+        {
+            Logger.getLogger("org.fourthline.cling").setLevel(Level.FINEST);
+        }
 
         super.onCreate();
 
@@ -105,7 +131,9 @@ public class NLUpnpRendererService extends AndroidUpnpServiceImpl
         {
             mLocalDevice = createLocalDevice();
 
-            mLogger.i("create Device: " + mLocalDevice);
+            mLogger.i(String.format("[create local device]: %s", mLocalDevice));
+
+            upnpService.getRegistry().addListener(mDefaultRegistryListener);
 
             upnpService.getRegistry().addDevice(mLocalDevice);
         }
@@ -113,20 +141,6 @@ public class NLUpnpRendererService extends AndroidUpnpServiceImpl
         {
             e.printStackTrace();
         }
-
-        mTimer = new Timer();
-
-        mTimer.schedule(new TimerTask()
-        {
-            @Override
-            public void run()
-            {
-                if (upnpService != null && mLocalDevice != null)
-                {
-                    upnpService.getRegistry().addDevice(mLocalDevice);
-                }
-            }
-        }, INTERVAL, INTERVAL);
     }
 
     @Override
@@ -166,11 +180,6 @@ public class NLUpnpRendererService extends AndroidUpnpServiceImpl
     {
         mLogger.w("NLUpnpRendererService onDestroy!!!");
 
-        if (mTimer != null)
-        {
-            mTimer.cancel();
-        }
-
         if (mLocalDevice != null)
         {
             upnpService.getRegistry().removeDevice(mLocalDevice);
@@ -196,8 +205,8 @@ public class NLUpnpRendererService extends AndroidUpnpServiceImpl
 
         UDADeviceType deviceType = new UDADeviceType("MediaRenderer", 1);
 
-        DeviceDetails deviceDetails = new DeviceDetails("NLMediaRenderer Demo", new ManufacturerDetails(android.os.Build.MANUFACTURER),
-                new ModelDetails("MediaRenderer", "MediaRenderer", "1"));
+        DeviceDetails deviceDetails = new DeviceDetails("NLCastRendererDemo", new ManufacturerDetails(android.os.Build.MANUFACTURER),
+                new ModelDetails("NLMediaRenderer", "NLCast Renderer Demo", "1"));
 
         return new LocalDevice(deviceIdentity, deviceType, deviceDetails, generateDeviceIcon(), generateLocalServices());
     }
@@ -307,4 +316,39 @@ public class NLUpnpRendererService extends AndroidUpnpServiceImpl
     {
         mCastControlListener.unregister(bridge);
     }
+
+    // -------------------------------------------------------------------------------------------
+    // - Registry listener
+    // -------------------------------------------------------------------------------------------
+    private DefaultRegistryListener mDefaultRegistryListener = new DefaultRegistryListener()
+    {
+        @Override
+        public void deviceAdded(Registry registry, Device device)
+        {
+            mLogger.d(String.format("deviceAdded:[%s][%s]", device.getDetails().getFriendlyName(), device.getType().getType()));
+        }
+
+        @Override
+        public void deviceRemoved(Registry registry, Device device)
+        {
+            mLogger.w(String.format("deviceRemoved:[%s][%s]", device.getDetails().getFriendlyName(), device.getType().getType()));
+        }
+
+        private Map<URL, Long> mRemoteDevice = new HashMap<>();
+
+        @Override
+        public void remoteDeviceUpdated(Registry registry, RemoteDevice device)
+        {
+            long now = SystemClock.currentThreadTimeMillis();
+
+            Long value = mRemoteDevice.get(device.getIdentity().getDescriptorURL());
+
+            if (value == null || (now - value > 30 * 1000))
+            {
+                mLogger.d(String.format("    remoteDeviceUpdated:[%s][%s]", device.getDetails().getFriendlyName(), device.getType().getType()));
+
+                mRemoteDevice.put(device.getIdentity().getDescriptorURL(), now);
+            }
+        }
+    };
 }
