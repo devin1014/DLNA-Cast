@@ -13,6 +13,8 @@ public interface ILogger
 {
     String PREFIX_TAG = "4Droid_";
 
+    void v(String msg);
+
     void d(String msg);
 
     void i(String msg);
@@ -40,6 +42,15 @@ public interface ILogger
         {
             TAG = PREFIX_TAG + tag;
             DEBUG = log;
+        }
+
+        @Override
+        public void v(String msg)
+        {
+            if (DEBUG)
+            {
+                Log.v(TAG, msg);
+            }
         }
 
         @Override

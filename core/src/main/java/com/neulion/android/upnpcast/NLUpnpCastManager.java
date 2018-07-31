@@ -188,6 +188,15 @@ public class NLUpnpCastManager implements IUpnpCast
         }
     }
 
+    @Override
+    public void clear()
+    {
+        if (mUpnpCastService != null)
+        {
+            mUpnpCastService.get().getRegistry().removeAllRemoteDevices();
+        }
+    }
+
     private CastControlImp mCastControlImp;
 
     @Override

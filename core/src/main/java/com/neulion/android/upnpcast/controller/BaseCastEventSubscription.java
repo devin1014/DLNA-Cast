@@ -281,7 +281,7 @@ public abstract class BaseCastEventSubscription extends SubscriptionCallback
 
             final Volume volume = lastChange.getEventedValue(0, Volume.class);
 
-            if (volume != null)
+            if (volume != null && volume.getValue() != null)
             {
                 notifyCallback(new Runnable()
                 {

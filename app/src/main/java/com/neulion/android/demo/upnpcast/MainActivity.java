@@ -128,6 +128,8 @@ public class MainActivity extends AppCompatActivity
 
                 Toast.makeText(this, "开始搜索", Toast.LENGTH_SHORT).show();
 
+                NLUpnpCastManager.getInstance().clear();
+
                 NLUpnpCastManager.getInstance().search(NLUpnpCastManager.DEVICE_TYPE_DMR);
 
                 break;

@@ -16,4 +16,6 @@ public interface IUpnpCast extends ICastControl
     void search(DeviceType type);
 
     void search(DeviceType type, int maxSeconds);
+
+    void clear();
 }

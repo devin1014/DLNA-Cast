@@ -2,6 +2,7 @@ package com.neulion.android.upnpcast;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 
 import com.neulion.android.upnpcast.device.CastDevice;
@@ -16,8 +17,11 @@ import org.fourthline.cling.model.types.DeviceType;
 import org.fourthline.cling.registry.DefaultRegistryListener;
 import org.fourthline.cling.registry.Registry;
 
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * User: liuwei(wei.liu@neulion.com.com)
@@ -60,6 +64,23 @@ public class NLDeviceRegistryListener extends DefaultRegistryListener
         mLog.w("remoteDeviceRemoved:" + DeviceUtil.parseDevice(device));
 
         deviceRemoved(device);
+    }
+
+    private Map<URL, Long> mRemoteDevice = new HashMap<>();
+
+    @Override
+    public void remoteDeviceUpdated(Registry registry, RemoteDevice device)
+    {
+        long now = SystemClock.currentThreadTimeMillis();
+
+        Long value = mRemoteDevice.get(device.getIdentity().getDescriptorURL());
+
+        if (value == null || (now - value > 30 * 1000))
+        {
+            mLog.d(String.format("    remoteDeviceUpdated:[%s][%s]", device.getType().getType(), device.getDetails().getFriendlyName()));
+
+            mRemoteDevice.put(device.getIdentity().getDescriptorURL(), now);
+        }
     }
 
     @Override
