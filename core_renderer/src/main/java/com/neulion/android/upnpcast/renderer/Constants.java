@@ -15,5 +15,6 @@ public class Constants
 
         public static final String EXTRA_URL = PACKAGE + "extra_url";
         public static final String EXTRA_METADATA = PACKAGE + "extra_metadata";
+        public static final String DEVICE_ID = PACKAGE + "device_uuid";
     }
 }

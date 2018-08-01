@@ -7,6 +7,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.IBinder;
 import android.os.SystemClock;
 
+import com.neulion.android.upnpcast.renderer.Constants.Key;
 import com.neulion.android.upnpcast.renderer.localservice.AVTransportControlImp;
 import com.neulion.android.upnpcast.renderer.localservice.AudioControlImp;
 import com.neulion.android.upnpcast.renderer.localservice.IRendererInterface.IAVTransport;
@@ -96,7 +97,7 @@ public class NLUpnpRendererService extends AndroidUpnpServiceImpl
     @Override
     public void onCreate()
     {
-        mLogger.i("NLUpnpRendererService onCreate");
+        mLogger.w(getClass().getSimpleName() + " onCreate!!!");
 
         org.seamless.util.logging.LoggingUtil.resetRootHandler(new FixedAndroidLogHandler());
 
@@ -127,26 +128,37 @@ public class NLUpnpRendererService extends AndroidUpnpServiceImpl
             mAudioControls.put(controlImp.getInstanceId(), controlImp);
         }
 
-        try
+        upnpService.getRegistry().addListener(mDefaultRegistryListener);
+
+        // Now add all devices to the list we already know about
+        for (Device device : upnpService.getRegistry().getDevices())
         {
-            mLocalDevice = createLocalDevice();
-
-            mLogger.i(String.format("[create local device]: %s", mLocalDevice));
-
-            upnpService.getRegistry().addListener(mDefaultRegistryListener);
-
-            upnpService.getRegistry().addDevice(mLocalDevice);
+            mDefaultRegistryListener.deviceAdded(upnpService.getRegistry(), device);
         }
-        catch (Exception e)
+
+        mLocalDevice = upnpService.getRegistry().getLocalDevice(getLocalDeviceUDN(), true);
+
+        if (mLocalDevice == null)
         {
-            e.printStackTrace();
+            try
+            {
+                mLocalDevice = createLocalDevice();
+
+                mLogger.i(String.format("[create local device]: %s", mLocalDevice));
+
+                upnpService.getRegistry().addDevice(mLocalDevice);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
         }
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-        mLogger.i(String.format("NLUpnpRendererService onStartCommand[%s]", intent));
+        mLogger.i(String.format("onStartCommand[%s]", intent));
 
         return START_STICKY;
     }
@@ -178,7 +190,7 @@ public class NLUpnpRendererService extends AndroidUpnpServiceImpl
     @Override
     public void onDestroy()
     {
-        mLogger.w("NLUpnpRendererService onDestroy!!!");
+        mLogger.w(getClass().getSimpleName() + " onDestroy!!!");
 
         if (mLocalDevice != null)
         {
@@ -190,18 +202,7 @@ public class NLUpnpRendererService extends AndroidUpnpServiceImpl
 
     protected LocalDevice createLocalDevice() throws ValidationException, IOException
     {
-        String key = getPackageName() + ".key.deviceUUID";
-
-        SharedPreferences sp = getApplicationContext().getSharedPreferences(getPackageName(), MODE_PRIVATE);
-
-        String uuid = sp.getString(key, UUID.randomUUID().toString());
-
-        if (!sp.contains(key))
-        {
-            sp.edit().putString(key, uuid).apply();
-        }
-
-        DeviceIdentity deviceIdentity = new DeviceIdentity(new UDN(UUID.fromString(uuid)));
+        DeviceIdentity deviceIdentity = new DeviceIdentity(getLocalDeviceUDN());
 
         UDADeviceType deviceType = new UDADeviceType("MediaRenderer", 1);
 
@@ -209,6 +210,20 @@ public class NLUpnpRendererService extends AndroidUpnpServiceImpl
                 new ModelDetails("NLMediaRenderer", "NLCast Renderer Demo", "1"));
 
         return new LocalDevice(deviceIdentity, deviceType, deviceDetails, generateDeviceIcon(), generateLocalServices());
+    }
+
+    private UDN getLocalDeviceUDN()
+    {
+        SharedPreferences sp = getApplicationContext().getSharedPreferences(getPackageName(), MODE_PRIVATE);
+
+        String uuid = sp.getString(Key.DEVICE_ID, UUID.randomUUID().toString());
+
+        if (!sp.contains(Key.DEVICE_ID))
+        {
+            sp.edit().putString(Key.DEVICE_ID, uuid).apply();
+        }
+
+        return new UDN(UUID.fromString(uuid));
     }
 
     protected Icon[] generateDeviceIcon() throws IOException
