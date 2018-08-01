@@ -18,6 +18,7 @@ import com.neulion.android.upnpcast.service.NLUpnpCastService.NLUpnpCastBinder;
 import com.neulion.android.upnpcast.util.ILogger;
 import com.neulion.android.upnpcast.util.ILogger.DefaultLoggerImpl;
 
+import org.fourthline.cling.model.meta.Device;
 import org.fourthline.cling.model.types.DeviceType;
 import org.fourthline.cling.model.types.ServiceType;
 import org.fourthline.cling.model.types.UDADeviceType;
@@ -102,6 +103,12 @@ public class NLUpnpCastManager implements IUpnpCast
             if (collection == null || !collection.contains(mNLDeviceRegistryListener))
             {
                 service.getRegistry().addListener(mNLDeviceRegistryListener);
+            }
+
+            // Now add all devices to the list we already know about
+            for (Device device : service.getRegistry().getDevices())
+            {
+                mNLDeviceRegistryListener.deviceAdded(service.getRegistry(), device);
             }
 
             if (mCastControlImp != null)

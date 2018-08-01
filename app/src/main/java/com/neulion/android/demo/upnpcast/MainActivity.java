@@ -18,6 +18,8 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.neulion.android.demo.browser.BrowserActivity;
+import com.neulion.android.demo.light.LightActivity;
 import com.neulion.android.demo.player.PlayerActivity;
 import com.neulion.android.demo.upnpcast.DeviceAdapter.OnItemSelectedListener;
 import com.neulion.android.upnpcast.NLUpnpCastManager;
@@ -139,6 +141,18 @@ public class MainActivity extends AppCompatActivity
                 Toast.makeText(this, "打开播放器", Toast.LENGTH_SHORT).show();
 
                 startActivity(new Intent(this, PlayerActivity.class));
+
+                break;
+
+            case R.id.menu_light:
+
+                startActivity(new Intent(this, LightActivity.class));
+
+                break;
+
+            case R.id.menu_browser:
+
+                startActivity(new Intent(this, BrowserActivity.class));
 
                 break;
         }

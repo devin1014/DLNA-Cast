@@ -33,6 +33,18 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name="com.neulion.android.demo.light.LightActivity"
+            android:configChanges="orientation" />
+
+        <activity
+            android:name="com.neulion.android.demo.browser.BrowserActivity"
+            android:configChanges="orientation" />
+
+        <service android:name="com.neulion.android.demo.browser.BrowserUpnpService" />
+
+        <service android:name="org.fourthline.cling.android.AndroidUpnpServiceImpl" />
+
     </application>
 
 </manifest>
