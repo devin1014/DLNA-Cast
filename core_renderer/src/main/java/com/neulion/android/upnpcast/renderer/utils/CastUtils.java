@@ -122,9 +122,8 @@ public class CastUtils
             case MediaControl.STATE_ERROR:
 
                 return new TransportInfo(TransportState.STOPPED);
-
         }
 
-        return new TransportInfo(TransportState.NO_MEDIA_PRESENT);
+        return new TransportInfo(TransportState.STOPPED);
     }
 }

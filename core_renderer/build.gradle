@@ -23,7 +23,7 @@ dependencies {
 
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:design:27.1.1'
-    api "com.android.support:leanback-v17:27.1.1"
+    implementation "com.android.support:leanback-v17:27.1.1"
 
     implementation('org.slf4j:slf4j-jdk14:1.7.14')
     implementation('com.orhanobut:logger:2.2.0')
@@ -35,10 +35,10 @@ dependencies {
     implementation 'org.eclipse.jetty:jetty-servlet:8.1.18.v20150929'
     implementation 'org.eclipse.jetty:jetty-client:8.1.18.v20150929'
     // NeuPlayer
-    implementation("com.neulion.android.media:NeuPlayer:5.5.3") {
+    api("com.neulion.android.media:NeuPlayer:5.5.3") {
         exclude group: 'com.android.support'
     }
-    implementation("com.neulion.android.media:neuplayer-tv:5.6.0-SNAPSHOT") {
+    api("com.neulion.android.media:neuplayer-tv:5.6.0-SNAPSHOT") {
         exclude group: 'com.android.support'
     }
 }

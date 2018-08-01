@@ -5,7 +5,7 @@ import android.text.TextUtils;
 
 import com.neulion.android.upnpcast.renderer.localservice.IRendererInterface.IAVTransport;
 import com.neulion.android.upnpcast.renderer.player.ICastMediaControl;
-import com.neulion.android.upnpcast.renderer.player.NLCastVideoPlayerActivity;
+import com.neulion.android.upnpcast.renderer.player.NLPlayerCompat;
 import com.neulion.android.upnpcast.renderer.utils.CastUtils;
 import com.neulion.android.upnpcast.renderer.utils.ILogger;
 import com.neulion.android.upnpcast.renderer.utils.ILogger.DefaultLoggerImpl;
@@ -167,10 +167,7 @@ public class AVTransportControlImp implements IAVTransport
 
         mPositionInfo = new PositionInfo(1, currentURIMetaData, currentURI);
 
-        if (mApplicationContext != null)
-        {
-            NLCastVideoPlayerActivity.startActivity(mApplicationContext, currentURI, currentURIMetaData);
-        }
+        NLPlayerCompat.startPlayer(mApplicationContext, currentURI, currentURIMetaData);
     }
 
     @Override

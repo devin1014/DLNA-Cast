@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.media.AudioManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -19,6 +18,7 @@ import com.neulion.android.upnpcast.renderer.NLUpnpRendererService.RendererServi
 import com.neulion.android.upnpcast.renderer.R;
 import com.neulion.android.upnpcast.renderer.player.RendererThread.AudioControlThread;
 import com.neulion.android.upnpcast.renderer.player.RendererThread.AvControlThread;
+import com.neulion.android.upnpcast.renderer.player.RendererThread.IActivityAliveCallback;
 import com.neulion.android.upnpcast.renderer.utils.CastUtils;
 import com.neulion.android.upnpcast.renderer.utils.ILogger;
 import com.neulion.android.upnpcast.renderer.utils.ILogger.DefaultLoggerImpl;
@@ -39,15 +39,13 @@ import java.net.URI;
  * Date: 2018-07-25
  * Time: 11:03
  */
-public class NLCastVideoPlayerActivity extends AppCompatActivity
+public class NLCastVideoPlayerActivity extends AppCompatActivity implements IActivityAliveCallback
 {
-    public static void startActivity(Context context, String url, String metaData)
+    public static void startActivity(Context context, CastMediaRequest mediaRequest)
     {
         Intent intent = new Intent(context, NLCastVideoPlayerActivity.class);
 
-        intent.putExtra(Key.EXTRA_URL, url);
-
-        intent.putExtra(Key.EXTRA_METADATA, metaData);
+        intent.putExtra(Key.EXTRA_CAST_REQUEST, mediaRequest);
 
         context.startActivity(intent);
     }
@@ -58,7 +56,7 @@ public class NLCastVideoPlayerActivity extends AppCompatActivity
 
     private CommonVideoController mVideoController;
 
-    private NLCastVideoPlayerController mCastControlImp;
+    private NLCastMediaController mCastControlImp;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
@@ -66,6 +64,8 @@ public class NLCastVideoPlayerActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         mLogger.d("onCreate: " + getIntent());
+
+        mActivityDestroy = false;
 
         setContentView(R.layout.activity_cast_video_player);
 
@@ -82,8 +82,6 @@ public class NLCastVideoPlayerActivity extends AppCompatActivity
         bindService(new Intent(this, NLUpnpRendererService.class), mRendererServiceConnection, Service.BIND_AUTO_CREATE);
 
         openMedia(getIntent());
-
-        mDestroy = false;
     }
 
     @Override
@@ -100,22 +98,14 @@ public class NLCastVideoPlayerActivity extends AppCompatActivity
 
     private void openMedia(Intent intent)
     {
-        Uri uri = intent.getData();
+        Bundle bundle = intent.getExtras();
 
-        if (uri != null)
+        if (bundle != null)
         {
-            mURI = CastUtils.parseURI(uri);
-        }
-        else
-        {
-            Bundle bundle = getIntent().getExtras();
+            CastMediaRequest mediaRequest = bundle.getParcelable(Key.EXTRA_CAST_REQUEST);
 
-            if (bundle != null)
-            {
-                String url = bundle.getString(Key.EXTRA_URL);
-
-                mURI = CastUtils.parseURI(url);
-            }
+            //noinspection ConstantConditions
+            mURI = CastUtils.parseURI(mediaRequest.videoURL);
         }
 
         if (mURI != null)
@@ -139,12 +129,7 @@ public class NLCastVideoPlayerActivity extends AppCompatActivity
         }
     }
 
-    private boolean mDestroy = false;
-
-    public boolean isActivityDestroy()
-    {
-        return mDestroy;
-    }
+    private boolean mActivityDestroy = false;
 
     @Override
     protected void onDestroy()
@@ -165,7 +150,7 @@ public class NLCastVideoPlayerActivity extends AppCompatActivity
 
         super.onDestroy();
 
-        mDestroy = true;
+        mActivityDestroy = true;
     }
 
     private NLUpnpRendererService mRendererService;
@@ -179,12 +164,12 @@ public class NLCastVideoPlayerActivity extends AppCompatActivity
 
             mRendererService = ((RendererServiceBinder) service).getRendererService();
 
-            mRendererService.registerControlBridge(mCastControlImp = new NLCastVideoPlayerController(NLCastVideoPlayerActivity.this, mRendererService, mVideoController));
+            mRendererService.registerControlBridge(mCastControlImp = new NLCastMediaController(NLCastVideoPlayerActivity.this, mRendererService, mVideoController));
 
             //TODO: service maybe bind more than once!
-            new AvControlThread(NLCastVideoPlayerActivity.this, mRendererService, mVideoController).start();
+            new AvControlThread(NLCastVideoPlayerActivity.this, mRendererService).start();
 
-            new AudioControlThread(NLCastVideoPlayerActivity.this, mRendererService, mVideoController).start();
+            new AudioControlThread(NLCastVideoPlayerActivity.this, mRendererService).start();
         }
 
         @Override
@@ -210,11 +195,17 @@ public class NLCastVideoPlayerActivity extends AppCompatActivity
                 mAudioManager = (AudioManager) getApplication().getSystemService(Context.AUDIO_SERVICE);
             }
 
-            int volume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+            @SuppressWarnings("ConstantConditions") int volume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
 
             mRendererService.getAudioControlLastChange().setEventedValue(INSTANCE_ID, new RenderingControlVariable.Volume(new ChannelVolume(Channel.Master, volume)));
         }
 
         return handled;
+    }
+
+    @Override
+    public boolean isActivityDestroyed()
+    {
+        return mActivityDestroy;
     }
 }

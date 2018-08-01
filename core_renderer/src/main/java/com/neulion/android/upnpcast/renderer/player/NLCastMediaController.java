@@ -5,16 +5,22 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 
 import com.neulion.android.upnpcast.renderer.NLUpnpRendererService;
 import com.neulion.android.upnpcast.renderer.localservice.IRendererInterface.IAVTransport;
 import com.neulion.android.upnpcast.renderer.utils.ILogger;
 import com.neulion.android.upnpcast.renderer.utils.ILogger.DefaultLoggerImpl;
 import com.neulion.media.control.MediaControl;
+import com.neulion.media.control.MediaControl.OnCompletionListener;
+import com.neulion.media.control.MediaControl.OnErrorListener;
 import com.neulion.media.control.MediaControl.OnPositionUpdateListener;
+import com.neulion.media.control.MediaControl.OnPreparedListener;
 import com.neulion.media.control.MediaControl.SimpleCallback;
 import com.neulion.media.control.MediaRequest;
 import com.neulion.media.control.impl.CommonVideoController;
+import com.neulion.media.control.impl.CommonVideoView;
 
 import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
 import org.fourthline.cling.support.avtransport.lastchange.AVTransportVariable;
@@ -34,7 +40,7 @@ import java.net.URISyntaxException;
  * Date: 2018-07-26
  * Time: 18:30
  */
-class NLCastVideoPlayerController implements ICastMediaControl
+class NLCastMediaController implements ICastMediaControl
 {
     private MediaControl mMediaControl;
 
@@ -50,7 +56,17 @@ class NLCastVideoPlayerController implements ICastMediaControl
 
     private AudioManager mAudioManager;
 
-    NLCastVideoPlayerController(Activity activity, NLUpnpRendererService service, CommonVideoController controller)
+    private Object mMediaBinder;
+
+    NLCastMediaController(@NonNull Fragment fragment, NLUpnpRendererService service, MediaControl controller)
+    {
+        //noinspection ConstantConditions
+        this(fragment.getActivity(), service, controller);
+
+        mMediaBinder = fragment;
+    }
+
+    NLCastMediaController(Activity activity, NLUpnpRendererService service, MediaControl controller)
     {
         mActivity = activity;
 
@@ -58,11 +74,13 @@ class NLCastVideoPlayerController implements ICastMediaControl
 
         mMediaControl = controller;
 
+        mMediaBinder = activity;
+
         mAvTransportLastChange = service.getAvTransportLastChange();
 
         mAudioControlLastChange = service.getAudioControlLastChange();
 
-        mAudioManager = (AudioManager) activity.getApplication().getSystemService(Context.AUDIO_SERVICE);
+        mAudioManager = (AudioManager) activity.getSystemService(Context.AUDIO_SERVICE);
 
         MediaCallback callback = new MediaCallback();
 
@@ -74,7 +92,14 @@ class NLCastVideoPlayerController implements ICastMediaControl
 
         controller.setOnErrorListener(callback);
 
-        controller.setCallback(callback);
+        if (controller instanceof CommonVideoController)
+        {
+            ((CommonVideoController) controller).setCallback(callback);
+        }
+        else if (controller instanceof CommonVideoView)
+        {
+            ((CommonVideoView) controller).setCallback(callback);
+        }
     }
 
     @Override
@@ -158,17 +183,24 @@ class NLCastVideoPlayerController implements ICastMediaControl
     private final UnsignedIntegerFourBytes INSTANCE_ID = new UnsignedIntegerFourBytes(0);
 
     private class MediaCallback extends SimpleCallback implements MediaControl.OnPreparedListener,
-
-            MediaControl.OnCompletionListener, MediaControl.OnErrorListener, OnPositionUpdateListener
+            MediaControl.OnCompletionListener,
+            MediaControl.OnErrorListener,
+            MediaControl.OnPositionUpdateListener
     {
         private URI mURI;
 
         private ILogger mILogger = new DefaultLoggerImpl(this);
 
         @Override
+        public void onOpen(MediaRequest request)
+        {
+            mILogger.i("onOpen: " + request.getDataSource());
+        }
+
+        @Override
         public void onPreparing(MediaRequest request)
         {
-            mILogger.d("onPreparing: " + request.getDataSource());
+            mILogger.i("onPreparing: " + request.getDataSource());
 
             try
             {
@@ -185,9 +217,14 @@ class NLCastVideoPlayerController implements ICastMediaControl
         @Override
         public void onPrepared()
         {
-            mILogger.d("onPrepared");
+            mILogger.i("onPrepared");
 
-           updateMediaState(MediaControl.STATE_PREPARED);
+            if (mMediaBinder instanceof OnPreparedListener)
+            {
+                ((OnPreparedListener) mMediaBinder).onPrepared();
+            }
+
+            updateMediaState(MediaControl.STATE_PREPARED);
 
             if (mAvTransportLastChange != null)
             {
@@ -198,7 +235,7 @@ class NLCastVideoPlayerController implements ICastMediaControl
         @Override
         public void onResume(boolean fromPause)
         {
-            mILogger.d("onResume: " + fromPause);
+            mILogger.i("onResume: " + fromPause);
 
             updateMediaState(MediaControl.STATE_PLAYING);
 
@@ -211,7 +248,7 @@ class NLCastVideoPlayerController implements ICastMediaControl
         @Override
         public void onPause(boolean fromResume)
         {
-            mILogger.d("onPause: " + fromResume);
+            mILogger.i("onPause: " + fromResume);
 
             updateMediaState(MediaControl.STATE_PAUSED);
 
@@ -224,7 +261,12 @@ class NLCastVideoPlayerController implements ICastMediaControl
         @Override
         public void onCompletion()
         {
-            mILogger.d("onCompletion");
+            mILogger.i("onCompletion");
+
+            if (mMediaBinder instanceof OnCompletionListener)
+            {
+                ((OnCompletionListener) mMediaBinder).onCompletion();
+            }
 
             updateMediaState(MediaControl.STATE_COMPLETED);
 
@@ -239,7 +281,12 @@ class NLCastVideoPlayerController implements ICastMediaControl
         @Override
         public void onError(CharSequence errorMessage)
         {
-            mILogger.d("onError: " + errorMessage);
+            mILogger.e("onError: " + errorMessage);
+
+            if (mMediaBinder instanceof OnErrorListener)
+            {
+                ((OnErrorListener) mMediaBinder).onError(errorMessage);
+            }
 
             updateMediaState(MediaControl.STATE_ERROR);
 
@@ -254,7 +301,7 @@ class NLCastVideoPlayerController implements ICastMediaControl
         @Override
         public void onRelease(boolean openingMedia)
         {
-            mILogger.d("onRelease: " + openingMedia);
+            mILogger.i("onRelease: " + openingMedia);
 
             if (!openingMedia)
             {
@@ -270,6 +317,11 @@ class NLCastVideoPlayerController implements ICastMediaControl
         @Override
         public void onPositionUpdate(long currentPosition)
         {
+            if (mMediaBinder instanceof OnPositionUpdateListener)
+            {
+                ((OnPositionUpdateListener) mMediaBinder).onPositionUpdate(currentPosition);
+            }
+
             for (UnsignedIntegerFourBytes id : mRendererService.getAVTransportControls().keySet())
             {
                 IAVTransport avTransport = mRendererService.getAVTransportControls().get(id);

@@ -17,6 +17,12 @@
             android:launchMode="singleTop"
             android:theme="@style/CastVideoPlayerTheme" />
 
+        <activity
+            android:name="com.neulion.android.upnpcast.renderer.player.NLCastVideoPlayerLeanbackActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:launchMode="singleTop"
+            android:theme="@style/CastVideoPlayerTheme_Leanback" />
+
         <!--service-->
         <service android:name="com.neulion.android.upnpcast.renderer.NLUpnpRendererService" />
 

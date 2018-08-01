@@ -5,7 +5,6 @@ import com.neulion.android.upnpcast.renderer.localservice.RendererAVTransportSer
 import com.neulion.android.upnpcast.renderer.localservice.RendererAudioControlService;
 import com.neulion.android.upnpcast.renderer.utils.ILogger;
 import com.neulion.android.upnpcast.renderer.utils.ILogger.DefaultLoggerImpl;
-import com.neulion.media.control.MediaControl;
 
 import org.fourthline.cling.model.meta.LocalDevice;
 import org.fourthline.cling.model.meta.LocalService;
@@ -18,27 +17,28 @@ import org.fourthline.cling.support.lastchange.LastChangeAwareServiceManager;
  */
 abstract class RendererThread extends Thread
 {
-    protected ILogger mLogger = new DefaultLoggerImpl(this);
-
-    protected NLUpnpRendererService mRendererService;
-
-    protected NLCastVideoPlayerActivity mActivity;
-
-    protected MediaControl mMediaControl;
-
-    public RendererThread(NLCastVideoPlayerActivity activity, NLUpnpRendererService service, MediaControl mediaControl)
+    public interface IActivityAliveCallback
     {
-        mActivity = activity;
+        boolean isActivityDestroyed();
+    }
+
+    private ILogger mLogger = new DefaultLoggerImpl(this);
+
+    NLUpnpRendererService mRendererService;
+
+    private IActivityAliveCallback mCallback;
+
+    RendererThread(IActivityAliveCallback callback, NLUpnpRendererService service)
+    {
+        mCallback = callback;
 
         mRendererService = service;
-
-        mMediaControl = mediaControl;
     }
 
     @Override
     public void run()
     {
-        mLogger.i(getClass().getSimpleName() + " running!");
+        mLogger.i(String.format("[%s] running!!!", getClass().getSimpleName()));
 
         if (mRendererService != null)
         {
@@ -58,20 +58,18 @@ abstract class RendererThread extends Thread
             mLogger.w("NLUpnpRendererService is NULL!");
         }
 
-        mLogger.w(getClass().getSimpleName() + " exit!");
+        mLogger.i(String.format("[%s] exit!!!", getClass().getSimpleName()));
 
-        mActivity = null;
+        mCallback = null;
 
         mRendererService = null;
-
-        mMediaControl = null;
     }
 
     public abstract void running(LocalDevice localDevice);
 
-    protected boolean isActivityAlive()
+    boolean isActivityAlive()
     {
-        return mActivity != null && !mActivity.isActivityDestroy();
+        return mCallback != null && !mCallback.isActivityDestroyed();
     }
 
 
@@ -80,9 +78,9 @@ abstract class RendererThread extends Thread
     // ---------------------------------------------------------------------------------------------------
     static class AvControlThread extends RendererThread
     {
-        AvControlThread(NLCastVideoPlayerActivity activity, NLUpnpRendererService service, MediaControl mediaControl)
+        AvControlThread(IActivityAliveCallback activity, NLUpnpRendererService service)
         {
-            super(activity, service, mediaControl);
+            super(activity, service);
         }
 
         @Override
@@ -121,9 +119,9 @@ abstract class RendererThread extends Thread
 
     static class AudioControlThread extends RendererThread
     {
-        AudioControlThread(NLCastVideoPlayerActivity activity, NLUpnpRendererService service, MediaControl mediaControl)
+        AudioControlThread(IActivityAliveCallback activity, NLUpnpRendererService service)
         {
-            super(activity, service, mediaControl);
+            super(activity, service);
         }
 
         @Override
