@@ -1,7 +1,5 @@
 package com.neulion.android.upnpcast.service;
 
-import com.neulion.android.upnpcast.Constants;
-
 import org.fourthline.cling.UpnpService;
 import org.fourthline.cling.UpnpServiceConfiguration;
 import org.fourthline.cling.android.AndroidUpnpService;
@@ -9,9 +7,6 @@ import org.fourthline.cling.android.AndroidUpnpServiceImpl;
 import org.fourthline.cling.android.FixedAndroidLogHandler;
 import org.fourthline.cling.controlpoint.ControlPoint;
 import org.fourthline.cling.registry.Registry;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * User: liuwei(wei.liu@neulion.com.com)
@@ -24,11 +19,6 @@ public class NLUpnpCastService extends AndroidUpnpServiceImpl implements Android
     public void onCreate()
     {
         org.seamless.util.logging.LoggingUtil.resetRootHandler(new FixedAndroidLogHandler());
-
-        if (Constants.DEBUG)
-        {
-            Logger.getLogger("org.fourthline.cling").setLevel(Level.FINEST);
-        }
 
         super.onCreate();
 

@@ -33,6 +33,9 @@ import org.fourthline.cling.support.model.MediaInfo;
 import org.fourthline.cling.support.model.PositionInfo;
 import org.fourthline.cling.support.model.TransportInfo;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 public class MainActivity extends AppCompatActivity
 {
@@ -50,6 +53,11 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+
+        if (com.neulion.android.upnpcast.Constants.DEBUG)
+        {
+            Logger.getLogger("org.fourthline.cling").setLevel(Level.FINEST);
+        }
 
         initComponent();
     }
@@ -96,7 +104,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onPause()
     {
-        //NLUpnpCastManager.getInstance().unbindUpnpCastService(this);
+        NLUpnpCastManager.getInstance().unbindUpnpCastService(this);
 
         super.onPause();
     }

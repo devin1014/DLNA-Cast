@@ -1,9 +1,12 @@
 package com.neulion.android.upnpcast.renderer;
 
+import android.app.Notification;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.SystemClock;
 
@@ -55,8 +58,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * User: liuwei(wei.liu@neulion.com.com)
@@ -65,6 +66,13 @@ import java.util.logging.Logger;
  */
 public class NLUpnpRendererService extends AndroidUpnpServiceImpl
 {
+    public static final int NOTIFICATION_ID = 0x11;
+
+    public static void startService(Context context)
+    {
+        context.getApplicationContext().startService(new Intent(context.getApplicationContext(), NLUpnpRendererService.class));
+    }
+
     private ILogger mLogger = new DefaultLoggerImpl(this);
 
     private Map<UnsignedIntegerFourBytes, IAVTransport> mAVTransportControls;
@@ -100,11 +108,6 @@ public class NLUpnpRendererService extends AndroidUpnpServiceImpl
         mLogger.w(getClass().getSimpleName() + " onCreate!!!");
 
         org.seamless.util.logging.LoggingUtil.resetRootHandler(new FixedAndroidLogHandler());
-
-        if (Constants.DEBUG)
-        {
-            Logger.getLogger("org.fourthline.cling").setLevel(Level.FINEST);
-        }
 
         super.onCreate();
 
@@ -152,6 +155,20 @@ public class NLUpnpRendererService extends AndroidUpnpServiceImpl
             {
                 e.printStackTrace();
             }
+        }
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2)
+        {
+            startForeground(NOTIFICATION_ID, new Notification());
+        }
+        else
+        {
+            //API 18以上，发送Notification并将其置为前台后，启动InnerService
+            Notification.Builder builder = new Notification.Builder(this);
+            //builder.setSmallIcon(R.mipmap.ic_launcher);
+            startForeground(NOTIFICATION_ID, builder.build());
+
+            startService(new Intent(this, KeepLiveInnerService.class));
         }
     }
 

@@ -22,6 +22,6 @@ public class CastServiceKeepReceiver extends BroadcastReceiver
     {
         mLogger.i(String.format("onReceive:[%s]", intent));
 
-        context.startService(new Intent(context, NLUpnpRendererService.class));
+        NLUpnpRendererService.startService(context);
     }
 }
