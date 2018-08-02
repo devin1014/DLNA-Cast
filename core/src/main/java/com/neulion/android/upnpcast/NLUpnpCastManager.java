@@ -18,6 +18,9 @@ import com.neulion.android.upnpcast.service.NLUpnpCastService.NLUpnpCastBinder;
 import com.neulion.android.upnpcast.util.ILogger;
 import com.neulion.android.upnpcast.util.ILogger.DefaultLoggerImpl;
 
+import org.fourthline.cling.model.message.header.STAllHeader;
+import org.fourthline.cling.model.message.header.UDADeviceTypeHeader;
+import org.fourthline.cling.model.message.header.UpnpHeader;
 import org.fourthline.cling.model.meta.Device;
 import org.fourthline.cling.model.types.DeviceType;
 import org.fourthline.cling.model.types.ServiceType;
@@ -66,7 +69,7 @@ public class NLUpnpCastManager implements IUpnpCast
         {
             mLogger.i(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 
-            mLogger.i(String.format("bindUpnpCastService[%s]", activity.getComponentName().getClassName()));
+            mLogger.i(String.format("bindUpnpCastService[%s]", activity.getComponentName().getShortClassName()));
 
             activity.getApplication().bindService(new Intent(activity, NLUpnpCastService.class), mUpnpCastServiceConnection, Service.BIND_AUTO_CREATE);
         }
@@ -78,7 +81,7 @@ public class NLUpnpCastManager implements IUpnpCast
         {
             activity.getApplication().unbindService(mUpnpCastServiceConnection);
 
-            mLogger.w(String.format("unbindUpnpCastService[%s]", activity.getComponentName().getClassName()));
+            mLogger.w(String.format("unbindUpnpCastService[%s]", activity.getComponentName().getShortClassName()));
 
             mLogger.i("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 
@@ -91,7 +94,8 @@ public class NLUpnpCastManager implements IUpnpCast
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder)
         {
-            mLogger.i(String.format("onServiceConnected [%s]", componentName.getClassName()));
+            mLogger.i(String.format("onServiceConnected [%s][%s]",
+                    componentName.getShortClassName(), iBinder.getClass().getSimpleName() + "@" + Integer.toHexString(iBinder.hashCode())));
 
             NLUpnpCastService service = ((NLUpnpCastBinder) iBinder).getService();
 
@@ -120,7 +124,7 @@ public class NLUpnpCastManager implements IUpnpCast
         @Override
         public void onServiceDisconnected(ComponentName componentName)
         {
-            mLogger.w(String.format("onServiceDisconnected [%s]", componentName != null ? componentName.getClassName() : "NULL"));
+            mLogger.w(String.format("onServiceDisconnected [%s]", componentName != null ? componentName.getShortClassName() : "NULL"));
 
             // clear registry listener
             if (mUpnpCastService != null)
@@ -150,6 +154,28 @@ public class NLUpnpCastManager implements IUpnpCast
 
     public void addRegistryDeviceListener(OnRegistryDeviceListener listener)
     {
+        if (mUpnpCastService != null)
+        {
+            Collection<Device> devices;
+
+            if (mSearchDeviceType == null)
+            {
+                devices = mUpnpCastService.getRegistry().getDevices();
+            }
+            else
+            {
+                devices = mUpnpCastService.getRegistry().getDevices(mSearchDeviceType);
+            }
+
+            if (devices != null)
+            {
+                for (Device device : devices)
+                {
+                    listener.onDeviceAdded(new CastDevice(device));
+                }
+            }
+        }
+
         mNLDeviceRegistryListener.addRegistryDeviceListener(listener);
     }
 
@@ -178,20 +204,24 @@ public class NLUpnpCastManager implements IUpnpCast
     // ------------------------------------------------------------------------------------------
     // control
     // ------------------------------------------------------------------------------------------
+    private DeviceType mSearchDeviceType;
+
     @Override
-    public void search(DeviceType type)
+    public void search()
     {
-        search(type, IUpnpCast.DEFAULT_MAX_SECONDS);
+        search(null, IUpnpCast.DEFAULT_MAX_SECONDS);
     }
 
     @Override
     public void search(DeviceType type, int maxSeconds)
     {
-        mNLDeviceRegistryListener.setSearchDeviceType(type);
+        mSearchDeviceType = type;
+
+        UpnpHeader header = type == null ? new STAllHeader() : new UDADeviceTypeHeader(type);
 
         if (mUpnpCastService != null)
         {
-            mUpnpCastService.get().getControlPoint().search(maxSeconds);
+            mUpnpCastService.get().getControlPoint().search(header, maxSeconds);
         }
     }
 

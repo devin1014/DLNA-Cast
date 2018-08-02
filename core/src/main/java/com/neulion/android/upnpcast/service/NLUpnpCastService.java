@@ -1,5 +1,10 @@
 package com.neulion.android.upnpcast.service;
 
+import android.content.Intent;
+
+import com.neulion.android.upnpcast.util.ILogger;
+import com.neulion.android.upnpcast.util.ILogger.DefaultLoggerImpl;
+
 import org.fourthline.cling.UpnpService;
 import org.fourthline.cling.UpnpServiceConfiguration;
 import org.fourthline.cling.android.AndroidUpnpService;
@@ -15,14 +20,34 @@ import org.fourthline.cling.registry.Registry;
  */
 public class NLUpnpCastService extends AndroidUpnpServiceImpl implements AndroidUpnpService
 {
+    private ILogger mLogger = new DefaultLoggerImpl(this);
+
     @Override
     public void onCreate()
     {
+        mLogger.i("onCreate");
+
         org.seamless.util.logging.LoggingUtil.resetRootHandler(new FixedAndroidLogHandler());
 
         super.onCreate();
 
         binder = new NLUpnpCastBinder();
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId)
+    {
+        mLogger.i("onStartCommand:" + intent);
+
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        mLogger.w("onDestroy");
+
+        super.onDestroy();
     }
 
     @Override

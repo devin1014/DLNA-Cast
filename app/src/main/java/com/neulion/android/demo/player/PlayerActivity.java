@@ -125,6 +125,14 @@ public class PlayerActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onPause()
+    {
+        NLUpnpCastManager.getInstance().unbindUpnpCastService(PlayerActivity.this);
+
+        super.onPause();
+    }
+
+    @Override
     public void onDestroy()
     {
         NLUpnpCastManager.getInstance().removeCastEventListener(mControlListener);
@@ -167,7 +175,7 @@ public class PlayerActivity extends AppCompatActivity
         @Override
         public void onClick(View v)
         {
-            NLUpnpCastManager.getInstance().search(NLUpnpCastManager.DEVICE_TYPE_DMR);
+            NLUpnpCastManager.getInstance().search(NLUpnpCastManager.DEVICE_TYPE_DMR, 60);
 
             Context context = PlayerActivity.this;
 

@@ -16,6 +16,11 @@ public class CastDevice implements ICastDevice<Device>
     public CastDevice(Device device)
     {
         mDevice = device;
+
+        if (device == null)
+        {
+            throw new IllegalArgumentException("device can not be NULL!");
+        }
     }
 
     @Override
