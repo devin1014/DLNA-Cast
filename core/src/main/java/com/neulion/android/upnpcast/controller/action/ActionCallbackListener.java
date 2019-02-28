@@ -4,9 +4,6 @@ import org.fourthline.cling.model.action.ActionInvocation;
 import org.fourthline.cling.model.message.UpnpResponse;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-17
- * Time: 18:06
  */
 public abstract class ActionCallbackListener
 {

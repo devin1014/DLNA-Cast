@@ -35,9 +35,6 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-06-29
- * Time: 18:28
  */
 public class NLUpnpCastManager implements IUpnpCast
 {

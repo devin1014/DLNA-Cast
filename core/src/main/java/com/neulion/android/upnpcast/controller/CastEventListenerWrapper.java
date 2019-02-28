@@ -9,9 +9,6 @@ import org.fourthline.cling.support.model.PositionInfo;
 import org.fourthline.cling.support.model.TransportInfo;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-11
- * Time: 17:05
  */
 public class CastEventListenerWrapper implements ICastEventListener
 {

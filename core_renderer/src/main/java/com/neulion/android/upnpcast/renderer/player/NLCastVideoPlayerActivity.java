@@ -35,9 +35,6 @@ import org.fourthline.cling.support.renderingcontrol.lastchange.RenderingControl
 import java.net.URI;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-25
- * Time: 11:03
  */
 public class NLCastVideoPlayerActivity extends AppCompatActivity implements IActivityAliveCallback
 {

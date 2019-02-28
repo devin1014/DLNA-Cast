@@ -57,7 +57,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * @author Christian Bauer
  */
 // DOC:CLASS
 public class LightActivity extends Activity implements PropertyChangeListener

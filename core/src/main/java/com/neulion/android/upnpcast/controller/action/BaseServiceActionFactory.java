@@ -11,9 +11,6 @@ import org.fourthline.cling.model.action.ActionInvocation;
 import org.fourthline.cling.model.message.UpnpResponse;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-18
- * Time: 11:35
  */
 public abstract class BaseServiceActionFactory
 {

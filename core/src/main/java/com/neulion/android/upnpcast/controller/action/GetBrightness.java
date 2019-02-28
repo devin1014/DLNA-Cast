@@ -8,9 +8,6 @@ import org.fourthline.cling.model.types.ErrorCode;
 import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-11
- * Time: 11:08
  */
 public abstract class GetBrightness extends ActionCallback
 {

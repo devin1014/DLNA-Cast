@@ -36,9 +36,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-26
- * Time: 18:30
  */
 class NLCastMediaController implements ICastMediaControl
 {

@@ -15,9 +15,6 @@ import com.neulion.android.upnpcast.renderer.utils.ILogger;
 import com.neulion.android.upnpcast.renderer.utils.ILogger.DefaultLoggerImpl;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-08-02
- * Time: 10:53
  */
 
 @TargetApi(VERSION_CODES.LOLLIPOP)

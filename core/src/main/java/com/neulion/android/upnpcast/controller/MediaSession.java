@@ -14,9 +14,6 @@ import org.fourthline.cling.model.message.UpnpResponse;
 import org.fourthline.cling.support.model.PositionInfo;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-18
- * Time: 14:03
  */
 public class MediaSession extends BaseSession
 {

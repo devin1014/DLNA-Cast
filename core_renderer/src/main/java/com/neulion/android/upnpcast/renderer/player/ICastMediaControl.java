@@ -7,9 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-26
- * Time: 18:19
  */
 public interface ICastMediaControl
 {

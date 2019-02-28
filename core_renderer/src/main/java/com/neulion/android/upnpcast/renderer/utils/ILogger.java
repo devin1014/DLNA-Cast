@@ -6,9 +6,6 @@ import com.neulion.android.upnpcast.renderer.Constants;
 
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-02
- * Time: 14:19
  */
 public interface ILogger
 {

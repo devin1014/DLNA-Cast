@@ -14,9 +14,6 @@ import org.fourthline.cling.controlpoint.ControlPoint;
 import org.fourthline.cling.registry.Registry;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-06-29
- * Time: 18:09
  */
 public class NLUpnpCastService extends AndroidUpnpServiceImpl implements AndroidUpnpService
 {

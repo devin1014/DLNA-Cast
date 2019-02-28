@@ -7,9 +7,6 @@ import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
 import org.fourthline.cling.model.types.UnsignedIntegerTwoBytes;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-11
- * Time: 11:01
  */
 public abstract class SetBrightness extends ActionCallback
 {

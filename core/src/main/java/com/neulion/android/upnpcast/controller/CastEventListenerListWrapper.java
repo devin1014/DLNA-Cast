@@ -13,9 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-19
- * Time: 16:14
  */
 public class CastEventListenerListWrapper implements ICastEventListener
 {

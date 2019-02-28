@@ -6,9 +6,6 @@ import com.neulion.android.upnpcast.controller.action.IRenderServiceActionFactor
 import com.neulion.android.upnpcast.device.CastDevice;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-17
- * Time: 18:03
  */
 public interface ICastActionFactory
 {

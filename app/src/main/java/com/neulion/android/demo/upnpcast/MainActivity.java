@@ -1,6 +1,5 @@
 package com.neulion.android.demo.upnpcast;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,9 +17,6 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.neulion.android.demo.browser.BrowserActivity;
-import com.neulion.android.demo.light.LightActivity;
-import com.neulion.android.demo.player.PlayerActivity;
 import com.neulion.android.demo.upnpcast.DeviceAdapter.OnItemSelectedListener;
 import com.neulion.android.upnpcast.NLUpnpCastManager;
 import com.neulion.android.upnpcast.controller.CastObject;
@@ -140,30 +136,30 @@ public class MainActivity extends AppCompatActivity
 
                 NLUpnpCastManager.getInstance().clear(); //TODO, need clear first?
 
-                NLUpnpCastManager.getInstance().search();
-                //NLUpnpCastManager.getInstance().search(NLUpnpCastManager.DEVICE_TYPE_DMR, 60);
+                //NLUpnpCastManager.getInstance().search();
+                NLUpnpCastManager.getInstance().search(NLUpnpCastManager.DEVICE_TYPE_DMR, 60);
 
                 break;
 
-            case R.id.menu_nlplayer:
-
-                Toast.makeText(this, "打开播放器", Toast.LENGTH_SHORT).show();
-
-                startActivity(new Intent(this, PlayerActivity.class));
-
-                break;
-
-            case R.id.menu_light:
-
-                startActivity(new Intent(this, LightActivity.class));
-
-                break;
-
-            case R.id.menu_browser:
-
-                startActivity(new Intent(this, BrowserActivity.class));
-
-                break;
+            //            case R.id.menu_nlplayer:
+            //
+            //                Toast.makeText(this, "打开播放器", Toast.LENGTH_SHORT).show();
+            //
+            //                startActivity(new Intent(this, PlayerActivity.class));
+            //
+            //                break;
+            //
+            //            case R.id.menu_light:
+            //
+            //                startActivity(new Intent(this, LightActivity.class));
+            //
+            //                break;
+            //
+            //            case R.id.menu_browser:
+            //
+            //                startActivity(new Intent(this, BrowserActivity.class));
+            //
+            //                break;
         }
 
         return super.onOptionsItemSelected(item);
@@ -202,7 +198,11 @@ public class MainActivity extends AppCompatActivity
             {
                 case R.id.btn_cast:
 
-                    NLUpnpCastManager.getInstance().cast(Constants.CAST_OBJECT.setDuration(Constants.CAST_VIDEO_DURATION));
+                    NLUpnpCastManager.getInstance().cast(
+                            CastObject
+                                    .newInstance(Constants.CAST_URL, Constants.CAST_ID, Constants.CAST_NAME)
+                                    .setDuration(Constants.CAST_VIDEO_DURATION)
+                    );
 
                     break;
 

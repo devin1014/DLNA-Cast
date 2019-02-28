@@ -12,9 +12,6 @@ import com.neulion.android.demo.upnpcast.DeviceAdapter.OnItemSelectedListener;
 import com.neulion.android.upnpcast.device.CastDevice;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-02
- * Time: 16:32
  */
 public class DeviceHolder extends ViewHolder implements OnClickListener, OnCheckedChangeListener
 {

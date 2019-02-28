@@ -11,9 +11,6 @@ import org.fourthline.cling.support.model.TransportInfo;
 import org.fourthline.cling.support.model.TransportSettings;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-25
- * Time: 19:06
  */
 public interface IRendererInterface
 {

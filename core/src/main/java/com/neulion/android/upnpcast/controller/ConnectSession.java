@@ -14,9 +14,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-17
- * Time: 17:04
  */
 public class ConnectSession extends BaseSession
 {

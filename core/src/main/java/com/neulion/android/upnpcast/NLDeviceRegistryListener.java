@@ -17,9 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-02
- * Time: 14:12
  */
 public class NLDeviceRegistryListener extends DefaultRegistryListener
 {

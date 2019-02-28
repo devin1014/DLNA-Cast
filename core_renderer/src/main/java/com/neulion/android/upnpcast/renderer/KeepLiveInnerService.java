@@ -12,9 +12,6 @@ import com.neulion.android.upnpcast.renderer.utils.ILogger;
 import com.neulion.android.upnpcast.renderer.utils.ILogger.DefaultLoggerImpl;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-08-02
- * Time: 10:44
  */
 public class KeepLiveInnerService extends Service
 {

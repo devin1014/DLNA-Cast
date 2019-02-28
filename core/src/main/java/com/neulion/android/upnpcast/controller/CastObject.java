@@ -1,9 +1,6 @@
 package com.neulion.android.upnpcast.controller;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-03
- * Time: 14:23
  */
 public class CastObject
 {

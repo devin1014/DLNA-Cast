@@ -5,9 +5,6 @@ import com.neulion.android.upnpcast.controller.ICastControl;
 import org.fourthline.cling.model.types.DeviceType;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-06-29
- * Time: 18:51
  */
 public interface IUpnpCast extends ICastControl
 {

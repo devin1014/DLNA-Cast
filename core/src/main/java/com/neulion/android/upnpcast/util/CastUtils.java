@@ -19,9 +19,6 @@ import java.util.Formatter;
 import java.util.Locale;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-04
- * Time: 16:00
  */
 public class CastUtils
 {

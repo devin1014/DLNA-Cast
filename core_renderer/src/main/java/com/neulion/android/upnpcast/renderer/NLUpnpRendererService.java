@@ -60,9 +60,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-25
- * Time: 14:02
  */
 public class NLUpnpRendererService extends AndroidUpnpServiceImpl
 {

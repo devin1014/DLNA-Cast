@@ -6,9 +6,6 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-16
- * Time: 11:28
  */
 public class CastButtonFactory
 {

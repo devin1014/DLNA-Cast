@@ -11,9 +11,6 @@ import com.neulion.android.upnpcast.renderer.KeepLiveJobService;
 import com.neulion.android.upnpcast.renderer.NLUpnpRendererService;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-25
- * Time: 16:15
  */
 public class MainActivity extends AppCompatActivity
 {

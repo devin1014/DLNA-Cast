@@ -11,9 +11,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-03
- * Time: 11:27
  */
 public interface ICastControl
 {

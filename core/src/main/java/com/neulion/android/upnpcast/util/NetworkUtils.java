@@ -7,9 +7,6 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-02
- * Time: 15:04
  */
 public class NetworkUtils
 {

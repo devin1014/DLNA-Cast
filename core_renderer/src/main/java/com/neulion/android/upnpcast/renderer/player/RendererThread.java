@@ -11,9 +11,6 @@ import org.fourthline.cling.model.meta.LocalService;
 import org.fourthline.cling.support.lastchange.LastChangeAwareServiceManager;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-26
- * Time: 15:41
  */
 abstract class RendererThread extends Thread
 {

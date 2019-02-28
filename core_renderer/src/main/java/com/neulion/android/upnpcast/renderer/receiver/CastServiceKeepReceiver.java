@@ -9,9 +9,6 @@ import com.neulion.android.upnpcast.renderer.utils.ILogger;
 import com.neulion.android.upnpcast.renderer.utils.ILogger.DefaultLoggerImpl;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-25
- * Time: 11:44
  */
 public class CastServiceKeepReceiver extends BroadcastReceiver
 {

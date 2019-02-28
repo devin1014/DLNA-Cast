@@ -10,9 +10,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-18
- * Time: 14:53
  */
 public abstract class BaseSession implements ICastSession
 {

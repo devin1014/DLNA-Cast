@@ -9,9 +9,6 @@ import org.fourthline.cling.support.model.MediaInfo;
 import org.fourthline.cling.support.model.TransportInfo;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-11
- * Time: 18:23
  */
 public interface ICastEventListener extends ICastControlListener
 {

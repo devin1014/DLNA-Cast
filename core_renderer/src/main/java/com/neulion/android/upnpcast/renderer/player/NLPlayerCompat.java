@@ -3,9 +3,6 @@ package com.neulion.android.upnpcast.renderer.player;
 import android.content.Context;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-08-01
- * Time: 10:45
  */
 public class NLPlayerCompat
 {

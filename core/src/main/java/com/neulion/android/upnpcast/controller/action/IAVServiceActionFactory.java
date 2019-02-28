@@ -22,9 +22,6 @@ import org.fourthline.cling.support.model.PositionInfo;
 import org.fourthline.cling.support.model.TransportInfo;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-18
- * Time: 10:45
  */
 public interface IAVServiceActionFactory
 {

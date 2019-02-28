@@ -28,9 +28,6 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-04
- * Time: 15:47
  */
 public abstract class BaseCastEventSubscription extends SubscriptionCallback
 {

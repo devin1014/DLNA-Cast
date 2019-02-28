@@ -5,9 +5,6 @@ import org.fourthline.cling.model.meta.LocalDevice;
 import org.fourthline.cling.model.meta.RemoteDevice;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-02
- * Time: 17:26
  */
 public class DeviceUtil
 {

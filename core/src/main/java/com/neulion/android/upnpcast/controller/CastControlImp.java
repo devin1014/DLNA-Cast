@@ -22,9 +22,6 @@ import org.fourthline.cling.support.model.TransportInfo;
 import org.fourthline.cling.support.model.TransportState;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-03
- * Time: 11:33
  */
 public class CastControlImp implements ICastControl, OnRegistryDeviceListener
 {

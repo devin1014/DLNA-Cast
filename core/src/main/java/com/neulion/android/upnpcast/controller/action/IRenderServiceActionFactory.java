@@ -14,9 +14,6 @@ import org.fourthline.cling.support.renderingcontrol.callback.SetMute;
 import org.fourthline.cling.support.renderingcontrol.callback.SetVolume;
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-18
- * Time: 10:45
  */
 public interface IRenderServiceActionFactory
 {

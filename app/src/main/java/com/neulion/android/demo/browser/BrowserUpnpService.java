@@ -22,7 +22,6 @@ import org.fourthline.cling.model.types.ServiceType;
 import org.fourthline.cling.model.types.UDAServiceType;
 
 /**
- * @author Christian Bauer
  */
 // DOC:CLASS
 public class BrowserUpnpService extends AndroidUpnpServiceImpl

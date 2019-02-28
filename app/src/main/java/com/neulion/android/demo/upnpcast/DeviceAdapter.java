@@ -16,9 +16,6 @@ import java.util.List;
 
 
 /**
- * User: liuwei(wei.liu@neulion.com.com)
- * Date: 2018-07-02
- * Time: 16:32
  */
 public class DeviceAdapter extends Adapter<DeviceHolder> implements OnRegistryDeviceListener
 {
