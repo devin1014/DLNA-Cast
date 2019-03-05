@@ -1,4 +1,4 @@
-<manifest package="com.neulion.android.upnpcast.renderer"
+<manifest package="com.liuwei.android.upnpcast.renderer"
           xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools">
 
@@ -15,29 +15,29 @@
     <application>
 
         <activity
-            android:name="com.neulion.android.upnpcast.renderer.player.NLCastVideoPlayerActivity"
+            android:name="com.liuwei.android.upnpcast.renderer.player.NLCastVideoPlayerActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:launchMode="singleTop"
             android:theme="@style/CastVideoPlayerTheme" />
 
         <activity
-            android:name="com.neulion.android.upnpcast.renderer.player.NLCastVideoPlayerLeanbackActivity"
+            android:name="com.liuwei.android.upnpcast.renderer.player.NLCastVideoPlayerLeanbackActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:launchMode="singleTop"
             android:theme="@style/CastVideoPlayerTheme_Leanback" />
 
         <!--service-->
-        <service android:name="com.neulion.android.upnpcast.renderer.NLUpnpRendererService" />
+        <service android:name="com.liuwei.android.upnpcast.renderer.NLUpnpRendererService" />
 
-        <service android:name="com.neulion.android.upnpcast.renderer.KeepLiveInnerService" />
+        <service android:name="com.liuwei.android.upnpcast.renderer.KeepLiveInnerService" />
 
         <service
-            android:name="com.neulion.android.upnpcast.renderer.KeepLiveJobService"
+            android:name="com.liuwei.android.upnpcast.renderer.KeepLiveJobService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <!--receiver-->
-        <receiver android:name="com.neulion.android.upnpcast.renderer.receiver.CastServiceKeepReceiver">
+        <receiver android:name="com.liuwei.android.upnpcast.renderer.receiver.CastServiceKeepReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
 

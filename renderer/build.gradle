@@ -4,7 +4,7 @@ android {
     compileSdkVersion 27
 
     defaultConfig {
-        applicationId "com.neulion.android.demo.render"
+        applicationId "com.liuwei.android.demo.render"
         minSdkVersion 17
         targetSdkVersion 27
         versionCode 1

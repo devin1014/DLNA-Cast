@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.neulion.android.demo.upnpcast"
+<manifest package="com.liuwei.android.demo.upnpcast"
           xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
@@ -12,7 +12,7 @@
 
         <!--dlna cast-->
         <activity
-            android:name="com.neulion.android.demo.upnpcast.MainActivity"
+            android:name="com.liuwei.android.demo.upnpcast.MainActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -23,7 +23,7 @@
         </activity>
 
         <activity
-            android:name="com.neulion.android.demo.player.PlayerActivity"
+            android:name="com.liuwei.android.demo.player.PlayerActivity"
             android:configChanges="screenSize|orientation"
             android:screenOrientation="user">
             <intent-filter>
@@ -34,14 +34,14 @@
         </activity>
 
         <activity
-            android:name="com.neulion.android.demo.light.LightActivity"
+            android:name="com.liuwei.android.demo.light.LightActivity"
             android:configChanges="orientation" />
 
         <activity
-            android:name="com.neulion.android.demo.browser.BrowserActivity"
+            android:name="com.liuwei.android.demo.browser.BrowserActivity"
             android:configChanges="orientation" />
 
-        <service android:name="com.neulion.android.demo.browser.BrowserUpnpService" />
+        <service android:name="com.liuwei.android.demo.browser.BrowserUpnpService" />
 
         <service android:name="org.fourthline.cling.android.AndroidUpnpServiceImpl" />
 
