@@ -1,2 +1,1 @@
 include ':app', ':core'
-//':renderer', ':core_renderer'
