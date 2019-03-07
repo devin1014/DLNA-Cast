@@ -14,7 +14,7 @@ DLNA-Cast
 
 - *支持移动端设备（DMC）搜索、连接、控制设备*
 - *支持移动端设备和电视端设备状态同步（播放进度、音量控制）*
-- *支持电视端设备播放器功能（DMP）
+- *支持电视端设备播放器功能（DMP）*
 
 
 **`索引`**
@@ -52,6 +52,7 @@ Proguard
 
 Guide
 -----
+所有投屏行为事件的入口是NLUpnpCastManager类，这是一个单例类。
 
 Step1:
 在AndroidManifest.xml中添加服务
@@ -119,5 +120,3 @@ class DemoActivity {
     }
 }
 ```
-
-所有投屏行为事件的入口是NLUpnpCastManager类，这是一个单例类。
