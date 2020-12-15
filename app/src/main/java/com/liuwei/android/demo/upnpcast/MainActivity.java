@@ -18,12 +18,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.liuwei.android.demo.upnpcast.DeviceAdapter.OnItemSelectedListener;
-import com.liuwei.android.upnpcast.NLUpnpCastManager;
-import com.liuwei.android.upnpcast.controller.CastObject;
-import com.liuwei.android.upnpcast.controller.ICastEventListener;
-import com.liuwei.android.upnpcast.device.CastDevice;
-import com.liuwei.android.upnpcast.util.CastUtils;
-import com.liuwei.android.upnpcast.util.NetworkUtils;
+import com.android.cast.dlna.NLUpnpCastManager;
+import com.android.cast.dlna.controller.CastObject;
+import com.android.cast.dlna.controller.ICastEventListener;
+import com.android.cast.dlna.device.CastDevice;
+import com.android.cast.dlna.util.CastUtils;
+import com.android.cast.dlna.util.NetworkUtils;
 
 import org.fourthline.cling.support.model.MediaInfo;
 import org.fourthline.cling.support.model.PositionInfo;
@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_main);
 
-        if (com.liuwei.android.upnpcast.Constants.DEBUG)
+        if (com.android.cast.dlna.Constants.DEBUG)
         {
             Logger.getLogger("org.fourthline.cling").setLevel(Level.FINEST);
         }

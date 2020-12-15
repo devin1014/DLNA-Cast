@@ -9,7 +9,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 
 import com.liuwei.android.demo.upnpcast.DeviceAdapter.OnItemSelectedListener;
-import com.liuwei.android.upnpcast.device.CastDevice;
+import com.android.cast.dlna.device.CastDevice;
 
 /**
  */

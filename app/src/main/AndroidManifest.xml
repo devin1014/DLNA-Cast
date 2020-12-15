@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.liuwei.android.demo.upnpcast"
-          xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.liuwei.android.demo.upnpcast">
 
     <application
         android:allowBackup="true"
@@ -22,16 +22,16 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name="com.liuwei.android.demo.player.PlayerActivity"
-            android:configChanges="screenSize|orientation"
-            android:screenOrientation="user">
-            <intent-filter>
-                <action android:name="android.intent.action.DLNA_CAST" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:scheme="http|https" />
-            </intent-filter>
-        </activity>
+        <!--<activity-->
+        <!--    android:name="com.liuwei.android.demo.player.PlayerActivity"-->
+        <!--    android:configChanges="screenSize|orientation"-->
+        <!--    android:screenOrientation="user">-->
+        <!--    <intent-filter>-->
+        <!--        <action android:name="android.intent.action.DLNA_CAST" />-->
+        <!--        <category android:name="android.intent.category.DEFAULT" />-->
+        <!--        <data android:scheme="http|https" />-->
+        <!--    </intent-filter>-->
+        <!--</activity>-->
 
         <activity
             android:name="com.liuwei.android.demo.light.LightActivity"
@@ -43,7 +43,7 @@
 
         <service android:name="com.liuwei.android.demo.browser.BrowserUpnpService" />
 
-        <service android:name="org.fourthline.cling.android.AndroidUpnpServiceImpl" />
+        <service android:name="com.android.cast.dlna.service.NLUpnpCastService" />
 
     </application>
 

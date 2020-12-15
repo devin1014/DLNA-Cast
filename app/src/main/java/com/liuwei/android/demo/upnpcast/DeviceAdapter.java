@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.RecyclerView.Adapter;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import com.liuwei.android.upnpcast.NLDeviceRegistryListener.OnRegistryDeviceListener;
-import com.liuwei.android.upnpcast.device.CastDevice;
+import com.android.cast.dlna.NLDeviceRegistryListener.OnRegistryDeviceListener;
+import com.android.cast.dlna.device.CastDevice;
 
 import java.util.ArrayList;
 import java.util.List;
