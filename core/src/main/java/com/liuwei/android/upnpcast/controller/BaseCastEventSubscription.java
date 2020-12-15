@@ -2,8 +2,8 @@ package com.liuwei.android.upnpcast.controller;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.CallSuper;
-import android.support.annotation.NonNull;
+import androidx.annotation.CallSuper;
+import androidx.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.liuwei.android.upnpcast.util.CastUtils;

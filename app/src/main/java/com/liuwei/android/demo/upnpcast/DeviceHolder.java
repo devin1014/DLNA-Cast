@@ -1,6 +1,6 @@
 package com.liuwei.android.demo.upnpcast;
 
-import android.support.v7.widget.RecyclerView.ViewHolder;
+import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.CheckBox;

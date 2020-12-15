@@ -1,6 +1,6 @@
 package com.liuwei.android.upnpcast.device;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import org.fourthline.cling.model.meta.Device;
 

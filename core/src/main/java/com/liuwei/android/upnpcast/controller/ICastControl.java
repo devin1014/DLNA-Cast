@@ -1,6 +1,6 @@
 package com.liuwei.android.upnpcast.controller;
 
-import android.support.annotation.IntDef;
+import androidx.annotation.IntDef;
 
 import com.liuwei.android.upnpcast.device.CastDevice;
 
