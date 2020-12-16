@@ -1,10 +1,8 @@
-package com.liuwei.android.demo.upnpcast;
+package com.android.cast.dlna.demo;
 
 import android.app.Activity;
 import android.os.Handler;
 import android.os.Looper;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView.Adapter;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -14,8 +12,12 @@ import com.android.cast.dlna.device.CastDevice;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView.Adapter;
+
 
 /**
+ *
  */
 public class DeviceAdapter extends Adapter<DeviceHolder> implements OnRegistryDeviceListener
 {

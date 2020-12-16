@@ -13,7 +13,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-package com.liuwei.android.demo.light;
+package com.android.cast.dlna.demo.light;
 
 import org.fourthline.cling.binding.annotations.UpnpAction;
 import org.fourthline.cling.binding.annotations.UpnpInputArgument;

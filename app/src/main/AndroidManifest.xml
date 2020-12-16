@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.liuwei.android.demo.upnpcast">
+    package="com.android.cast.dlna.demo">
 
     <application
         android:allowBackup="true"
@@ -12,7 +12,7 @@
 
         <!--dlna cast-->
         <activity
-            android:name="com.liuwei.android.demo.upnpcast.MainActivity"
+            android:name="com.android.cast.dlna.demo.MainActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -34,14 +34,14 @@
         <!--</activity>-->
 
         <activity
-            android:name="com.liuwei.android.demo.light.LightActivity"
+            android:name="com.android.cast.dlna.demo.light.LightActivity"
             android:configChanges="orientation" />
 
         <activity
-            android:name="com.liuwei.android.demo.browser.BrowserActivity"
+            android:name="com.android.cast.dlna.demo.browser.BrowserActivity"
             android:configChanges="orientation" />
 
-        <service android:name="com.liuwei.android.demo.browser.BrowserUpnpService" />
+        <service android:name="com.android.cast.dlna.demo.browser.BrowserUpnpService" />
 
         <service android:name="com.android.cast.dlna.service.NLUpnpCastService" />
 

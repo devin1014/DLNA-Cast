@@ -13,7 +13,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-package com.liuwei.android.demo.light;
+package com.android.cast.dlna.demo.light;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -28,7 +28,7 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.liuwei.android.demo.upnpcast.R;
+import com.android.cast.dlna.demo.R;
 
 import org.fourthline.cling.android.AndroidUpnpService;
 import org.fourthline.cling.android.AndroidUpnpServiceImpl;

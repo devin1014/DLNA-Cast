@@ -1,4 +1,4 @@
-package com.liuwei.android.demo.upnpcast;
+package com.android.cast.dlna.demo;
 
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -17,7 +17,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.liuwei.android.demo.upnpcast.DeviceAdapter.OnItemSelectedListener;
+import com.android.cast.dlna.demo.DeviceAdapter.OnItemSelectedListener;
 import com.android.cast.dlna.NLUpnpCastManager;
 import com.android.cast.dlna.controller.CastObject;
 import com.android.cast.dlna.controller.ICastEventListener;

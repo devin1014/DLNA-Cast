@@ -13,7 +13,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-package com.liuwei.android.demo.browser;
+package com.android.cast.dlna.demo.browser;
 
 import org.fourthline.cling.UpnpServiceConfiguration;
 import org.fourthline.cling.android.AndroidUpnpServiceConfiguration;

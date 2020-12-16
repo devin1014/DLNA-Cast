@@ -1,6 +1,5 @@
-package com.liuwei.android.demo.upnpcast;
+package com.android.cast.dlna.demo;
 
-import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.CheckBox;
@@ -8,10 +7,13 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 
-import com.liuwei.android.demo.upnpcast.DeviceAdapter.OnItemSelectedListener;
+import com.android.cast.dlna.demo.DeviceAdapter.OnItemSelectedListener;
 import com.android.cast.dlna.device.CastDevice;
 
+import androidx.recyclerview.widget.RecyclerView.ViewHolder;
+
 /**
+ *
  */
 public class DeviceHolder extends ViewHolder implements OnClickListener, OnCheckedChangeListener
 {

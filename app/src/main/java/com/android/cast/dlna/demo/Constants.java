@@ -1,4 +1,4 @@
-package com.liuwei.android.demo.upnpcast;
+package com.android.cast.dlna.demo;
 
 /**
  *
