@@ -57,10 +57,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ *
  */
 // DOC:CLASS
-public class LightActivity extends Activity implements PropertyChangeListener
-{
+public class LightActivity extends Activity implements PropertyChangeListener {
     // DOC:CLASS
     private static final Logger log = Logger.getLogger(LightActivity.class.getName());
 
@@ -69,10 +69,8 @@ public class LightActivity extends Activity implements PropertyChangeListener
 
     private UDN udn = new UDN(UUID.randomUUID()); // TODO: Not stable!
 
-    private ServiceConnection serviceConnection = new ServiceConnection()
-    {
-        public void onServiceConnected(ComponentName className, IBinder service)
-        {
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
             Toast.makeText(LightActivity.this, LightActivity.this.getClass().getSimpleName() + " bind service!", Toast.LENGTH_SHORT).show();
 
             upnpService = (AndroidUpnpService) service;
@@ -80,10 +78,8 @@ public class LightActivity extends Activity implements PropertyChangeListener
             LocalService<SwitchPower> switchPowerService = getSwitchPowerService();
 
             // Register the device when this activity binds to the service for the first time
-            if (switchPowerService == null)
-            {
-                try
-                {
+            if (switchPowerService == null) {
+                try {
                     LocalDevice binaryLightDevice = createDevice();
 
                     Toast.makeText(LightActivity.this, R.string.registeringDevice, Toast.LENGTH_SHORT).show();
@@ -92,9 +88,7 @@ public class LightActivity extends Activity implements PropertyChangeListener
 
                     switchPowerService = getSwitchPowerService();
 
-                }
-                catch (Exception ex)
-                {
+                } catch (Exception ex) {
                     log.log(Level.SEVERE, "Creating BinaryLight device failed", ex);
                     Toast.makeText(LightActivity.this, R.string.createDeviceFailed, Toast.LENGTH_SHORT).show();
                     return;
@@ -109,8 +103,7 @@ public class LightActivity extends Activity implements PropertyChangeListener
 
         }
 
-        public void onServiceDisconnected(ComponentName className)
-        {
+        public void onServiceDisconnected(ComponentName className) {
             upnpService = null;
 
             Toast.makeText(LightActivity.this, LightActivity.this.getClass().getSimpleName() + " unbind service!", Toast.LENGTH_SHORT).show();
@@ -118,8 +111,7 @@ public class LightActivity extends Activity implements PropertyChangeListener
     };
 
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // DOC:LOGGING
         // Fix the logging integration between java.util.logging and Android internal logging
@@ -139,32 +131,27 @@ public class LightActivity extends Activity implements PropertyChangeListener
     }
 
     @Override
-    protected void onDestroy()
-    {
+    protected void onDestroy() {
         super.onDestroy();
 
         // Stop monitoring the power switch
         LocalService<SwitchPower> switchPowerService = getSwitchPowerService();
 
-        if (switchPowerService != null)
-        {
+        if (switchPowerService != null) {
             switchPowerService.getManager().getImplementation().getPropertyChangeSupport().removePropertyChangeListener(this);
         }
 
         getApplicationContext().unbindService(serviceConnection);
     }
 
-    protected LocalService<SwitchPower> getSwitchPowerService()
-    {
-        if (upnpService == null)
-        {
+    protected LocalService<SwitchPower> getSwitchPowerService() {
+        if (upnpService == null) {
             return null;
         }
 
         LocalDevice binaryLightDevice = upnpService.getRegistry().getLocalDevice(udn, true);
 
-        if (binaryLightDevice == null)
-        {
+        if (binaryLightDevice == null) {
             return null;
         }
 
@@ -173,37 +160,27 @@ public class LightActivity extends Activity implements PropertyChangeListener
     // DOC:SERVICE_BINDING
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(0, 0, 0, R.string.switchRouter).setIcon(android.R.drawable.ic_menu_revert);
         menu.add(0, 1, 0, R.string.toggleDebugLogging).setIcon(android.R.drawable.ic_menu_info_details);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        switch (item.getItemId())
-        {
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
             case 0:
-                if (upnpService != null)
-                {
+                if (upnpService != null) {
                     Router router = upnpService.get().getRouter();
-                    try
-                    {
-                        if (router.isEnabled())
-                        {
+                    try {
+                        if (router.isEnabled()) {
                             Toast.makeText(this, R.string.disablingRouter, Toast.LENGTH_SHORT).show();
                             router.disable();
-                        }
-                        else
-                        {
+                        } else {
                             Toast.makeText(this, R.string.enablingRouter, Toast.LENGTH_SHORT).show();
                             router.enable();
                         }
-                    }
-                    catch (RouterException ex)
-                    {
+                    } catch (RouterException ex) {
                         Toast.makeText(this, getText(R.string.errorSwitchingRouter) + ex.toString(), Toast.LENGTH_LONG).show();
                         ex.printStackTrace(System.err);
                     }
@@ -211,13 +188,10 @@ public class LightActivity extends Activity implements PropertyChangeListener
                 break;
             case 1:
                 Logger logger = Logger.getLogger("org.fourthline.cling");
-                if (logger.getLevel() != null && !logger.getLevel().equals(Level.INFO))
-                {
+                if (logger.getLevel() != null && !logger.getLevel().equals(Level.INFO)) {
                     Toast.makeText(this, R.string.disablingDebugLogging, Toast.LENGTH_SHORT).show();
                     logger.setLevel(Level.INFO);
-                }
-                else
-                {
+                } else {
                     Toast.makeText(this, R.string.enablingDebugLogging, Toast.LENGTH_SHORT).show();
                     logger.setLevel(Level.FINEST);
                 }
@@ -227,22 +201,17 @@ public class LightActivity extends Activity implements PropertyChangeListener
     }
 
     // DOC:PROPERTY_CHANGE
-    public void propertyChange(PropertyChangeEvent event)
-    {
+    public void propertyChange(PropertyChangeEvent event) {
         // This is regular JavaBean eventing, not UPnP eventing!
-        if (event.getPropertyName().equals("status"))
-        {
+        if (event.getPropertyName().equals("status")) {
             log.info("Turning light: " + event.getNewValue());
             setLightbulb((Boolean) event.getNewValue());
         }
     }
 
-    protected void setLightbulb(final boolean on)
-    {
-        runOnUiThread(new Runnable()
-        {
-            public void run()
-            {
+    protected void setLightbulb(final boolean on) {
+        runOnUiThread(new Runnable() {
+            public void run() {
                 ImageView imageView = findViewById(R.id.light_imageview);
                 imageView.setImageResource(on ? R.drawable.light_on : R.drawable.light_off);
                 // You can NOT externalize this color into /res/values/colors.xml. Go on, try it!
@@ -253,8 +222,7 @@ public class LightActivity extends Activity implements PropertyChangeListener
     // DOC:PROPERTY_CHANGE
 
     // DOC:CREATE_DEVICE
-    protected LocalDevice createDevice() throws ValidationException, LocalServiceBindingException
-    {
+    protected LocalDevice createDevice() throws ValidationException, LocalServiceBindingException {
         DeviceType type = new UDADeviceType("BinaryLight", 1);
 
         DeviceDetails details =
@@ -278,8 +246,7 @@ public class LightActivity extends Activity implements PropertyChangeListener
     }
     // DOC:CREATE_DEVICE
 
-    protected Icon createDefaultDeviceIcon()
-    {
+    protected Icon createDefaultDeviceIcon() {
         return new Icon(
                 "image/png",
                 48, 48, 8,

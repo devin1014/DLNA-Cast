@@ -24,8 +24,7 @@ import org.fourthline.cling.support.model.TransportInfo;
 /**
  *
  */
-public interface IAVServiceActionFactory
-{
+public interface IAVServiceActionFactory {
     SetAVTransportURI setCastAction(ActionCallbackListener listener, String uri, String metadata);
 
     Play playAction(ActionCallbackListener listener);
@@ -47,170 +46,135 @@ public interface IAVServiceActionFactory
     // ---------------------------------------------------------------------------------------------------------
     // Implement
     // ---------------------------------------------------------------------------------------------------------
-    class AvServiceActionFactory extends BaseServiceActionFactory implements IAVServiceActionFactory
-    {
+    class AvServiceActionFactory extends BaseServiceActionFactory implements IAVServiceActionFactory {
         private final Service mAvService;
 
-        public AvServiceActionFactory(Service service)
-        {
+        public AvServiceActionFactory(Service service) {
             mAvService = service;
         }
 
         @Override
-        public SetAVTransportURI setCastAction(final ActionCallbackListener listener, final String uri, final String metadata)
-        {
-            return new SetAVTransportURI(mAvService, uri, metadata)
-            {
+        public SetAVTransportURI setCastAction(final ActionCallbackListener listener, final String uri, final String metadata) {
+            return new SetAVTransportURI(mAvService, uri, metadata) {
                 @Override
-                public void success(final ActionInvocation invocation)
-                {
+                public void success(final ActionInvocation invocation) {
                     notifySuccess(listener, invocation, uri, metadata);
                 }
 
                 @Override
-                public void failure(final ActionInvocation invocation, final UpnpResponse operation, final String defaultMsg)
-                {
+                public void failure(final ActionInvocation invocation, final UpnpResponse operation, final String defaultMsg) {
                     notifyFailure(listener, invocation, operation, defaultMsg);
                 }
             };
         }
 
         @Override
-        public Play playAction(final ActionCallbackListener listener)
-        {
-            return new Play(mAvService)
-            {
+        public Play playAction(final ActionCallbackListener listener) {
+            return new Play(mAvService) {
                 @Override
-                public void success(final ActionInvocation invocation)
-                {
+                public void success(final ActionInvocation invocation) {
                     notifySuccess(listener, invocation);
                 }
 
                 @Override
-                public void failure(final ActionInvocation invocation, final UpnpResponse operation, final String defaultMsg)
-                {
+                public void failure(final ActionInvocation invocation, final UpnpResponse operation, final String defaultMsg) {
                     notifyFailure(listener, invocation, operation, defaultMsg);
                 }
             };
         }
 
         @Override
-        public Pause pauseAction(final ActionCallbackListener listener)
-        {
-            return new Pause(mAvService)
-            {
+        public Pause pauseAction(final ActionCallbackListener listener) {
+            return new Pause(mAvService) {
                 @Override
-                public void success(final ActionInvocation invocation)
-                {
+                public void success(final ActionInvocation invocation) {
                     notifySuccess(listener, invocation);
                 }
 
                 @Override
-                public void failure(final ActionInvocation invocation, final UpnpResponse operation, final String defaultMsg)
-                {
+                public void failure(final ActionInvocation invocation, final UpnpResponse operation, final String defaultMsg) {
                     notifyFailure(listener, invocation, operation, defaultMsg);
                 }
             };
         }
 
         @Override
-        public Stop stopAction(final ActionCallbackListener listener)
-        {
-            return new Stop(mAvService)
-            {
+        public Stop stopAction(final ActionCallbackListener listener) {
+            return new Stop(mAvService) {
                 @Override
-                public void success(final ActionInvocation invocation)
-                {
+                public void success(final ActionInvocation invocation) {
                     notifySuccess(listener, invocation);
                 }
 
                 @Override
-                public void failure(final ActionInvocation invocation, final UpnpResponse operation, final String defaultMsg)
-                {
+                public void failure(final ActionInvocation invocation, final UpnpResponse operation, final String defaultMsg) {
                     notifyFailure(listener, invocation, operation, defaultMsg);
                 }
             };
         }
 
         @Override
-        public Seek seekAction(final ActionCallbackListener listener, final long position)
-        {
-            return new Seek(mAvService, CastUtils.getStringTime(position))
-            {
+        public Seek seekAction(final ActionCallbackListener listener, final long position) {
+            return new Seek(mAvService, CastUtils.getStringTime(position)) {
                 @Override
-                public void success(final ActionInvocation invocation)
-                {
+                public void success(final ActionInvocation invocation) {
                     notifySuccess(listener, invocation, position);
                 }
 
                 @Override
-                public void failure(final ActionInvocation invocation, final UpnpResponse operation, final String defaultMsg)
-                {
+                public void failure(final ActionInvocation invocation, final UpnpResponse operation, final String defaultMsg) {
                     notifyFailure(listener, invocation, operation, defaultMsg);
                 }
             };
         }
 
         @Override
-        public GetPositionInfo getPositionInfoAction(final ActionCallbackListener listener)
-        {
-            return new GetPositionInfo(mAvService)
-            {
+        public GetPositionInfo getPositionInfoAction(final ActionCallbackListener listener) {
+            return new GetPositionInfo(mAvService) {
                 @Override
-                public void received(ActionInvocation invocation, final PositionInfo positionInfo)
-                {
+                public void received(ActionInvocation invocation, final PositionInfo positionInfo) {
                     notifySuccess(listener, invocation, positionInfo);
                 }
 
                 @Override
-                public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
-                {
+                public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
                     notifyFailure(listener, invocation, operation, defaultMsg);
                 }
             };
         }
 
         @Override
-        public GetMediaInfo getMediaInfo(final ActionCallbackListener listener)
-        {
-            return new GetMediaInfo(mAvService)
-            {
+        public GetMediaInfo getMediaInfo(final ActionCallbackListener listener) {
+            return new GetMediaInfo(mAvService) {
                 @Override
-                public void received(ActionInvocation invocation, final MediaInfo mediaInfo)
-                {
+                public void received(ActionInvocation invocation, final MediaInfo mediaInfo) {
                     notifySuccess(listener, invocation, mediaInfo);
                 }
 
                 @Override
-                public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
-                {
+                public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
                     notifyFailure(listener, invocation, operation, defaultMsg);
                 }
             };
         }
 
         @Override
-        public GetTransportInfo getTransportInfo(final ActionCallbackListener listener)
-        {
-            return new GetTransportInfo(mAvService)
-            {
+        public GetTransportInfo getTransportInfo(final ActionCallbackListener listener) {
+            return new GetTransportInfo(mAvService) {
                 @Override
-                public void received(ActionInvocation invocation, TransportInfo transportInfo)
-                {
+                public void received(ActionInvocation invocation, TransportInfo transportInfo) {
                     notifySuccess(listener, invocation, transportInfo);
                 }
 
                 @Override
-                public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
-                {
+                public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
                     notifyFailure(listener, invocation, operation, defaultMsg);
                 }
             };
         }
 
         @Override
-        public SubscriptionCallback subscriptionCallback(ICastControlListener listener, EventCallbackListener eventCallbackListener)
-        {
+        public SubscriptionCallback subscriptionCallback(ICastControlListener listener, EventCallbackListener eventCallbackListener) {
             return new AvTransportSubscription(mAvService, listener, eventCallbackListener);
         }
     }

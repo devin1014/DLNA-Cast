@@ -12,8 +12,7 @@ import java.util.TimerTask;
 /**
  *
  */
-public abstract class BaseSession implements ICastSession
-{
+public abstract class BaseSession implements ICastSession {
     protected final ILogger mLogger = new DefaultLoggerImpl(this);
 
     private Handler mHandler = new Handler(Looper.getMainLooper());
@@ -22,19 +21,16 @@ public abstract class BaseSession implements ICastSession
 
     private int mIndex;
 
-    protected void startTimer(long delay, long interval)
-    {
+    protected void startTimer(long delay, long interval) {
         stopTimer();
 
         mLogger.i("start");
 
         mTimer = new Timer();
 
-        mTimer.scheduleAtFixedRate(new TimerTask()
-        {
+        mTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
-            public void run()
-            {
+            public void run() {
                 mIndex++;
 
                 onInterval(mIndex);
@@ -44,10 +40,8 @@ public abstract class BaseSession implements ICastSession
 
     protected abstract void onInterval(int index);
 
-    protected void stopTimer()
-    {
-        if (mTimer != null)
-        {
+    protected void stopTimer() {
+        if (mTimer != null) {
             mTimer.cancel();
 
             mLogger.i("stop");
@@ -58,21 +52,16 @@ public abstract class BaseSession implements ICastSession
         mIndex = 0;
     }
 
-    protected final void notifyRunnable(Runnable r)
-    {
-        if (Looper.myLooper() == Looper.getMainLooper())
-        {
+    protected final void notifyRunnable(Runnable r) {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
             r.run();
-        }
-        else
-        {
+        } else {
             mHandler.post(r);
         }
     }
 
     @Override
-    public boolean isRunning()
-    {
+    public boolean isRunning() {
         return mTimer != null;
     }
 }

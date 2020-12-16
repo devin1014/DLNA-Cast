@@ -50,10 +50,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ *
  */
 // DOC:CLASS
-public class BrowserActivity extends ListActivity
-{
+public class BrowserActivity extends ListActivity {
     // DOC:CLASS
     // DOC:SERVICE_BINDING
     private ArrayAdapter<DeviceDisplay> listAdapter;
@@ -62,10 +62,8 @@ public class BrowserActivity extends ListActivity
 
     private AndroidUpnpService upnpService;
 
-    private ServiceConnection serviceConnection = new ServiceConnection()
-    {
-        public void onServiceConnected(ComponentName className, IBinder service)
-        {
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
             upnpService = (AndroidUpnpService) service;
 
             // Clear the list
@@ -75,8 +73,7 @@ public class BrowserActivity extends ListActivity
             upnpService.getRegistry().addListener(registryListener);
 
             // Now add all devices to the list we already know about
-            for (Device device : upnpService.getRegistry().getDevices())
-            {
+            for (Device device : upnpService.getRegistry().getDevices()) {
                 registryListener.deviceAdded(device);
             }
 
@@ -84,15 +81,13 @@ public class BrowserActivity extends ListActivity
             upnpService.getControlPoint().search();
         }
 
-        public void onServiceDisconnected(ComponentName className)
-        {
+        public void onServiceDisconnected(ComponentName className) {
             upnpService = null;
         }
     };
 
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // Fix the logging integration between java.util.logging and Android internal logging
@@ -114,11 +109,9 @@ public class BrowserActivity extends ListActivity
     }
 
     @Override
-    protected void onDestroy()
-    {
+    protected void onDestroy() {
         super.onDestroy();
-        if (upnpService != null)
-        {
+        if (upnpService != null) {
             upnpService.getRegistry().removeListener(registryListener);
         }
         // This will stop the UPnP service if nobody else is bound to it
@@ -128,8 +121,7 @@ public class BrowserActivity extends ListActivity
 
     // DOC:MENU
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(0, 0, 0, R.string.searchLAN).setIcon(android.R.drawable.ic_menu_search);
         // DOC:OPTIONAL
         menu.add(0, 1, 0, R.string.switchRouter).setIcon(android.R.drawable.ic_menu_revert);
@@ -139,13 +131,10 @@ public class BrowserActivity extends ListActivity
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        switch (item.getItemId())
-        {
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
             case 0:
-                if (upnpService == null)
-                {
+                if (upnpService == null) {
                     break;
                 }
                 Toast.makeText(this, R.string.searchingLAN, Toast.LENGTH_SHORT).show();
@@ -154,24 +143,17 @@ public class BrowserActivity extends ListActivity
                 break;
             // DOC:OPTIONAL
             case 1:
-                if (upnpService != null)
-                {
+                if (upnpService != null) {
                     Router router = upnpService.get().getRouter();
-                    try
-                    {
-                        if (router.isEnabled())
-                        {
+                    try {
+                        if (router.isEnabled()) {
                             Toast.makeText(this, R.string.disablingRouter, Toast.LENGTH_SHORT).show();
                             router.disable();
-                        }
-                        else
-                        {
+                        } else {
                             Toast.makeText(this, R.string.enablingRouter, Toast.LENGTH_SHORT).show();
                             router.enable();
                         }
-                    }
-                    catch (RouterException ex)
-                    {
+                    } catch (RouterException ex) {
                         Toast.makeText(this, getText(R.string.errorSwitchingRouter) + ex.toString(), Toast.LENGTH_LONG).show();
                         ex.printStackTrace(System.err);
                     }
@@ -179,13 +161,10 @@ public class BrowserActivity extends ListActivity
                 break;
             case 2:
                 Logger logger = Logger.getLogger("org.fourthline.cling");
-                if (logger.getLevel() != null && !logger.getLevel().equals(Level.INFO))
-                {
+                if (logger.getLevel() != null && !logger.getLevel().equals(Level.INFO)) {
                     Toast.makeText(this, R.string.disablingDebugLogging, Toast.LENGTH_SHORT).show();
                     logger.setLevel(Level.INFO);
-                }
-                else
-                {
+                } else {
                     Toast.makeText(this, R.string.enablingDebugLogging, Toast.LENGTH_SHORT).show();
                     logger.setLevel(Level.FINEST);
                 }
@@ -197,18 +176,15 @@ public class BrowserActivity extends ListActivity
     // DOC:MENU
 
     @Override
-    protected void onListItemClick(ListView l, View v, int position, long id)
-    {
+    protected void onListItemClick(ListView l, View v, int position, long id) {
         AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.setTitle(R.string.deviceDetails);
         DeviceDisplay deviceDisplay = (DeviceDisplay) l.getItemAtPosition(position);
         dialog.setMessage(deviceDisplay.getDetailsMessage());
         dialog.setButton(
                 getString(R.string.OK),
-                new DialogInterface.OnClickListener()
-                {
-                    public void onClick(DialogInterface dialog, int which)
-                    {
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
                     }
                 }
         );
@@ -218,22 +194,17 @@ public class BrowserActivity extends ListActivity
         super.onListItemClick(l, v, position, id);
     }
 
-    protected class BrowseRegistryListener extends DefaultRegistryListener
-    {
+    protected class BrowseRegistryListener extends DefaultRegistryListener {
         /* Discovery performance optimization for very slow Android devices! */
         @Override
-        public void remoteDeviceDiscoveryStarted(Registry registry, RemoteDevice device)
-        {
+        public void remoteDeviceDiscoveryStarted(Registry registry, RemoteDevice device) {
             deviceAdded(device);
         }
 
         @Override
-        public void remoteDeviceDiscoveryFailed(Registry registry, final RemoteDevice device, final Exception ex)
-        {
-            runOnUiThread(new Runnable()
-            {
-                public void run()
-                {
+        public void remoteDeviceDiscoveryFailed(Registry registry, final RemoteDevice device, final Exception ex) {
+            runOnUiThread(new Runnable() {
+                public void run() {
                     Toast.makeText(
                             BrowserActivity.this,
                             "Discovery failed of '" + device.getDisplayString() + "': "
@@ -247,92 +218,71 @@ public class BrowserActivity extends ListActivity
         /* End of optimization, you can remove the whole block if your Android handset is fast (>= 600 Mhz) */
 
         @Override
-        public void remoteDeviceAdded(Registry registry, RemoteDevice device)
-        {
+        public void remoteDeviceAdded(Registry registry, RemoteDevice device) {
             deviceAdded(device);
         }
 
         @Override
-        public void remoteDeviceRemoved(Registry registry, RemoteDevice device)
-        {
+        public void remoteDeviceRemoved(Registry registry, RemoteDevice device) {
             deviceRemoved(device);
         }
 
         @Override
-        public void localDeviceAdded(Registry registry, LocalDevice device)
-        {
+        public void localDeviceAdded(Registry registry, LocalDevice device) {
             deviceAdded(device);
         }
 
         @Override
-        public void localDeviceRemoved(Registry registry, LocalDevice device)
-        {
+        public void localDeviceRemoved(Registry registry, LocalDevice device) {
             deviceRemoved(device);
         }
 
-        public void deviceAdded(final Device device)
-        {
-            runOnUiThread(new Runnable()
-            {
-                public void run()
-                {
+        public void deviceAdded(final Device device) {
+            runOnUiThread(new Runnable() {
+                public void run() {
                     DeviceDisplay d = new DeviceDisplay(device);
                     int position = listAdapter.getPosition(d);
-                    if (position >= 0)
-                    {
+                    if (position >= 0) {
                         // Device already in the list, re-set new value at same position
                         listAdapter.remove(d);
                         listAdapter.insert(d, position);
-                    }
-                    else
-                    {
+                    } else {
                         listAdapter.add(d);
                     }
                 }
             });
         }
 
-        public void deviceRemoved(final Device device)
-        {
-            runOnUiThread(new Runnable()
-            {
-                public void run()
-                {
+        public void deviceRemoved(final Device device) {
+            runOnUiThread(new Runnable() {
+                public void run() {
                     listAdapter.remove(new DeviceDisplay(device));
                 }
             });
         }
     }
 
-    protected class DeviceDisplay
-    {
+    protected class DeviceDisplay {
         Device device;
 
-        public DeviceDisplay(Device device)
-        {
+        public DeviceDisplay(Device device) {
             this.device = device;
         }
 
-        public Device getDevice()
-        {
+        public Device getDevice() {
             return device;
         }
 
         // DOC:DETAILS
-        public String getDetailsMessage()
-        {
+        public String getDetailsMessage() {
             StringBuilder sb = new StringBuilder();
-            if (getDevice().isFullyHydrated())
-            {
+            if (getDevice().isFullyHydrated()) {
                 sb.append(getDevice().getDisplayString());
                 sb.append("\n\n");
-                for (Service service : getDevice().getServices())
-                {
+                for (Service service : getDevice().getServices()) {
                     sb.append(service.getServiceType()).append("\n");
                 }
-            }
-            else
-            {
+            } else {
                 sb.append(getString(R.string.deviceDetailsNotYetAvailable));
             }
             return sb.toString();
@@ -340,14 +290,11 @@ public class BrowserActivity extends ListActivity
         // DOC:DETAILS
 
         @Override
-        public boolean equals(Object o)
-        {
-            if (this == o)
-            {
+        public boolean equals(Object o) {
+            if (this == o) {
                 return true;
             }
-            if (o == null || getClass() != o.getClass())
-            {
+            if (o == null || getClass() != o.getClass()) {
                 return false;
             }
             DeviceDisplay that = (DeviceDisplay) o;
@@ -355,14 +302,12 @@ public class BrowserActivity extends ListActivity
         }
 
         @Override
-        public int hashCode()
-        {
+        public int hashCode() {
             return device.hashCode();
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             String name =
                     getDevice().getDetails() != null && getDevice().getDetails().getFriendlyName() != null
                             ? getDevice().getDetails().getFriendlyName()

@@ -1,9 +1,9 @@
 package com.android.cast.dlna.controller;
 
 /**
+ *
  */
-public interface ICastSession
-{
+public interface ICastSession {
     void start();
 
     void stop();

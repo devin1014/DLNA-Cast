@@ -5,9 +5,9 @@ import com.android.cast.dlna.controller.ICastControl;
 import org.fourthline.cling.model.types.DeviceType;
 
 /**
+ *
  */
-public interface IUpnpCast extends ICastControl
-{
+public interface IUpnpCast extends ICastControl {
     int DEFAULT_MAX_SECONDS = 60;
 
     void search();

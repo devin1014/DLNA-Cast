@@ -1,13 +1,12 @@
 package com.android.cast.dlna;
 
 /**
+ *
  */
-public class Constants
-{
+public class Constants {
     public static final boolean DEBUG = true;
 
-    public static class Key
-    {
+    public static class Key {
         private static final String PACKAGE = "com.liuwei.android.upnpcast.key.";
 
         public static final String ID = PACKAGE + "id";

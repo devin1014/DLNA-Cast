@@ -26,23 +26,19 @@
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/AppTheme.PopupOverlay" />
 
-            <FrameLayout
+            <TextView
+                android:id="@+id/cast_network_info"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="12dp">
-
-                <TextView
-                    android:id="@+id/cast_network_info"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start|top"
-                    android:padding="16dp"
-                    android:textColor="#ffffff"
-                    android:textSize="16dp"
-                    android:textStyle="bold"
-                    tools:ignore="SpUsage" />
-
-            </FrameLayout>
+                android:layout_gravity="start|top"
+                android:layout_marginTop="?attr/actionBarSize"
+                android:gravity="center_vertical"
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp"
+                android:textColor="#ffffff"
+                android:textSize="14dp"
+                android:textStyle="bold"
+                tools:ignore="SpUsage" />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 

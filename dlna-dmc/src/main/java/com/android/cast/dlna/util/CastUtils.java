@@ -19,17 +19,25 @@ import java.util.Formatter;
 import java.util.Locale;
 
 /**
+ *
  */
-public class CastUtils
-{
+public class CastUtils {
+    private static final String DIDL_LITE_FOOTER = "</DIDL-Lite>";
+    private static final String DIDL_LITE_HEADER = "<?xml version=\"1.0\"?>" + "<DIDL-Lite " + "xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\" " +
+            "xmlns:dc=\"http://purl.org/dc/elements/1.1/\" " + "xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" " +
+            "xmlns:dlna=\"urn:schemas-dlna-org:metadata-1-0/\">";
+    private static final String CAST_PARENT_ID = "1";
+    private static final String CAST_CREATOR = "NLUpnpCast";
+    private static final String CAST_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(CAST_DATE_FORMAT, Locale.US);
+
     /**
      * 把时间戳转换成 00:00:00 格式
      *
      * @param timeMs 时间戳
      * @return 00:00:00 时间格式
      */
-    public static String getStringTime(long timeMs)
-    {
+    public static String getStringTime(long timeMs) {
         StringBuilder formatBuilder = new StringBuilder();
         Formatter formatter = new Formatter(formatBuilder, Locale.US);
 
@@ -47,14 +55,11 @@ public class CastUtils
      * @param formatTime 00:00:00 时间格式
      * @return 时间戳(毫秒)
      */
-    public static long getIntTime(String formatTime)
-    {
-        if (!TextUtils.isEmpty(formatTime))
-        {
+    public static long getIntTime(String formatTime) {
+        if (!TextUtils.isEmpty(formatTime)) {
             String[] tmp = formatTime.split(":");
 
-            if (tmp.length < 3)
-            {
+            if (tmp.length < 3) {
                 return 0;
             }
 
@@ -66,31 +71,17 @@ public class CastUtils
         return 0;
     }
 
-    public static long parseTime(String s)
-    {
-        try
-        {
+    public static long parseTime(String s) {
+        try {
             return Long.parseLong(s);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         return 0L;
     }
 
-    private static final String DIDL_LITE_FOOTER = "</DIDL-Lite>";
-    private static final String DIDL_LITE_HEADER = "<?xml version=\"1.0\"?>" + "<DIDL-Lite " + "xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\" " +
-            "xmlns:dc=\"http://purl.org/dc/elements/1.1/\" " + "xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" " +
-            "xmlns:dlna=\"urn:schemas-dlna-org:metadata-1-0/\">";
-    private static final String CAST_PARENT_ID = "1";
-    private static final String CAST_CREATOR = "NLUpnpCast";
-    private static final String CAST_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(CAST_DATE_FORMAT, Locale.US);
-
-    public static String getMetadata(CastObject castObject)
-    {
+    public static String getMetadata(CastObject castObject) {
         //TODO,the params!
         long size = 0;
         long bitrate = 0;
@@ -105,15 +96,13 @@ public class CastUtils
         return createItemMetadata(videoItem);
     }
 
-    private static String createItemMetadata(DIDLObject item)
-    {
+    private static String createItemMetadata(DIDLObject item) {
         StringBuilder metadata = new StringBuilder();
         metadata.append(DIDL_LITE_HEADER);
         metadata.append(String.format("<item id=\"%s\" parentID=\"%s\" restricted=\"%s\">", item.getId(), item.getParentID(), item.isRestricted() ? "1" : "0"));
         metadata.append(String.format("<dc:title>%s</dc:title>", item.getTitle()));
         String creator = item.getCreator();
-        if (creator != null)
-        {
+        if (creator != null) {
             creator = creator.replaceAll("<", "_");
             creator = creator.replaceAll(">", "_");
         }
@@ -126,27 +115,23 @@ public class CastUtils
         // resolution="640x478">http://192.168.1.104:8088/Music/07.我醒著做夢.mp3</res>
 
         Res res = item.getFirstResource();
-        if (res != null)
-        {
+        if (res != null) {
             // protocol info
             String protocolInfo = "";
             ProtocolInfo pi = res.getProtocolInfo();
-            if (pi != null)
-            {
+            if (pi != null) {
                 protocolInfo = String.format("protocolInfo=\"%s:%s:%s:%s\"", pi.getProtocol(), pi.getNetwork(), pi.getContentFormatMimeType(), pi.getAdditionalInfo());
             }
 
             // resolution, extra info, not adding yet
             String resolution = "";
-            if (!TextUtils.isEmpty(res.getResolution()))
-            {
+            if (!TextUtils.isEmpty(res.getResolution())) {
                 resolution = String.format("resolution=\"%s\"", res.getResolution());
             }
 
             // duration
             String duration = "";
-            if (!TextUtils.isEmpty(res.getDuration()))
-            {
+            if (!TextUtils.isEmpty(res.getDuration())) {
                 duration = String.format("duration=\"%s\"", res.getDuration());
             }
 
@@ -167,23 +152,18 @@ public class CastUtils
         return metadata.toString();
     }
 
-    private static void printDeviceSupportServiceAndAction(CastDevice castDevice, ILogger logger)
-    {
+    private static void printDeviceSupportServiceAndAction(CastDevice castDevice, ILogger logger) {
         // device support services and actions
         Service[] services = castDevice.getDevice().getServices();
 
-        if (services != null)
-        {
-            for (Service service : services)
-            {
+        if (services != null) {
+            for (Service service : services) {
                 Action[] actions = service.getActions();
 
-                if (actions != null)
-                {
+                if (actions != null) {
                     String device = castDevice.getDevice().getDisplayString();
 
-                    for (Action action : actions)
-                    {
+                    for (Action action : actions) {
                         logger.d(String.format("Device[%s],Service[%s],Action[%s]", device, service.getServiceType().getType(), action.getName()));
                     }
                 }

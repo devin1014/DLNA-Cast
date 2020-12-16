@@ -8,8 +8,7 @@ import com.android.cast.dlna.Constants;
 /**
  *
  */
-public interface ILogger
-{
+public interface ILogger {
     String PREFIX_TAG = "4Droid_";
 
     void v(String msg);
@@ -22,68 +21,54 @@ public interface ILogger
 
     void e(String msg);
 
-    class DefaultLoggerImpl implements ILogger
-    {
+    class DefaultLoggerImpl implements ILogger {
         private final String TAG;
         private final boolean DEBUG;
 
-        public DefaultLoggerImpl(Object object)
-        {
+        public DefaultLoggerImpl(Object object) {
             this(object.getClass().getSimpleName() + "@" + Integer.toHexString(object.hashCode()));
         }
 
-        public DefaultLoggerImpl(String tag)
-        {
+        public DefaultLoggerImpl(String tag) {
             this(tag, Constants.DEBUG);
         }
 
-        public DefaultLoggerImpl(String tag, boolean log)
-        {
+        public DefaultLoggerImpl(String tag, boolean log) {
             TAG = PREFIX_TAG + tag;
             DEBUG = log;
         }
 
         @Override
-        public void v(String msg)
-        {
-            if (DEBUG)
-            {
+        public void v(String msg) {
+            if (DEBUG) {
                 Log.v(TAG, msg);
             }
         }
 
         @Override
-        public void d(String msg)
-        {
-            if (DEBUG)
-            {
+        public void d(String msg) {
+            if (DEBUG) {
                 Log.d(TAG, msg);
             }
         }
 
         @Override
-        public void i(String msg)
-        {
-            if (DEBUG)
-            {
+        public void i(String msg) {
+            if (DEBUG) {
                 Log.i(TAG, msg);
             }
         }
 
         @Override
-        public void w(String msg)
-        {
-            if (DEBUG)
-            {
+        public void w(String msg) {
+            if (DEBUG) {
                 Log.w(TAG, msg);
             }
         }
 
         @Override
-        public void e(String msg)
-        {
-            if (DEBUG)
-            {
+        public void e(String msg) {
+            if (DEBUG) {
                 Log.e(TAG, msg);
             }
         }

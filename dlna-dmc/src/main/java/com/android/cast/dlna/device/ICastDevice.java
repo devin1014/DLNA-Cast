@@ -5,9 +5,9 @@ import androidx.annotation.NonNull;
 import org.fourthline.cling.model.meta.Device;
 
 /**
+ *
  */
-public interface ICastDevice<T extends Device>
-{
+public interface ICastDevice<T extends Device> {
     T getDevice();
 
     @NonNull

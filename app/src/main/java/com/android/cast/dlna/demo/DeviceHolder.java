@@ -7,16 +7,15 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView.ViewHolder;
+
 import com.android.cast.dlna.demo.DeviceAdapter.OnItemSelectedListener;
 import com.android.cast.dlna.device.CastDevice;
-
-import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
 /**
  *
  */
-public class DeviceHolder extends ViewHolder implements OnClickListener, OnCheckedChangeListener
-{
+public class DeviceHolder extends ViewHolder implements OnClickListener, OnCheckedChangeListener {
     private TextView name;
     private TextView description;
     private CheckBox selector;
@@ -24,8 +23,7 @@ public class DeviceHolder extends ViewHolder implements OnClickListener, OnCheck
     private CastDevice mCastDevice;
     private boolean mBinding = false;
 
-    DeviceHolder(final View itemView, OnItemSelectedListener listener)
-    {
+    DeviceHolder(final View itemView, OnItemSelectedListener listener) {
         super(itemView);
 
         mOnItemSelectedListener = listener;
@@ -37,8 +35,7 @@ public class DeviceHolder extends ViewHolder implements OnClickListener, OnCheck
         selector.setOnCheckedChangeListener(this);
     }
 
-    public void setData(CastDevice castDevice, boolean isSelected)
-    {
+    public void setData(CastDevice castDevice, boolean isSelected) {
         mBinding = true;
         mCastDevice = castDevice;
         name.setText(castDevice.getName());
@@ -48,16 +45,13 @@ public class DeviceHolder extends ViewHolder implements OnClickListener, OnCheck
     }
 
     @Override
-    public void onClick(View v)
-    {
+    public void onClick(View v) {
         selector.setChecked(!selector.isChecked());
     }
 
     @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-    {
-        if (mOnItemSelectedListener != null && !mBinding)
-        {
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (mOnItemSelectedListener != null && !mBinding) {
             mOnItemSelectedListener.onItemSelected(mCastDevice, isChecked);
         }
     }

@@ -16,13 +16,11 @@ import org.fourthline.cling.registry.Registry;
 /**
  *
  */
-public class NLUpnpCastService extends AndroidUpnpServiceImpl implements AndroidUpnpService
-{
+public class NLUpnpCastService extends AndroidUpnpServiceImpl implements AndroidUpnpService {
     private ILogger mLogger = new DefaultLoggerImpl(this);
 
     @Override
-    public void onCreate()
-    {
+    public void onCreate() {
         mLogger.i("onCreate");
 
         org.seamless.util.logging.LoggingUtil.resetRootHandler(new FixedAndroidLogHandler());
@@ -33,52 +31,44 @@ public class NLUpnpCastService extends AndroidUpnpServiceImpl implements Android
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId)
-    {
+    public int onStartCommand(Intent intent, int flags, int startId) {
         mLogger.i("onStartCommand:" + intent);
 
         return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
-    public void onDestroy()
-    {
+    public void onDestroy() {
         mLogger.w("onDestroy");
 
         super.onDestroy();
     }
 
     @Override
-    public UpnpService get()
-    {
+    public UpnpService get() {
         return binder.get();
     }
 
     @Override
-    public UpnpServiceConfiguration getConfiguration()
-    {
+    public UpnpServiceConfiguration getConfiguration() {
         return binder.getConfiguration();
     }
 
     @Override
-    public Registry getRegistry()
-    {
+    public Registry getRegistry() {
         return binder.getRegistry();
     }
 
     @Override
-    public ControlPoint getControlPoint()
-    {
+    public ControlPoint getControlPoint() {
         return binder.getControlPoint();
     }
 
     // -------------------------------------------------------------------------------------
     // Upnp cast binder
     // -------------------------------------------------------------------------------------
-    public class NLUpnpCastBinder extends Binder
-    {
-        public NLUpnpCastService getService()
-        {
+    public class NLUpnpCastBinder extends Binder {
+        public NLUpnpCastService getService() {
             return NLUpnpCastService.this;
         }
     }

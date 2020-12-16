@@ -33,6 +33,10 @@ import java.beans.PropertyChangeSupport;
 public class SwitchPower {
 
     private final PropertyChangeSupport propertyChangeSupport;
+    @UpnpStateVariable(defaultValue = "0", sendEvents = false)
+    private boolean target = false;
+    @UpnpStateVariable(defaultValue = "0")
+    private boolean status = false;
 
     public SwitchPower() {
         this.propertyChangeSupport = new PropertyChangeSupport(this);
@@ -42,11 +46,10 @@ public class SwitchPower {
         return propertyChangeSupport;
     }
 
-    @UpnpStateVariable(defaultValue = "0", sendEvents = false)
-    private boolean target = false;
-
-    @UpnpStateVariable(defaultValue = "0")
-    private boolean status = false;
+    @UpnpAction(out = @UpnpOutputArgument(name = "RetTargetValue"))
+    public boolean getTarget() {
+        return target;
+    }
 
     @UpnpAction
     public void setTarget(@UpnpInputArgument(name = "NewTargetValue") boolean newTargetValue) {
@@ -61,11 +64,6 @@ public class SwitchPower {
 
         // This will send a UPnP event, it's the name of a state variable that sends events
         getPropertyChangeSupport().firePropertyChange("Status", statusOldValue, status);
-    }
-
-    @UpnpAction(out = @UpnpOutputArgument(name = "RetTargetValue"))
-    public boolean getTarget() {
-        return target;
     }
 
     @UpnpAction(out = @UpnpOutputArgument(name = "ResultStatus"))

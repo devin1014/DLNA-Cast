@@ -1,4 +1,4 @@
-package com.android.cast.dlna.util;
+package com.android.cast.dlna.demo;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -7,19 +7,16 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
 /**
+ *
  */
-public class NetworkUtils
-{
-    public static String getActiveNetworkInfo(Context context)
-    {
+public class NetworkUtils {
+    public static String getActiveNetworkInfo(Context context) {
         ConnectivityManager connectivityManager = getSystemService(context, Context.CONNECTIVITY_SERVICE);
 
-        if (connectivityManager != null)
-        {
+        if (connectivityManager != null) {
             NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
-            if (networkInfo != null && networkInfo.getType() == ConnectivityManager.TYPE_WIFI)
-            {
+            if (networkInfo != null && networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
                 return getWifiInfo(context);
             }
         }
@@ -27,8 +24,7 @@ public class NetworkUtils
         return null;
     }
 
-    private static String getWifiInfo(Context context)
-    {
+    private static String getWifiInfo(Context context) {
         WifiManager wifiManager = getSystemService(context, Context.WIFI_SERVICE);
 
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
@@ -69,8 +65,7 @@ public class NetworkUtils
     //    }
 
     @SuppressWarnings({"unchecked", "TypeParameterExplicitlyExtendsObject"})
-    private static <T extends Object> T getSystemService(Context context, String name)
-    {
+    private static <T extends Object> T getSystemService(Context context, String name) {
         return (T) context.getApplicationContext().getSystemService(name);
     }
 }

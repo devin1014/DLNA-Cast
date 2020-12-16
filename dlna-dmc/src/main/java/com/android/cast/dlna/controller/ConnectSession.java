@@ -14,25 +14,21 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
+ *
  */
-public class ConnectSession extends BaseSession
-{
+public class ConnectSession extends BaseSession {
     private static final int TASK_COUNT = 3;
     private static final int POSITION_INTERVAL = 60 * 1000; // 1min
     private ControlPoint mControlPoint;
     private ICastActionFactory mCastActionFactory;
     private ConnectSessionCallback mListener;
     private CountDownLatch mCountDownLatch;
+    private TransportInfo mTransportInfo = null;
+    private int mTransportRetry = 3;
+    private MediaInfo mMediaInfo = null;
+    private int mCurrentVolume = -1;
 
-    public interface ConnectSessionCallback
-    {
-        void onCastSession(TransportInfo transportInfo, MediaInfo mediaInfo, int volume);
-
-        void onCastSessionTimeout();
-    }
-
-    public ConnectSession(ControlPoint controlPoint, ICastActionFactory factory, ConnectSessionCallback listener)
-    {
+    public ConnectSession(ControlPoint controlPoint, ICastActionFactory factory, ConnectSessionCallback listener) {
         mControlPoint = controlPoint;
 
         mCastActionFactory = factory;
@@ -43,20 +39,17 @@ public class ConnectSession extends BaseSession
     }
 
     @Override
-    public void start()
-    {
+    public void start() {
         startTimer(0, POSITION_INTERVAL);
     }
 
     @Override
-    public void stop()
-    {
+    public void stop() {
         stopTimer();
     }
 
     @Override
-    protected void onInterval(int index)
-    {
+    protected void onInterval(int index) {
         mCountDownLatch = new CountDownLatch(TASK_COUNT);
 
         getTransportInfo();
@@ -65,26 +58,18 @@ public class ConnectSession extends BaseSession
 
         getVolume();
 
-        try
-        {
+        try {
             mCountDownLatch.await(5, TimeUnit.SECONDS);
-        }
-        catch (InterruptedException e)
-        {
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        notifyRunnable(new Runnable()
-        {
+        notifyRunnable(new Runnable() {
             @Override
-            public void run()
-            {
-                if (mTransportInfo != null)
-                {
+            public void run() {
+                if (mTransportInfo != null) {
                     mListener.onCastSession(mTransportInfo, mMediaInfo, mCurrentVolume);
-                }
-                else
-                {
+                } else {
                     mLogger.w("onCastSessionTimeout");
 
                     mListener.onCastSessionTimeout();
@@ -93,17 +78,10 @@ public class ConnectSession extends BaseSession
         });
     }
 
-    private TransportInfo mTransportInfo = null;
-
-    private int mTransportRetry = 3;
-
-    private void getTransportInfo()
-    {
-        ActionCallback action = mCastActionFactory.getAvService().getTransportInfo(new ActionCallbackListener()
-        {
+    private void getTransportInfo() {
+        ActionCallback action = mCastActionFactory.getAvService().getTransportInfo(new ActionCallbackListener() {
             @Override
-            public void success(ActionInvocation invocation, Object... received)
-            {
+            public void success(ActionInvocation invocation, Object... received) {
                 TransportInfo transportInfo = (TransportInfo) received[0];
 
                 mTransportInfo = transportInfo;
@@ -116,16 +94,12 @@ public class ConnectSession extends BaseSession
             }
 
             @Override
-            public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
-            {
+            public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
                 mTransportRetry--;
 
-                if (mTransportRetry > 0)
-                {
+                if (mTransportRetry > 0) {
                     getTransportInfo();
-                }
-                else
-                {
+                } else {
                     mTransportInfo = null;
 
                     mCountDownLatch.countDown();
@@ -138,15 +112,10 @@ public class ConnectSession extends BaseSession
         mControlPoint.execute(action);
     }
 
-    private MediaInfo mMediaInfo = null;
-
-    private void getMediaInfo()
-    {
-        ActionCallback action = mCastActionFactory.getAvService().getMediaInfo(new ActionCallbackListener()
-        {
+    private void getMediaInfo() {
+        ActionCallback action = mCastActionFactory.getAvService().getMediaInfo(new ActionCallbackListener() {
             @Override
-            public void success(ActionInvocation invocation, Object... received)
-            {
+            public void success(ActionInvocation invocation, Object... received) {
                 MediaInfo mediaInfo = (MediaInfo) received[0];
 
                 mMediaInfo = mediaInfo;
@@ -157,8 +126,7 @@ public class ConnectSession extends BaseSession
             }
 
             @Override
-            public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
-            {
+            public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
                 mMediaInfo = null;
 
                 mCountDownLatch.countDown();
@@ -168,15 +136,10 @@ public class ConnectSession extends BaseSession
         mControlPoint.execute(action);
     }
 
-    private int mCurrentVolume = -1;
-
-    private void getVolume()
-    {
-        ActionCallback action = mCastActionFactory.getRenderService().getVolumeAction(new ActionCallbackListener()
-        {
+    private void getVolume() {
+        ActionCallback action = mCastActionFactory.getRenderService().getVolumeAction(new ActionCallbackListener() {
             @Override
-            public void success(ActionInvocation invocation, Object... received)
-            {
+            public void success(ActionInvocation invocation, Object... received) {
                 int volume = (int) received[0];
 
                 mCurrentVolume = volume;
@@ -187,8 +150,7 @@ public class ConnectSession extends BaseSession
             }
 
             @Override
-            public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg)
-            {
+            public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
                 mCurrentVolume = -1;
 
                 mCountDownLatch.countDown();
@@ -196,5 +158,11 @@ public class ConnectSession extends BaseSession
         });
 
         mControlPoint.execute(action);
+    }
+
+    public interface ConnectSessionCallback {
+        void onCastSession(TransportInfo transportInfo, MediaInfo mediaInfo, int volume);
+
+        void onCastSessionTimeout();
     }
 }

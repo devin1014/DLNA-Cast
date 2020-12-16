@@ -7,12 +7,11 @@ import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
 import org.fourthline.cling.model.types.UnsignedIntegerTwoBytes;
 
 /**
+ *
  */
-public abstract class SetBrightness extends ActionCallback
-{
+public abstract class SetBrightness extends ActionCallback {
     @SuppressWarnings({"unchecked", "WeakerAccess"})
-    public SetBrightness(Service service, long newBrightness)
-    {
+    public SetBrightness(Service service, long newBrightness) {
         super(new ActionInvocation(service.getAction("SetBrightness")));
         getActionInvocation().setInput("InstanceID", new UnsignedIntegerFourBytes(0));
         //getActionInvocation().setInput("Channel", Channel.Master.toString());
@@ -20,7 +19,6 @@ public abstract class SetBrightness extends ActionCallback
     }
 
     @Override
-    public void success(ActionInvocation invocation)
-    {
+    public void success(ActionInvocation invocation) {
     }
 }

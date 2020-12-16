@@ -11,9 +11,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
+ *
  */
-public interface ICastControl
-{
+public interface ICastControl {
     int IDLE = 0;
     int CASTING = 1;
     int PLAY = 2;
@@ -21,12 +21,6 @@ public interface ICastControl
     int STOP = 4;
     int BUFFER = 5;
     int ERROR = 6;
-
-    @IntDef({IDLE, CASTING, PLAY, PAUSE, STOP, BUFFER, ERROR})
-    @Retention(RetentionPolicy.SOURCE)
-    @interface CastStatus
-    {
-    }
 
     // device control
     void connect(CastDevice castDevice);
@@ -56,4 +50,9 @@ public interface ICastControl
     PositionInfo getPosition();
 
     MediaInfo getMedia();
+
+    @IntDef({IDLE, CASTING, PLAY, PAUSE, STOP, BUFFER, ERROR})
+    @Retention(RetentionPolicy.SOURCE)
+    @interface CastStatus {
+    }
 }

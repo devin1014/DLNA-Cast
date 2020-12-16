@@ -8,36 +8,30 @@ import org.fourthline.cling.model.types.ErrorCode;
 import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
 
 /**
+ *
  */
-public abstract class GetBrightness extends ActionCallback
-{
+public abstract class GetBrightness extends ActionCallback {
     @SuppressWarnings("WeakerAccess")
-    public GetBrightness(Service service)
-    {
+    public GetBrightness(Service service) {
         //noinspection unchecked
         super(new ActionInvocation(service.getAction("GetBrightness")));
         getActionInvocation().setInput("InstanceID", new UnsignedIntegerFourBytes(0));
         //getActionInvocation().setInput("Channel", Channel.Master.toString());
     }
 
-    public void success(ActionInvocation invocation)
-    {
+    public void success(ActionInvocation invocation) {
         boolean ok = true;
         int brightness = 0;
-        try
-        {
+        try {
             brightness = Integer.valueOf(invocation.getOutput("CurrentBrightness").getValue().toString()); // UnsignedIntegerTwoBytes...
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             invocation.setFailure(new ActionException(ErrorCode.ACTION_FAILED, "Can't parse ProtocolInfo response: " + ex, ex));
 
             failure(invocation, null);
 
             ok = false;
         }
-        if (ok)
-        {
+        if (ok) {
             received(invocation, brightness);
         }
     }

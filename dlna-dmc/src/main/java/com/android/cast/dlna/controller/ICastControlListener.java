@@ -3,9 +3,9 @@ package com.android.cast.dlna.controller;
 import org.fourthline.cling.support.model.PositionInfo;
 
 /**
+ *
  */
-public interface ICastControlListener
-{
+public interface ICastControlListener {
     void onCast(CastObject castObject);
 
     void onStart();
