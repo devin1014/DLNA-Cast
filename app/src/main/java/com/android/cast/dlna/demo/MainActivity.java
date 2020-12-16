@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.cast.dlna.NLUpnpCastManager;
+import com.android.cast.dlna.DLNACastManager;
 import com.android.cast.dlna.controller.CastObject;
 import com.android.cast.dlna.controller.ICastEventListener;
 import com.android.cast.dlna.demo.DeviceAdapter.OnItemSelectedListener;
@@ -98,27 +98,27 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         recyclerView.setAdapter(mDeviceAdapter = new DeviceAdapter(this, mOnClickListener));
 
-        NLUpnpCastManager.getInstance().addCastEventListener(mControlListener);
-        NLUpnpCastManager.getInstance().addRegistryDeviceListener(mDeviceAdapter);
+        DLNACastManager.getInstance().addCastEventListener(mControlListener);
+        DLNACastManager.getInstance().addRegistryDeviceListener(mDeviceAdapter);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        NLUpnpCastManager.getInstance().bindUpnpCastService(this);
+        DLNACastManager.getInstance().bindUpnpCastService(this);
     }
 
     @Override
     protected void onPause() {
-        NLUpnpCastManager.getInstance().unbindUpnpCastService(this);
+        DLNACastManager.getInstance().unbindUpnpCastService(this);
         super.onPause();
     }
 
     @Override
     protected void onDestroy() {
-        NLUpnpCastManager.getInstance().disconnect();
-        NLUpnpCastManager.getInstance().removeRegistryListener(mDeviceAdapter);
-        NLUpnpCastManager.getInstance().removeCastEventListener(mControlListener);
+        DLNACastManager.getInstance().disconnect();
+        DLNACastManager.getInstance().removeRegistryListener(mDeviceAdapter);
+        DLNACastManager.getInstance().removeCastEventListener(mControlListener);
         super.onDestroy();
     }
 
@@ -134,9 +134,9 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.menu_search_start:
                 Toast.makeText(this, "开始搜索", Toast.LENGTH_SHORT).show();
-                NLUpnpCastManager.getInstance().clear(); //TODO, need clear first?
+                DLNACastManager.getInstance().clear(); //TODO, need clear first?
                 //NLUpnpCastManager.getInstance().search();
-                NLUpnpCastManager.getInstance().search(NLUpnpCastManager.DEVICE_TYPE_DMR, 60);
+                DLNACastManager.getInstance().search(DLNACastManager.DEVICE_TYPE_DMR, 60);
 
                 break;
 
@@ -169,11 +169,11 @@ public class MainActivity extends AppCompatActivity {
         public void onItemSelected(CastDevice castDevice, boolean selected) {
             if (selected) {
                 mDeviceAdapter.setSelectedDevice(castDevice);
-                NLUpnpCastManager.getInstance().connect(castDevice);
+                DLNACastManager.getInstance().connect(castDevice);
                 mCastDeviceInfo.setText(String.format("当前设备：%s", castDevice.getName()));
             } else {
                 mDeviceAdapter.setSelectedDevice(null);
-                NLUpnpCastManager.getInstance().disconnect();
+                DLNACastManager.getInstance().disconnect();
                 mCastDeviceInfo.setText(String.format("当前设备: "));
             }
         }
@@ -185,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.btn_cast: {
-                    NLUpnpCastManager.getInstance().cast(
+                    DLNACastManager.getInstance().cast(
                             CastObject
                                     .newInstance(Constants.CAST_URL, Constants.CAST_ID, Constants.CAST_NAME)
                                     .setDuration(Constants.CAST_VIDEO_DURATION)
@@ -193,15 +193,15 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 }
                 case R.id.btn_cast_stop: {
-                    NLUpnpCastManager.getInstance().stop();
+                    DLNACastManager.getInstance().stop();
                     break;
                 }
                 case R.id.btn_cast_resume: {
-                    NLUpnpCastManager.getInstance().start();
+                    DLNACastManager.getInstance().start();
                     break;
                 }
                 case R.id.btn_cast_pause: {
-                    NLUpnpCastManager.getInstance().pause();
+                    DLNACastManager.getInstance().pause();
                     break;
                 }
             }
@@ -222,12 +222,12 @@ public class MainActivity extends AppCompatActivity {
         public void onStopTrackingTouch(SeekBar seekBar) {
             switch (seekBar.getId()) {
                 case R.id.seek_cast_volume: {
-                    NLUpnpCastManager.getInstance().setVolume((int) (seekBar.getProgress() * 100f / seekBar.getMax()));
+                    DLNACastManager.getInstance().setVolume((int) (seekBar.getProgress() * 100f / seekBar.getMax()));
                     break;
                 }
                 case R.id.seek_cast_duration: {
                     int position = (int) ((seekBar.getProgress() * 1f / seekBar.getMax()) * Constants.CAST_VIDEO_DURATION);
-                    NLUpnpCastManager.getInstance().seekTo(position);
+                    DLNACastManager.getInstance().seekTo(position);
                     break;
                 }
             }

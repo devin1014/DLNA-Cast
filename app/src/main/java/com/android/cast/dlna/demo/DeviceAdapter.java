@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView.Adapter;
 
-import com.android.cast.dlna.NLDeviceRegistryListener.OnRegistryDeviceListener;
+import com.android.cast.dlna.DeviceRegistryListener.OnRegistryDeviceListener;
 import com.android.cast.dlna.device.CastDevice;
 
 import java.util.ArrayList;

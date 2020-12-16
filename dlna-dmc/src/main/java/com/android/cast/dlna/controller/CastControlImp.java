@@ -1,13 +1,13 @@
 package com.android.cast.dlna.controller;
 
-import com.android.cast.dlna.NLDeviceRegistryListener;
-import com.android.cast.dlna.NLDeviceRegistryListener.OnRegistryDeviceListener;
+import com.android.cast.dlna.DeviceRegistryListener;
+import com.android.cast.dlna.DeviceRegistryListener.OnRegistryDeviceListener;
 import com.android.cast.dlna.controller.ConnectSession.ConnectSessionCallback;
 import com.android.cast.dlna.controller.action.ActionCallbackListener;
 import com.android.cast.dlna.controller.action.ICastActionFactory;
 import com.android.cast.dlna.controller.action.ICastActionFactory.CastActionFactory;
 import com.android.cast.dlna.device.CastDevice;
-import com.android.cast.dlna.service.NLUpnpCastService;
+import com.android.cast.dlna.service.DLNACastService;
 import com.android.cast.dlna.util.CastUtils;
 import com.android.cast.dlna.util.ILogger;
 import com.android.cast.dlna.util.ILogger.DefaultLoggerImpl;
@@ -73,7 +73,7 @@ public class CastControlImp implements ICastControl, OnRegistryDeviceListener {
         }
     };
 
-    public CastControlImp(NLUpnpCastService service, NLDeviceRegistryListener registryListener, ICastEventListener listener) {
+    public CastControlImp(DLNACastService service, DeviceRegistryListener registryListener, ICastEventListener listener) {
         mLogger.d("new CastControlImp()");
 
         mControlPoint = service.getControlPoint();
@@ -83,7 +83,7 @@ public class CastControlImp implements ICastControl, OnRegistryDeviceListener {
         registryListener.addRegistryDeviceListener(this);
     }
 
-    public void bindNLUpnpCastService(NLUpnpCastService service) {
+    public void bindNLUpnpCastService(DLNACastService service) {
         mControlPoint = service.getControlPoint();
 
         if (isConnected()) {

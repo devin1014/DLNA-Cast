@@ -1,6 +1,6 @@
 package com.android.cast.dlna.controller.action;
 
-import com.android.cast.dlna.NLUpnpCastManager;
+import com.android.cast.dlna.DLNACastManager;
 import com.android.cast.dlna.controller.action.IAVServiceActionFactory.AvServiceActionFactory;
 import com.android.cast.dlna.controller.action.IRenderServiceActionFactory.RenderServiceActionFactory;
 import com.android.cast.dlna.device.CastDevice;
@@ -22,9 +22,9 @@ public interface ICastActionFactory {
         private IRenderServiceActionFactory mRenderService;
 
         public CastActionFactory(CastDevice castDevice) {
-            mAvService = new AvServiceActionFactory(castDevice.getDevice().findService(NLUpnpCastManager.SERVICE_AV_TRANSPORT));
+            mAvService = new AvServiceActionFactory(castDevice.getDevice().findService(DLNACastManager.SERVICE_AV_TRANSPORT));
 
-            mRenderService = new RenderServiceActionFactory(castDevice.getDevice().findService(NLUpnpCastManager.SERVICE_RENDERING_CONTROL));
+            mRenderService = new RenderServiceActionFactory(castDevice.getDevice().findService(DLNACastManager.SERVICE_RENDERING_CONTROL));
         }
 
         @Override

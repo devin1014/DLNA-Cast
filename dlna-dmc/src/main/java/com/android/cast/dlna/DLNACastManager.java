@@ -7,14 +7,14 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 
-import com.android.cast.dlna.NLDeviceRegistryListener.OnRegistryDeviceListener;
+import com.android.cast.dlna.DeviceRegistryListener.OnRegistryDeviceListener;
 import com.android.cast.dlna.controller.CastControlImp;
 import com.android.cast.dlna.controller.CastEventListenerListWrapper;
 import com.android.cast.dlna.controller.CastObject;
 import com.android.cast.dlna.controller.ICastEventListener;
 import com.android.cast.dlna.device.CastDevice;
-import com.android.cast.dlna.service.NLUpnpCastService;
-import com.android.cast.dlna.service.NLUpnpCastService.NLUpnpCastBinder;
+import com.android.cast.dlna.service.DLNACastService;
+import com.android.cast.dlna.service.DLNACastService.DLNACastBinder;
 import com.android.cast.dlna.util.ILogger;
 import com.android.cast.dlna.util.ILogger.DefaultLoggerImpl;
 
@@ -37,13 +37,13 @@ import java.util.List;
 /**
  *
  */
-public class NLUpnpCastManager implements IUpnpCast {
+public class DLNACastManager implements IDLNACast {
     public static final DeviceType DEVICE_TYPE_DMR = new UDADeviceType("MediaRenderer");
     public static final ServiceType SERVICE_AV_TRANSPORT = new UDAServiceType("AVTransport");
     public static final ServiceType SERVICE_RENDERING_CONTROL = new UDAServiceType("RenderingControl");
-    private NLUpnpCastService mUpnpCastService;
+    private DLNACastService mUpnpCastService;
     private ILogger mLogger = new DefaultLoggerImpl(this);
-    private NLDeviceRegistryListener mNLDeviceRegistryListener = new NLDeviceRegistryListener();
+    private DeviceRegistryListener mNLDeviceRegistryListener = new DeviceRegistryListener();
     private List<ICastEventListener> mListeners = new ArrayList<>();
     // ------------------------------------------------------------------------------------------
     // control
@@ -56,7 +56,7 @@ public class NLUpnpCastManager implements IUpnpCast {
             mLogger.i(String.format("onServiceConnected [%s][%s]",
                     componentName.getShortClassName(), iBinder.getClass().getSimpleName() + "@" + Integer.toHexString(iBinder.hashCode())));
 
-            NLUpnpCastService service = ((NLUpnpCastBinder) iBinder).getService();
+            DLNACastService service = ((DLNACastBinder) iBinder).getService();
 
             mUpnpCastService = service;
 
@@ -103,10 +103,10 @@ public class NLUpnpCastManager implements IUpnpCast {
         }
     };
 
-    private NLUpnpCastManager() {
+    private DLNACastManager() {
     }
 
-    public static NLUpnpCastManager getInstance() {
+    public static DLNACastManager getInstance() {
         return Holder.INSTANCE;
     }
 
@@ -116,7 +116,7 @@ public class NLUpnpCastManager implements IUpnpCast {
 
             mLogger.i(String.format("bindUpnpCastService[%s]", activity.getComponentName().getShortClassName()));
 
-            activity.getApplication().bindService(new Intent(activity, NLUpnpCastService.class), mUpnpCastServiceConnection, Service.BIND_AUTO_CREATE);
+            activity.getApplication().bindService(new Intent(activity, DLNACastService.class), mUpnpCastServiceConnection, Service.BIND_AUTO_CREATE);
         }
     }
 
@@ -168,7 +168,7 @@ public class NLUpnpCastManager implements IUpnpCast {
 
     @Override
     public void search() {
-        search(null, IUpnpCast.DEFAULT_MAX_SECONDS);
+        search(null, IDLNACast.DEFAULT_MAX_SECONDS);
     }
 
     @Override
@@ -287,7 +287,7 @@ public class NLUpnpCastManager implements IUpnpCast {
     }
 
     private static class Holder {
-        private static final NLUpnpCastManager INSTANCE = new NLUpnpCastManager();
+        private static final DLNACastManager INSTANCE = new DLNACastManager();
     }
 
 }

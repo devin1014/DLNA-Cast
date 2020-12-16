@@ -16,31 +16,26 @@ import org.fourthline.cling.registry.Registry;
 /**
  *
  */
-public class NLUpnpCastService extends AndroidUpnpServiceImpl implements AndroidUpnpService {
-    private ILogger mLogger = new DefaultLoggerImpl(this);
+public class DLNACastService extends AndroidUpnpServiceImpl implements AndroidUpnpService {
+    private final ILogger mLogger = new DefaultLoggerImpl(this);
 
     @Override
     public void onCreate() {
         mLogger.i("onCreate");
-
         org.seamless.util.logging.LoggingUtil.resetRootHandler(new FixedAndroidLogHandler());
-
         super.onCreate();
-
-        binder = new NLUpnpCastBinder();
+        binder = new DLNACastBinder();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         mLogger.i("onStartCommand:" + intent);
-
         return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
     public void onDestroy() {
         mLogger.w("onDestroy");
-
         super.onDestroy();
     }
 
@@ -67,9 +62,9 @@ public class NLUpnpCastService extends AndroidUpnpServiceImpl implements Android
     // -------------------------------------------------------------------------------------
     // Upnp cast binder
     // -------------------------------------------------------------------------------------
-    public class NLUpnpCastBinder extends Binder {
-        public NLUpnpCastService getService() {
-            return NLUpnpCastService.this;
+    public class DLNACastBinder extends Binder {
+        public DLNACastService getService() {
+            return DLNACastService.this;
         }
     }
 }

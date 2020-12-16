@@ -22,6 +22,7 @@ public class DeviceUtil {
     }
 
     public static String parseDevice(Device device) {
+        device.getServices();
         return String.format("[%s@%s] ", device.getDetails().getFriendlyName(), Integer.toHexString(device.hashCode())) +
                 String.format("[%s] ", device.getType().getType()) +
                 String.format("[%s] ", device.getIdentity().getUdn());

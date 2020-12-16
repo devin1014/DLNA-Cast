@@ -9,7 +9,7 @@ import com.android.cast.dlna.Constants;
  *
  */
 public interface ILogger {
-    String PREFIX_TAG = "4Droid_";
+    String PREFIX_TAG = "DLNACast_";
 
     void v(String msg);
 
@@ -33,9 +33,9 @@ public interface ILogger {
             this(tag, Constants.DEBUG);
         }
 
-        public DefaultLoggerImpl(String tag, boolean log) {
+        public DefaultLoggerImpl(String tag, boolean debug) {
             TAG = PREFIX_TAG + tag;
-            DEBUG = log;
+            DEBUG = debug;
         }
 
         @Override

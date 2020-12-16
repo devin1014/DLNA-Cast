@@ -7,7 +7,7 @@ import org.fourthline.cling.model.types.DeviceType;
 /**
  *
  */
-public interface IUpnpCast extends ICastControl {
+public interface IDLNACast extends ICastControl {
     int DEFAULT_MAX_SECONDS = 60;
 
     void search();

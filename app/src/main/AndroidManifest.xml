@@ -50,7 +50,7 @@
 
         <service android:name="com.android.cast.dlna.demo.browser.BrowserUpnpService" />
 
-        <service android:name="com.android.cast.dlna.service.NLUpnpCastService" />
+        <service android:name="com.android.cast.dlna.service.DLNACastService" />
 
     </application>
 
