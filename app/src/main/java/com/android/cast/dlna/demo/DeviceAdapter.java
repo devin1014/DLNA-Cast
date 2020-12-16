@@ -20,26 +20,22 @@ import java.util.List;
  *
  */
 public class DeviceAdapter extends Adapter<DeviceHolder> implements OnRegistryDeviceListener {
-    private List<CastDevice> mDeviceList = new ArrayList<>();
-
-    private LayoutInflater mLayoutInflater;
-
-    private Handler mHandler = new Handler(Looper.getMainLooper());
-
-    private OnItemSelectedListener mOnItemSelectedListener;
+    private final List<CastDevice> mDeviceList = new ArrayList<>();
+    private final LayoutInflater mLayoutInflater;
+    private final Handler mHandler = new Handler(Looper.getMainLooper());
+    private final OnItemSelectedListener mOnItemSelectedListener;
 
     private CastDevice mSelectedDevice;
 
     public DeviceAdapter(Activity activity, OnItemSelectedListener listener) {
         mLayoutInflater = activity.getLayoutInflater();
-
         mOnItemSelectedListener = listener;
     }
 
     @NonNull
     @Override
     public DeviceHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new DeviceHolder(mLayoutInflater.inflate(R.layout.item_device_list, parent, false), mOnItemSelectedListener);
+        return new DeviceHolder(mLayoutInflater.inflate(R.layout.item_device, parent, false), mOnItemSelectedListener);
     }
 
     @Override
@@ -66,32 +62,25 @@ public class DeviceAdapter extends Adapter<DeviceHolder> implements OnRegistryDe
         //        {
         //            return;
         //        }
-
         mSelectedDevice = device;
-
         notifyDataSetChanged();
     }
 
     private boolean isSelected(int position) {
         CastDevice device = getItem(position);
-
         if (device != null && mSelectedDevice != null) {
             return device == mSelectedDevice || device.getId().equals(mSelectedDevice.getId());
         }
-
         return false;
     }
 
     @Override
     public void onDeviceAdded(CastDevice device) {
         boolean added = false;
-
         for (CastDevice castDevice : mDeviceList) {
             if (castDevice.getId().equals(device.getId())) {
                 castDevice = new CastDevice(device.getDevice());
-
                 added = true;
-
                 break;
             }
         }
@@ -115,18 +104,15 @@ public class DeviceAdapter extends Adapter<DeviceHolder> implements OnRegistryDe
     @Override
     public void onDeviceRemoved(CastDevice device) {
         CastDevice removeDevice = null;
-
         for (CastDevice castDevice : mDeviceList) {
             if (castDevice.getId().equals(device.getId())) {
                 removeDevice = castDevice;
-
                 break;
             }
         }
 
         if (removeDevice != null) {
             mDeviceList.remove(removeDevice);
-
             if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
                 mHandler.post(new Runnable() {
                     @Override

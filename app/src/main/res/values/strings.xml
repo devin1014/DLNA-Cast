@@ -1,6 +1,6 @@
 <resources>
 
-    <string name="app_name">DLNA投屏</string>
+    <string name="app_name">DLNA 投屏</string>
 
     <string name="switchRouter">Network On/Off</string>
     <string name="toggleDebugLogging">Toggle debug logging</string>
@@ -21,5 +21,7 @@
 
     <string name="searchingLAN">Searching LAN for UPnP devices…</string>
     <string name="deviceDetailsNotYetAvailable">Device details are being discovered, please wait.</string>
+
+    <string name="not_connect_wifi">当前没有连接到WiFi网络，请检查</string>
 
 </resources>

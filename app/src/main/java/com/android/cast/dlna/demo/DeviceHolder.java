@@ -7,6 +7,7 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
 import com.android.cast.dlna.demo.DeviceAdapter.OnItemSelectedListener;
@@ -16,10 +17,10 @@ import com.android.cast.dlna.device.CastDevice;
  *
  */
 public class DeviceHolder extends ViewHolder implements OnClickListener, OnCheckedChangeListener {
-    private TextView name;
-    private TextView description;
-    private CheckBox selector;
-    private OnItemSelectedListener mOnItemSelectedListener;
+    private final TextView name;
+    private final TextView description;
+    private final CheckBox selector;
+    private final OnItemSelectedListener mOnItemSelectedListener;
     private CastDevice mCastDevice;
     private boolean mBinding = false;
 
@@ -35,7 +36,8 @@ public class DeviceHolder extends ViewHolder implements OnClickListener, OnCheck
         selector.setOnCheckedChangeListener(this);
     }
 
-    public void setData(CastDevice castDevice, boolean isSelected) {
+    public void setData(@Nullable CastDevice castDevice, boolean isSelected) {
+        if (castDevice == null) return;
         mBinding = true;
         mCastDevice = castDevice;
         name.setText(castDevice.getName());
