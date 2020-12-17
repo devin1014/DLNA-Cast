@@ -1,7 +1,6 @@
 package com.android.cast.dlna.controller;
 
-import com.android.cast.dlna.DeviceRegistryListener;
-import com.android.cast.dlna.DeviceRegistryListener.OnRegistryDeviceListener;
+import com.android.cast.dlna.OnDeviceRegistryListener;
 import com.android.cast.dlna.controller.ConnectSession.ConnectSessionCallback;
 import com.android.cast.dlna.controller.action.ActionCallbackListener;
 import com.android.cast.dlna.controller.action.ICastActionFactory;
@@ -24,7 +23,7 @@ import org.fourthline.cling.support.model.TransportState;
 /**
  *
  */
-public class CastControlImp implements ICastControl, OnRegistryDeviceListener {
+public class CastControlImp implements ICastControl, OnDeviceRegistryListener {
     private ILogger mLogger = new DefaultLoggerImpl(this);
 
     private ControlPoint mControlPoint;
@@ -73,14 +72,12 @@ public class CastControlImp implements ICastControl, OnRegistryDeviceListener {
         }
     };
 
-    public CastControlImp(DLNACastService service, DeviceRegistryListener registryListener, ICastEventListener listener) {
+    public CastControlImp(DLNACastService service, ICastEventListener listener) {
         mLogger.d("new CastControlImp()");
 
         mControlPoint = service.getControlPoint();
 
         mCastEventListener = new CastEventListener(listener);
-
-        registryListener.addRegistryDeviceListener(this);
     }
 
     public void bindNLUpnpCastService(DLNACastService service) {

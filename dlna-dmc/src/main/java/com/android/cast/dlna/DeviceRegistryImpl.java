@@ -15,54 +15,29 @@ import org.fourthline.cling.model.meta.RemoteDevice;
 import org.fourthline.cling.registry.DefaultRegistryListener;
 import org.fourthline.cling.registry.Registry;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  *
  */
-public class DeviceRegistryListener extends DefaultRegistryListener {
+final class DeviceRegistryImpl extends DefaultRegistryListener {
 
-    private final List<OnRegistryDeviceListener> mOnRegistryDeviceListener = new ArrayList<>();
+    private final OnDeviceRegistryListener mOnDeviceRegistryListener;
     private final ILogger mLogger = new DefaultLoggerImpl(this);
     private final Handler mHandler = new Handler(Looper.getMainLooper());
-    private final byte[] mLock = new byte[0];
 
-    public interface OnRegistryDeviceListener {
-        void onDeviceAdded(CastDevice device);
-
-        void onDeviceUpdated(CastDevice device);
-
-        void onDeviceRemoved(CastDevice device);
-    }
-
-    // --------------------------------------------------------------------------------
-    // ---- Register Listener
-    // --------------------------------------------------------------------------------
-    public void addRegistryDeviceListener(@NonNull OnRegistryDeviceListener listener) {
-        synchronized (mLock) {
-            if (!mOnRegistryDeviceListener.contains(listener)) {
-                mOnRegistryDeviceListener.add(listener);
-            }
-        }
-    }
-
-    public void removeRegistryDeviceListener(@NonNull OnRegistryDeviceListener listener) {
-        synchronized (mLock) {
-            mOnRegistryDeviceListener.remove(listener);
-        }
+    public DeviceRegistryImpl(@NonNull OnDeviceRegistryListener listener) {
+        mOnDeviceRegistryListener = listener;
     }
 
     //Discovery performance optimization for very slow Android devices!
     @Override
     public void remoteDeviceDiscoveryStarted(Registry registry, RemoteDevice device) {
-        mLogger.i(">>>remoteDeviceDiscoveryStarted: " + device.getDetails().getFriendlyName());
+        mLogger.i(String.format("[%s] discovery started >>>>", device.getDetails().getFriendlyName()));
     }
 
     //End of optimization, you can remove the whole block if your Android handset is fast (>= 600 Mhz)
     @Override
     public void remoteDeviceDiscoveryFailed(Registry registry, final RemoteDevice device, final Exception ex) {
-        mLogger.e(">>>remoteDeviceDiscoveryFailed: " + device.getDetails().getFriendlyName());
+        mLogger.e(String.format("[%s] discovery failed <<<<", device.getDetails().getFriendlyName()));
         mLogger.e(ex.toString());
     }
 
@@ -76,8 +51,8 @@ public class DeviceRegistryListener extends DefaultRegistryListener {
 
     @Override
     public void remoteDeviceUpdated(Registry registry, RemoteDevice device) {
-        mLogger.d("remoteDeviceUpdated: " + DeviceUtil.parseDeviceInfo(device));
-        notifyDeviceUpdate(device);
+        // mLogger.d("remoteDeviceUpdated: " + DeviceUtil.parseDeviceInfo(device));
+        // notifyDeviceUpdate(device);
     }
 
     @Override
@@ -98,32 +73,15 @@ public class DeviceRegistryListener extends DefaultRegistryListener {
     }
 
     private void notifyDeviceAdd(final Device<?, ?, ?> device) {
-        mHandler.post(() -> {
-            synchronized (mLock) {
-                for (OnRegistryDeviceListener listener : mOnRegistryDeviceListener) {
-                    listener.onDeviceAdded(new CastDevice(device));
-                }
-            }
-        });
+        mHandler.post(() -> mOnDeviceRegistryListener.onDeviceAdded(new CastDevice(device)));
     }
 
+    @SuppressWarnings("unused")
     private void notifyDeviceUpdate(final Device<?, ?, ?> device) {
-        mHandler.post(() -> {
-            synchronized (mLock) {
-                for (OnRegistryDeviceListener listener : mOnRegistryDeviceListener) {
-                    listener.onDeviceUpdated(new CastDevice(device));
-                }
-            }
-        });
+        mHandler.post(() -> mOnDeviceRegistryListener.onDeviceUpdated(new CastDevice(device)));
     }
 
     private void notifyDeviceRemove(final Device<?, ?, ?> device) {
-        mHandler.post(() -> {
-            synchronized (mLock) {
-                for (OnRegistryDeviceListener listener : mOnRegistryDeviceListener) {
-                    listener.onDeviceRemoved(new CastDevice(device));
-                }
-            }
-        });
+        mHandler.post(() -> mOnDeviceRegistryListener.onDeviceRemoved(new CastDevice(device)));
     }
 }

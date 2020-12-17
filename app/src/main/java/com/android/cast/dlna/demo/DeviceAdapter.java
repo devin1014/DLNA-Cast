@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView.Adapter;
 
-import com.android.cast.dlna.DeviceRegistryListener.OnRegistryDeviceListener;
+import com.android.cast.dlna.OnDeviceRegistryListener;
 import com.android.cast.dlna.device.CastDevice;
 
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ import java.util.List;
 /**
  *
  */
-public class DeviceAdapter extends Adapter<DeviceHolder> implements OnRegistryDeviceListener {
+public class DeviceAdapter extends Adapter<DeviceHolder> implements OnDeviceRegistryListener {
     private final List<CastDevice> mDeviceList = new ArrayList<>();
     private final LayoutInflater mLayoutInflater;
     private final Handler mHandler = new Handler(Looper.getMainLooper());

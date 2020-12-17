@@ -15,7 +15,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,13 +26,11 @@ import com.android.cast.dlna.demo.DeviceAdapter.OnItemSelectedListener;
 import com.android.cast.dlna.device.CastDevice;
 import com.android.cast.dlna.util.CastUtils;
 import com.permissionx.guolindev.PermissionX;
-import com.permissionx.guolindev.callback.RequestCallback;
 
 import org.fourthline.cling.support.model.MediaInfo;
 import org.fourthline.cling.support.model.PositionInfo;
 import org.fourthline.cling.support.model.TransportInfo;
 
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -64,16 +61,13 @@ public class MainActivity extends AppCompatActivity {
 
         PermissionX.init(this)
                 .permissions(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
-                .request(new RequestCallback() {
-                    @Override
-                    public void onResult(boolean allGranted, List<String> grantedList, List<String> deniedList) {
-                        ((TextView) findViewById(R.id.cast_network_info)).setText(NetworkUtils.getActiveNetworkInfo(MainActivity.this));
-                    }
-                });
+                .request((allGranted, grantedList, deniedList) ->
+                        ((TextView) findViewById(R.id.cast_network_info)).setText(NetworkUtils.getActiveNetworkInfo(MainActivity.this))
+                );
     }
 
     private void initComponent() {
-        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+        setSupportActionBar(findViewById(R.id.toolbar));
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle("DLNA Cast");
         }

@@ -26,10 +26,9 @@ public class NetworkUtils {
     private static String getWifiInfo(Context context) {
         WifiManager wifiManager = getSystemService(context, Context.WIFI_SERVICE);
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-        String result = "WIFI:\r" + wifiInfo.getSSID() + "\n";
         int address = wifiInfo.getIpAddress();
         String ip = (address & 0xFF) + "." + ((address >> 8) & 0xFF) + "." + ((address >> 16) & 0xFF) + "." + (address >> 24 & 0xFF);
-        return result + "IP:\r" + ip;
+        return String.format("WIFI: %s\nIP: %s", wifiInfo.getSSID().replaceAll("\"", ""), ip);
     }
 
     @SuppressWarnings({"unchecked", "TypeParameterExplicitlyExtendsObject"})
