@@ -7,8 +7,8 @@ import org.fourthline.cling.model.meta.Device;
 /**
  *
  */
-public class CastDevice implements IDLNACastDevice<Device> {
-    private final Device mDevice;
+public class CastDevice implements IDLNACastDevice<Device<?, ?, ?>> {
+    private final Device<?, ?, ?> mDevice;
 
     public CastDevice(Device device) {
         mDevice = device;

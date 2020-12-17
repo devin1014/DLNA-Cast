@@ -7,7 +7,7 @@ import org.fourthline.cling.model.meta.Device;
 /**
  *
  */
-public interface IDLNACastDevice<T extends Device> {
+public interface IDLNACastDevice<T extends Device<?, ?, ?>> {
     T getDevice();
 
     @NonNull

@@ -153,7 +153,7 @@ public class DLNACastManager implements IDLNACast {
     }
 
     public void removeRegistryListener(OnRegistryDeviceListener listener) {
-        mNLDeviceRegistryListener.removeRegistryListener(listener);
+        mNLDeviceRegistryListener.removeRegistryDeviceListener(listener);
     }
 
     public void addCastEventListener(ICastEventListener listener) {

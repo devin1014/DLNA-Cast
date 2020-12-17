@@ -157,6 +157,10 @@ public class CastControlImp implements ICastControl, OnRegistryDeviceListener {
     }
 
     @Override
+    public void onDeviceUpdated(CastDevice device) {
+    }
+
+    @Override
     public void onDeviceRemoved(CastDevice device) {
         if (isConnected() && mCastDevice.equals(device)) {
             mSessionTimeoutDevice = device;

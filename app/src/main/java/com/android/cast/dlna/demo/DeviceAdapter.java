@@ -102,6 +102,10 @@ public class DeviceAdapter extends Adapter<DeviceHolder> implements OnRegistryDe
     }
 
     @Override
+    public void onDeviceUpdated(CastDevice device) {
+    }
+
+    @Override
     public void onDeviceRemoved(CastDevice device) {
         CastDevice removeDevice = null;
         for (CastDevice castDevice : mDeviceList) {
