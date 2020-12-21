@@ -6,11 +6,11 @@ import com.android.cast.dlna.controller.action.ActionCallbackListener;
 import com.android.cast.dlna.controller.action.ICastActionFactory;
 import com.android.cast.dlna.controller.action.ICastActionFactory.CastActionFactory;
 import com.android.cast.dlna.device.CastDevice;
-import com.android.cast.dlna.service.DLNACastService;
 import com.android.cast.dlna.util.CastUtils;
 import com.android.cast.dlna.util.ILogger;
 import com.android.cast.dlna.util.ILogger.DefaultLoggerImpl;
 
+import org.fourthline.cling.android.AndroidUpnpService;
 import org.fourthline.cling.controlpoint.ActionCallback;
 import org.fourthline.cling.controlpoint.ControlPoint;
 import org.fourthline.cling.model.action.ActionInvocation;
@@ -72,7 +72,7 @@ public class CastControlImp implements ICastControl, OnDeviceRegistryListener {
         }
     };
 
-    public CastControlImp(DLNACastService service, ICastEventListener listener) {
+    public CastControlImp(AndroidUpnpService service, ICastEventListener listener) {
         mLogger.d("new CastControlImp()");
 
         mControlPoint = service.getControlPoint();
@@ -80,7 +80,7 @@ public class CastControlImp implements ICastControl, OnDeviceRegistryListener {
         mCastEventListener = new CastEventListener(listener);
     }
 
-    public void bindNLUpnpCastService(DLNACastService service) {
+    public void bindNLUpnpCastService(AndroidUpnpService service) {
         mControlPoint = service.getControlPoint();
 
         if (isConnected()) {

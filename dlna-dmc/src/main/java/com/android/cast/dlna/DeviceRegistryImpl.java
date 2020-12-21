@@ -28,7 +28,8 @@ final class DeviceRegistryImpl extends DefaultRegistryListener {
         mOnDeviceRegistryListener = listener;
     }
 
-    //Discovery performance optimization for very slow Android devices!
+    // Discovery performance optimization for very slow Android devices!
+    // This function will called early than 'remoteDeviceAdded',but the device services maybe not entirely.
     @Override
     public void remoteDeviceDiscoveryStarted(Registry registry, RemoteDevice device) {
         mLogger.i(String.format("[%s] discovery started >>>>", device.getDetails().getFriendlyName()));

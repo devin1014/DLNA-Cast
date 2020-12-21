@@ -1,4 +1,4 @@
-package com.android.cast.dlna.service;
+package com.android.cast.dlna;
 
 import android.content.Intent;
 
@@ -8,9 +8,11 @@ import com.android.cast.dlna.util.ILogger.DefaultLoggerImpl;
 import org.fourthline.cling.UpnpService;
 import org.fourthline.cling.UpnpServiceConfiguration;
 import org.fourthline.cling.android.AndroidUpnpService;
+import org.fourthline.cling.android.AndroidUpnpServiceConfiguration;
 import org.fourthline.cling.android.AndroidUpnpServiceImpl;
 import org.fourthline.cling.android.FixedAndroidLogHandler;
 import org.fourthline.cling.controlpoint.ControlPoint;
+import org.fourthline.cling.model.types.ServiceType;
 import org.fourthline.cling.registry.Registry;
 
 /**
@@ -21,7 +23,7 @@ public class DLNACastService extends AndroidUpnpServiceImpl implements AndroidUp
 
     @Override
     public void onCreate() {
-        mLogger.i("onCreate");
+        mLogger.i(String.format("[%s] onCreate", getClass().getSimpleName()));
         org.seamless.util.logging.LoggingUtil.resetRootHandler(new FixedAndroidLogHandler());
         super.onCreate();
         binder = new DLNACastBinder();
@@ -29,14 +31,24 @@ public class DLNACastService extends AndroidUpnpServiceImpl implements AndroidUp
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        mLogger.i("onStartCommand:" + intent);
+        mLogger.i(String.format("[%s] onStartCommand: %s , %s", getClass().getSimpleName(), intent, flags));
         return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
     public void onDestroy() {
-        mLogger.w("onDestroy");
+        mLogger.w(String.format("[%s] onDestroy", getClass().getSimpleName()));
         super.onDestroy();
+    }
+
+    @Override
+    protected UpnpServiceConfiguration createConfiguration() {
+        return new AndroidUpnpServiceConfiguration() {
+            @Override
+            public ServiceType[] getExclusiveServiceTypes() {
+                return new ServiceType[]{DLNACastManager.SERVICE_RENDERING_CONTROL, DLNACastManager.SERVICE_AV_TRANSPORT};
+            }
+        };
     }
 
     @Override
@@ -60,10 +72,10 @@ public class DLNACastService extends AndroidUpnpServiceImpl implements AndroidUp
     }
 
     // -------------------------------------------------------------------------------------
-    // Upnp cast binder
+    // DLNACast service binder
     // -------------------------------------------------------------------------------------
-    public class DLNACastBinder extends Binder {
-        public DLNACastService getService() {
+    final class DLNACastBinder extends Binder {
+        public AndroidUpnpService getService() {
             return DLNACastService.this;
         }
     }

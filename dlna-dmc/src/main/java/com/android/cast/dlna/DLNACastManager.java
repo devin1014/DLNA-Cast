@@ -7,16 +7,16 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 
+import com.android.cast.dlna.DLNACastService.DLNACastBinder;
 import com.android.cast.dlna.controller.CastControlImp;
 import com.android.cast.dlna.controller.CastEventListenerListWrapper;
 import com.android.cast.dlna.controller.CastObject;
 import com.android.cast.dlna.controller.ICastEventListener;
 import com.android.cast.dlna.device.CastDevice;
-import com.android.cast.dlna.service.DLNACastService;
-import com.android.cast.dlna.service.DLNACastService.DLNACastBinder;
 import com.android.cast.dlna.util.ILogger;
 import com.android.cast.dlna.util.ILogger.DefaultLoggerImpl;
 
+import org.fourthline.cling.android.AndroidUpnpService;
 import org.fourthline.cling.model.message.header.STAllHeader;
 import org.fourthline.cling.model.message.header.UDADeviceTypeHeader;
 import org.fourthline.cling.model.message.header.UpnpHeader;
@@ -52,12 +52,12 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
         return Holder.INSTANCE;
     }
 
-    private DLNACastService mDLNACastService;
+    private AndroidUpnpService mDLNACastService;
     private final ILogger mLogger = new DefaultLoggerImpl(this);
     private final DeviceRegistryImpl mDeviceRegistryImpl = new DeviceRegistryImpl(this);
     private final List<ICastEventListener> mListeners = new ArrayList<>();
 
-    private DeviceType mSearchDeviceType = DEVICE_TYPE_DMR;
+    private DeviceType mSearchDeviceType;
     private CastControlImp mCastControlImp;
 
     private DLNACastManager() {
@@ -81,7 +81,7 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             mLogger.i(String.format("[%s] onServiceConnected", componentName.getShortClassName()));
 
-            DLNACastService service = ((DLNACastBinder) iBinder).getService();
+            AndroidUpnpService service = ((DLNACastBinder) iBinder).getService();
 
             mDLNACastService = service;
 
