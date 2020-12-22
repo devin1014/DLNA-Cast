@@ -2,10 +2,10 @@ package com.android.cast.dlna.demo;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -64,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
                 .request((allGranted, grantedList, deniedList) ->
                         ((TextView) findViewById(R.id.cast_network_info)).setText(NetworkUtils.getActiveNetworkInfo(MainActivity.this))
                 );
+
+        // DLNACastManager.getInstance().bindCastService(this);
     }
 
     private void initComponent() {
@@ -97,15 +99,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        DLNACastManager.getInstance().bindUpnpCastService(this);
+    protected void onStart() {
+        super.onStart();
+        DLNACastManager.getInstance().bindCastService(this);
     }
 
     @Override
-    protected void onPause() {
-        DLNACastManager.getInstance().unbindUpnpCastService(this);
-        super.onPause();
+    protected void onStop() {
+        super.onStop();
+        DLNACastManager.getInstance().unbindCastService(this);
     }
 
     @Override
@@ -125,36 +127,14 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_search_start:
-                Toast.makeText(this, "开始搜索", Toast.LENGTH_SHORT).show();
-                DLNACastManager.getInstance().clear(); //TODO, need clear first?
-                //NLUpnpCastManager.getInstance().search();
-                DLNACastManager.getInstance().search(DLNACastManager.DEVICE_TYPE_DMR, 60);
-
-                break;
-
-            //            case R.id.menu_nlplayer:
-            //
-            //                Toast.makeText(this, "打开播放器", Toast.LENGTH_SHORT).show();
-            //
-            //                startActivity(new Intent(this, PlayerActivity.class));
-            //
-            //                break;
-            //
-            //            case R.id.menu_light:
-            //
-            //                startActivity(new Intent(this, LightActivity.class));
-            //
-            //                break;
-            //
-            //            case R.id.menu_browser:
-            //
-            //                startActivity(new Intent(this, BrowserActivity.class));
-            //
-            //                break;
+        if (item.getItemId() == R.id.menu_search_start) {
+            Toast.makeText(this, "开始搜索", Toast.LENGTH_SHORT).show();
+            DLNACastManager.getInstance().clear(); //TODO, need clear first?
+            //NLUpnpCastManager.getInstance().search();
+            DLNACastManager.getInstance().search(DLNACastManager.DEVICE_TYPE_DMR, 60);
+        } else if (item.getItemId() == R.id.menu_link_detail) {
+            startActivity(new Intent(this, DetailActivity.class));
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -168,36 +148,32 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 mDeviceAdapter.setSelectedDevice(null);
                 DLNACastManager.getInstance().disconnect();
-                mCastDeviceInfo.setText(String.format("当前设备: "));
+                mCastDeviceInfo.setText(String.format("当前设备: %s", ""));
             }
         }
     };
 
-    private final OnClickListener mControlClickListener = new OnClickListener() {
-        @SuppressLint("NonConstantResourceId")
-        @Override
-        public void onClick(View v) {
-            switch (v.getId()) {
-                case R.id.btn_cast: {
-                    DLNACastManager.getInstance().cast(
-                            CastObject
-                                    .newInstance(Constants.CAST_URL, Constants.CAST_ID, Constants.CAST_NAME)
-                                    .setDuration(Constants.CAST_VIDEO_DURATION)
-                    );
-                    break;
-                }
-                case R.id.btn_cast_stop: {
-                    DLNACastManager.getInstance().stop();
-                    break;
-                }
-                case R.id.btn_cast_resume: {
-                    DLNACastManager.getInstance().start();
-                    break;
-                }
-                case R.id.btn_cast_pause: {
-                    DLNACastManager.getInstance().pause();
-                    break;
-                }
+    @SuppressLint("NonConstantResourceId")
+    private final OnClickListener mControlClickListener = v -> {
+        switch (v.getId()) {
+            case R.id.btn_cast: {
+                DLNACastManager.getInstance().cast(
+                        CastObject
+                                .newInstance(Constants.CAST_URL, Constants.CAST_ID, Constants.CAST_NAME)
+                                .setDuration(Constants.CAST_VIDEO_DURATION));
+                break;
+            }
+            case R.id.btn_cast_stop: {
+                DLNACastManager.getInstance().stop();
+                break;
+            }
+            case R.id.btn_cast_resume: {
+                DLNACastManager.getInstance().start();
+                break;
+            }
+            case R.id.btn_cast_pause: {
+                DLNACastManager.getInstance().pause();
+                break;
             }
         }
     };

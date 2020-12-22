@@ -25,16 +25,7 @@
             </intent-filter>
         </activity>
 
-        <!--<activity-->
-        <!--    android:name="com.liuwei.android.demo.player.PlayerActivity"-->
-        <!--    android:configChanges="screenSize|orientation"-->
-        <!--    android:screenOrientation="user">-->
-        <!--    <intent-filter>-->
-        <!--        <action android:name="android.intent.action.DLNA_CAST" />-->
-        <!--        <category android:name="android.intent.category.DEFAULT" />-->
-        <!--        <data android:scheme="http|https" />-->
-        <!--    </intent-filter>-->
-        <!--</activity>-->
+        <activity android:name=".DetailActivity" />
 
         <activity
             android:name="com.android.cast.dlna.demo.light.LightActivity"
@@ -43,8 +34,6 @@
         <activity
             android:name="com.android.cast.dlna.demo.browser.BrowserActivity"
             android:configChanges="orientation" />
-
-        <service android:name="com.android.cast.dlna.demo.browser.BrowserUpnpService" />
 
         <service android:name="com.android.cast.dlna.DLNACastService" />
 

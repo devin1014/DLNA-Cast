@@ -1,34 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:anroid="http://schemas.android.com/tools">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <item
         android:id="@+id/menu_search_start"
         android:icon="@android:drawable/ic_menu_search"
         android:orderInCategory="100"
         android:title="开始搜索"
-        anroid:ignore="HardcodedText"
-        anroid:showAsAction="always" />
+        app:showAsAction="always"
+        tools:ignore="HardcodedText" />
 
     <item
-        android:id="@+id/menu_nlplayer"
-        android:orderInCategory="200"
-        android:title="播放器"
-        anroid:ignore="HardcodedText"
-        anroid:showAsAction="ifRoom" />
-
-    <item
-        android:id="@+id/menu_light"
-        android:orderInCategory="200"
-        android:title="Light"
-        anroid:ignore="HardcodedText"
-        anroid:showAsAction="ifRoom" />
-
-    <item
-        android:id="@+id/menu_browser"
-        android:orderInCategory="200"
-        android:title="Browser"
-        anroid:ignore="HardcodedText"
-        anroid:showAsAction="ifRoom" />
+        android:id="@+id/menu_link_detail"
+        android:icon="@android:drawable/ic_menu_directions"
+        android:orderInCategory="100"
+        android:title="详细信息"
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction,HardcodedText" />
 
 </menu>
