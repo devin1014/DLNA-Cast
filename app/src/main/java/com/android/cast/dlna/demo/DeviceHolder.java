@@ -19,6 +19,7 @@ import com.android.cast.dlna.device.CastDevice;
 public class DeviceHolder extends ViewHolder implements OnClickListener, OnCheckedChangeListener {
     private final TextView name;
     private final TextView description;
+    private final TextView id;
     private final CheckBox selector;
     private final OnItemSelectedListener mOnItemSelectedListener;
     private CastDevice mCastDevice;
@@ -32,6 +33,7 @@ public class DeviceHolder extends ViewHolder implements OnClickListener, OnCheck
         itemView.setOnClickListener(this);
         name = itemView.findViewById(R.id.device_name);
         description = itemView.findViewById(R.id.device_description);
+        id = itemView.findViewById(R.id.device_id);
         selector = itemView.findViewById(R.id.device_selector);
         selector.setOnCheckedChangeListener(this);
     }
@@ -42,6 +44,7 @@ public class DeviceHolder extends ViewHolder implements OnClickListener, OnCheck
         mCastDevice = castDevice;
         name.setText(castDevice.getName());
         description.setText(castDevice.getDescription());
+        id.setText(castDevice.getId());
         selector.setChecked(isSelected);
         mBinding = false;
     }

@@ -10,16 +10,13 @@ import org.fourthline.cling.model.meta.Device;
 public class CastDevice implements IDLNACastDevice<Device<?, ?, ?>> {
     private final Device<?, ?, ?> mDevice;
 
-    public CastDevice(Device device) {
+    public CastDevice(Device<?, ?, ?> device) {
         mDevice = device;
-
-        if (device == null) {
-            throw new IllegalArgumentException("device can not be NULL!");
-        }
+        if (device == null) throw new IllegalArgumentException("device can not be NULL!");
     }
 
     @Override
-    public Device getDevice() {
+    public Device<?, ?, ?> getDevice() {
         return mDevice;
     }
 
@@ -36,15 +33,12 @@ public class CastDevice implements IDLNACastDevice<Device<?, ?, ?>> {
 
     @Override
     public String getDescription() {
-        return String.format("[%s]", mDevice.getIdentity().getUdn().toString());
+        return mDevice.getDetails().getModelDetails().getModelName();
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof CastDevice) {
-            return getId().equals(((CastDevice) obj).getId());
-        }
-
+        if (obj instanceof CastDevice) return getId().equals(((CastDevice) obj).getId());
         return super.equals(obj);
     }
 

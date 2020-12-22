@@ -58,7 +58,6 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
     private AndroidUpnpService mDLNACastService;
     private final ILogger mLogger = new DefaultLoggerImpl(this);
     private final DeviceRegistryImpl mDeviceRegistryImpl = new DeviceRegistryImpl(this);
-    private final List<ICastEventListener> mListeners = new ArrayList<>();
 
     private DeviceType mSearchDeviceType;
     private CastControlImp mCastControlImp;
@@ -231,14 +230,16 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
         return mSearchDeviceType == null || mSearchDeviceType.equals(device.getType());
     }
 
-    public void addCastEventListener(ICastEventListener listener) {
-        if (!mListeners.contains(listener)) {
-            mListeners.add(listener);
+    private final List<ICastEventListener> mCastEventListenerList = new ArrayList<>();
+
+    public void addCastEventListener(@NonNull ICastEventListener listener) {
+        if (!mCastEventListenerList.contains(listener)) {
+            mCastEventListenerList.add(listener);
         }
     }
 
-    public void removeCastEventListener(ICastEventListener listener) {
-        mListeners.remove(listener);
+    public void removeCastEventListener(@NonNull ICastEventListener listener) {
+        mCastEventListenerList.remove(listener);
     }
 
     // -----------------------------------------------------------------------------------------
@@ -267,7 +268,7 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
     @Override
     public void connect(CastDevice castDevice) {
         if (mCastControlImp == null) {
-            mCastControlImp = new CastControlImp(mDLNACastService, new CastEventListenerListWrapper(mListeners));
+            mCastControlImp = new CastControlImp(mDLNACastService, new CastEventListenerListWrapper(mCastEventListenerList));
         }
 
         mCastControlImp.connect(castDevice);

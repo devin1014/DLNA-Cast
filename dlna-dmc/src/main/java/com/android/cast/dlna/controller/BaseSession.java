@@ -13,26 +13,20 @@ import java.util.TimerTask;
  *
  */
 public abstract class BaseSession implements ICastSession {
+
     protected final ILogger mLogger = new DefaultLoggerImpl(this);
-
-    private Handler mHandler = new Handler(Looper.getMainLooper());
-
+    private final Handler mHandler = new Handler(Looper.getMainLooper());
     private Timer mTimer;
-
     private int mIndex;
 
     protected void startTimer(long delay, long interval) {
         stopTimer();
-
         mLogger.i("start");
-
         mTimer = new Timer();
-
         mTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 mIndex++;
-
                 onInterval(mIndex);
             }
         }, delay, interval);
@@ -43,12 +37,9 @@ public abstract class BaseSession implements ICastSession {
     protected void stopTimer() {
         if (mTimer != null) {
             mTimer.cancel();
-
             mLogger.i("stop");
         }
-
         mTimer = null;
-
         mIndex = 0;
     }
 

@@ -16,10 +16,10 @@ import java.util.List;
  *
  */
 public class CastEventListenerListWrapper implements ICastEventListener {
-    private List<ICastEventListener> mCastListenerList;
+    private final List<ICastEventListener> mCastListenerList;
 
     public CastEventListenerListWrapper(List<ICastEventListener> list) {
-        mCastListenerList = list != null ? list : new ArrayList<ICastEventListener>();
+        mCastListenerList = list != null ? list : new ArrayList<>();
     }
 
     @Override

@@ -47,9 +47,9 @@ public interface IAVServiceActionFactory {
     // Implement
     // ---------------------------------------------------------------------------------------------------------
     class AvServiceActionFactory extends BaseServiceActionFactory implements IAVServiceActionFactory {
-        private final Service mAvService;
+        private final Service<?, ?> mAvService;
 
-        public AvServiceActionFactory(Service service) {
+        public AvServiceActionFactory(Service<?, ?> service) {
             mAvService = service;
         }
 

@@ -2,6 +2,7 @@ package com.android.cast.dlna;
 
 import androidx.annotation.NonNull;
 
+import org.fourthline.cling.model.meta.Action;
 import org.fourthline.cling.model.meta.RemoteDevice;
 import org.fourthline.cling.model.meta.RemoteService;
 
@@ -21,11 +22,17 @@ final class DeviceUtil {
     }
 
     public static String parseDeviceService(@NonNull RemoteDevice device) {
-        StringBuilder builder = new StringBuilder("service list:[");
-        for (RemoteService services : device.getServices()) {
-            builder.append(" ").append(services.getServiceType().getType());
+        StringBuilder builder = new StringBuilder(device.getDetails().getFriendlyName());
+        builder.append(":");
+        for (RemoteService service : device.getServices()) {
+            builder.append("\nservice:").append(service.getServiceType().getType());
+            if (service.hasActions()) {
+                builder.append("\nactions: ");
+                for (Action<?> action : service.getActions()) {
+                    builder.append(action.getName()).append(", ");
+                }
+            }
         }
-        builder.append(" ]");
         return builder.toString();
     }
 }

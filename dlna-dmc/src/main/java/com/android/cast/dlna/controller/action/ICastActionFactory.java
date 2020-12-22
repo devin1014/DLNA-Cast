@@ -17,13 +17,11 @@ public interface ICastActionFactory {
     // Implement
     // ------------------------------------------------------------------------------------------
     class CastActionFactory implements ICastActionFactory {
-        private IAVServiceActionFactory mAvService;
-
-        private IRenderServiceActionFactory mRenderService;
+        private final IAVServiceActionFactory mAvService;
+        private final IRenderServiceActionFactory mRenderService;
 
         public CastActionFactory(CastDevice castDevice) {
             mAvService = new AvServiceActionFactory(castDevice.getDevice().findService(DLNACastManager.SERVICE_AV_TRANSPORT));
-
             mRenderService = new RenderServiceActionFactory(castDevice.getDevice().findService(DLNACastManager.SERVICE_RENDERING_CONTROL));
         }
 

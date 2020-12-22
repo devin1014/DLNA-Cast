@@ -24,26 +24,53 @@ import org.fourthline.cling.support.model.TransportState;
  *
  */
 public class CastControlImp implements ICastControl, OnDeviceRegistryListener {
-    private ILogger mLogger = new DefaultLoggerImpl(this);
 
+    private final ILogger mLogger = new DefaultLoggerImpl(this);
     private ControlPoint mControlPoint;
-
     private ICastActionFactory mCastActionFactory;
-
-    private ICastEventListener mCastEventListener;
-
+    private final ICastEventListener mCastEventListener;
     private ICastSession mMediaSession;
-
     private ICastSession mConnectSession;
 
     private CastDevice mCastDevice;
-    private boolean mConnected = false;
     private MediaInfo mMediaInfo;
     private CastDevice mSessionTimeoutDevice;
+    private PositionInfo mPositionInfo;
     @CastStatus
     private int mCastStatus = CastControlImp.IDLE;
-    private PositionInfo mPositionInfo;
-    private ConnectSessionCallback mConnectSessionCallback = new ConnectSessionCallback() {
+    private boolean mConnected = false;
+
+    public CastControlImp(AndroidUpnpService service, ICastEventListener listener) {
+
+        mControlPoint = service.getControlPoint();
+        mCastEventListener = new CastEventListener(listener);
+    }
+
+    public void bindNLUpnpCastService(AndroidUpnpService service) {
+        mControlPoint = service.getControlPoint();
+
+        if (isConnected()) {
+            if (mConnectSession == null) {
+                mConnectSession = new ConnectSession(mControlPoint, mCastActionFactory, mConnectSessionCallback);
+            }
+
+            mConnectSession.start();
+        }
+    }
+
+    public void unbindNLUpnpCastService() {
+        endMediaSession();
+
+        if (mConnectSession != null) {
+            mConnectSession.stop();
+        }
+
+        mConnectSession = null;
+
+        mControlPoint = null;
+    }
+
+    private final ConnectSessionCallback mConnectSessionCallback = new ConnectSessionCallback() {
         @Override
         public void onCastSession(TransportInfo transportInfo, MediaInfo mediaInfo, int volume) {
             mMediaInfo = mediaInfo;
@@ -72,78 +99,35 @@ public class CastControlImp implements ICastControl, OnDeviceRegistryListener {
         }
     };
 
-    public CastControlImp(AndroidUpnpService service, ICastEventListener listener) {
-        mLogger.d("new CastControlImp()");
-
-        mControlPoint = service.getControlPoint();
-
-        mCastEventListener = new CastEventListener(listener);
-    }
-
-    public void bindNLUpnpCastService(AndroidUpnpService service) {
-        mControlPoint = service.getControlPoint();
-
-        if (isConnected()) {
-            if (mConnectSession == null) {
-                mConnectSession = new ConnectSession(mControlPoint, mCastActionFactory, mConnectSessionCallback);
-            }
-
-            mConnectSession.start();
-        }
-    }
-
-    public void unbindNLUpnpCastService() {
-        endMediaSession();
-
-        if (mConnectSession != null) {
-            mConnectSession.stop();
-        }
-
-        mConnectSession = null;
-
-        mControlPoint = null;
-    }
-
+    // ------------------------------------------------------------------------------------------------
+    // control
+    // ------------------------------------------------------------------------------------------------
     @Override
     public void connect(CastDevice castDevice) {
-        if (mCastDevice != null) {
-            disconnect();
-        }
-
-        mLogger.i(String.format("############ connect [%s@%s]", castDevice.getName(), Integer.toHexString(castDevice.hashCode())));
+        if (mCastDevice != null) disconnect();
+        mLogger.i(String.format("connecting ==> [%s@%s]", castDevice.getName(), castDevice.getId()));
 
         mCastDevice = castDevice;
-
         mCastEventListener.onConnecting(mCastDevice);
-
         mCastActionFactory = new CastActionFactory(castDevice);
-
         mConnectSession = new ConnectSession(mControlPoint, mCastActionFactory, mConnectSessionCallback);
-
         mConnectSession.start();
-
         mSessionTimeoutDevice = null;
     }
 
     @Override
     public void disconnect() {
         final CastDevice device = mCastDevice;
-
         mCastDevice = null;
-
         mConnected = false;
+        if (device == null) return;
 
-        if (device != null) {
-            mLogger.w(String.format("############ disconnect [%s@%s]", device.getName(), Integer.toHexString(device.hashCode())));
-
-            endMediaSession();
-
-            if (mConnectSession != null) {
-                mConnectSession.stop();
-            }
-
-            mCastEventListener.onDisconnect();
+        mLogger.w(String.format("disconnect ==> [%s@%s]", device.getName(), device.getId()));
+        endMediaSession();
+        if (mConnectSession != null) {
+            mConnectSession.stop();
         }
+        mCastEventListener.onDisconnect();
     }
 
     @Override
@@ -183,14 +167,14 @@ public class CastControlImp implements ICastControl, OnDeviceRegistryListener {
         if (checkConnection()) {
             ActionCallback action = mCastActionFactory.getAvService().setCastAction(new ActionCallbackListener() {
                 @Override
-                public void success(ActionInvocation invocation, Object... received) {
+                public void success(ActionInvocation<?> invocation, Object... received) {
                     mCastEventListener.onCast(castObject);
 
                     startMediaSession();
                 }
 
                 @Override
-                public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
+                public void failure(ActionInvocation<?> invocation, UpnpResponse operation, String defaultMsg) {
                     endMediaSession();
 
                     mCastEventListener.onError(defaultMsg);
@@ -207,7 +191,7 @@ public class CastControlImp implements ICastControl, OnDeviceRegistryListener {
         if (checkConnection()) {
             ActionCallback action = mCastActionFactory.getAvService().playAction(new ActionCallbackListener() {
                 @Override
-                public void success(ActionInvocation invocation, Object... received) {
+                public void success(ActionInvocation<?> invocation, Object... received) {
                     mCastEventListener.onStart();
                 }
             });
@@ -221,7 +205,7 @@ public class CastControlImp implements ICastControl, OnDeviceRegistryListener {
         if (checkConnection()) {
             ActionCallback action = mCastActionFactory.getAvService().pauseAction(new ActionCallbackListener() {
                 @Override
-                public void success(ActionInvocation invocation, Object... received) {
+                public void success(ActionInvocation<?> invocation, Object... received) {
                     mCastEventListener.onPause();
                 }
             });
@@ -235,7 +219,7 @@ public class CastControlImp implements ICastControl, OnDeviceRegistryListener {
         if (checkConnection()) {
             ActionCallback action = mCastActionFactory.getAvService().stopAction(new ActionCallbackListener() {
                 @Override
-                public void success(ActionInvocation invocation, Object... received) {
+                public void success(ActionInvocation<?> invocation, Object... received) {
                     mCastEventListener.onStop();
                 }
             });
@@ -249,7 +233,7 @@ public class CastControlImp implements ICastControl, OnDeviceRegistryListener {
         if (checkConnection()) {
             ActionCallback action = mCastActionFactory.getAvService().seekAction(new ActionCallbackListener() {
                 @Override
-                public void success(ActionInvocation invocation, Object... received) {
+                public void success(ActionInvocation<?> invocation, Object... received) {
                     mCastEventListener.onSeekTo((long) (received[0]));
                 }
             }, position);
@@ -263,7 +247,7 @@ public class CastControlImp implements ICastControl, OnDeviceRegistryListener {
         if (checkConnection()) {
             ActionCallback action = mCastActionFactory.getRenderService().setVolumeAction(new ActionCallbackListener() {
                 @Override
-                public void success(ActionInvocation invocation, Object... received) {
+                public void success(ActionInvocation<?> invocation, Object... received) {
                     mCastEventListener.onVolume((int) (received[0]));
                 }
             }, percent);
@@ -277,7 +261,7 @@ public class CastControlImp implements ICastControl, OnDeviceRegistryListener {
         if (checkConnection()) {
             ActionCallback action = mCastActionFactory.getRenderService().setBrightnessAction(new ActionCallbackListener() {
                 @Override
-                public void success(ActionInvocation invocation, Object... received) {
+                public void success(ActionInvocation<?> invocation, Object... received) {
                     mCastEventListener.onBrightness((int) (received[0]));
                 }
             }, percent);

@@ -35,9 +35,9 @@ public interface IRenderServiceActionFactory {
     // Implement
     // ---------------------------------------------------------------------------------------------------------
     class RenderServiceActionFactory extends BaseServiceActionFactory implements IRenderServiceActionFactory {
-        private final Service mRenderService;
+        private final Service<?, ?> mRenderService;
 
-        public RenderServiceActionFactory(Service service) {
+        public RenderServiceActionFactory(Service<?, ?> service) {
             mRenderService = service;
         }
 
@@ -120,7 +120,7 @@ public interface IRenderServiceActionFactory {
         public GetBrightness getBrightnessAction(final ActionCallbackListener listener) {
             return new GetBrightness(mRenderService) {
                 @Override
-                public void received(ActionInvocation invocation, final int brightness) {
+                public void received(ActionInvocation<?> invocation, final int brightness) {
                     notifySuccess(listener, invocation, brightness);
                 }
 
