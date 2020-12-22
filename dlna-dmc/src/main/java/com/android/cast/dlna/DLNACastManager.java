@@ -1,13 +1,16 @@
 package com.android.cast.dlna;
 
 import android.app.Activity;
+import android.app.Application;
 import android.app.Service;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 
-import com.android.cast.dlna.DLNACastService.DLNACastBinder;
+import androidx.annotation.NonNull;
+
 import com.android.cast.dlna.controller.CastControlImp;
 import com.android.cast.dlna.controller.CastEventListenerListWrapper;
 import com.android.cast.dlna.controller.CastObject;
@@ -63,48 +66,54 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
     private DLNACastManager() {
     }
 
-    public void bindUpnpCastService(Activity activity) {
-        if (activity != null) {
-            activity.getApplication().bindService(new Intent(activity, DLNACastService.class), mDLNACastServiceConnection, Service.BIND_AUTO_CREATE);
+    @Override
+    public void bindCastService(@NonNull Context context) {
+        if (context instanceof Application || context instanceof Activity) {
+            context.bindService(new Intent(context, DLNACastService.class), mServiceConnection, Service.BIND_AUTO_CREATE);
+        } else {
+            mLogger.e("bindCastService only support Application or Activity implementation.");
         }
     }
 
-    public void unbindUpnpCastService(Activity activity) {
-        if (activity != null) {
-            activity.getApplication().unbindService(mDLNACastServiceConnection);
-            mDLNACastServiceConnection.onServiceDisconnected(null);
+    @Override
+    public void unbindCastService(@NonNull Context context) {
+        if (context instanceof Application || context instanceof Activity) {
+            context.unbindService(mServiceConnection);
+        } else {
+            mLogger.e("bindCastService only support Application or Activity implementation.");
         }
     }
 
-    private final ServiceConnection mDLNACastServiceConnection = new ServiceConnection() {
+    private final ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            mLogger.i(String.format("[%s] onServiceConnected", componentName.getShortClassName()));
-
-            AndroidUpnpService service = ((DLNACastBinder) iBinder).getService();
-
-            mDLNACastService = service;
-
+            mDLNACastService = (AndroidUpnpService) iBinder;
+            mLogger.i("-------------------------------------------------------------------");
+            mLogger.i(String.format("[%s] onServiceConnected, %s@%s", componentName.getShortClassName(), iBinder.getClass().getName(), iBinder.hashCode()));
+            mLogger.i(String.format("[UpnpService]: %s@%s", mDLNACastService.get().getClass().getName(), mDLNACastService.get().hashCode()));
+            mLogger.i(String.format("[Registry]: %s@%s", mDLNACastService.getRegistry().getClass().getName(), mDLNACastService.getRegistry().hashCode()));
+            mLogger.i(String.format("[ControlPoint]: %s@%s", mDLNACastService.getControlPoint().getClass().getName(), mDLNACastService.getControlPoint().hashCode()));
+            mLogger.i("-------------------------------------------------------------------");
             // add registry listener
-            Collection<RegistryListener> collection = service.getRegistry().getListeners();
+            Collection<RegistryListener> collection = mDLNACastService.getRegistry().getListeners();
 
             if (collection == null || !collection.contains(mDeviceRegistryImpl)) {
-                service.getRegistry().addListener(mDeviceRegistryImpl);
+                mDLNACastService.getRegistry().addListener(mDeviceRegistryImpl);
             }
 
             // Now add all devices to the list we already know about
-            for (Device<?, ?, ?> device : service.getRegistry().getDevices()) {
+            for (Device<?, ?, ?> device : mDLNACastService.getRegistry().getDevices()) {
                 if (device instanceof RemoteDevice) {
-                    mDeviceRegistryImpl.remoteDeviceAdded(service.getRegistry(), (RemoteDevice) device);
+                    mDeviceRegistryImpl.remoteDeviceAdded(mDLNACastService.getRegistry(), (RemoteDevice) device);
                 } else if (device instanceof LocalDevice) {
-                    mDeviceRegistryImpl.localDeviceAdded(service.getRegistry(), (LocalDevice) device);
+                    mDeviceRegistryImpl.localDeviceAdded(mDLNACastService.getRegistry(), (LocalDevice) device);
                 } else {
-                    mDeviceRegistryImpl.deviceAdded(service.getRegistry(), device);
+                    mDeviceRegistryImpl.deviceAdded(mDLNACastService.getRegistry(), device);
                 }
             }
 
             if (mCastControlImp != null) {
-                mCastControlImp.bindNLUpnpCastService(service);
+                mCastControlImp.bindNLUpnpCastService(mDLNACastService);
             }
         }
 
@@ -233,15 +242,14 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
     }
 
     // -----------------------------------------------------------------------------------------
-    // ---- control
+    // ---- service
     // -----------------------------------------------------------------------------------------
     @Override
     public void search(DeviceType type, int maxSeconds) {
         mSearchDeviceType = type;
 
-        UpnpHeader<?> header = type == null ? new STAllHeader() : new UDADeviceTypeHeader(type);
-
         if (mDLNACastService != null) {
+            UpnpHeader<?> header = type == null ? new STAllHeader() : new UDADeviceTypeHeader(type);
             mDLNACastService.get().getControlPoint().search(header, maxSeconds);
         }
     }
@@ -253,6 +261,9 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
         }
     }
 
+    // -----------------------------------------------------------------------------------------
+    // ---- control
+    // -----------------------------------------------------------------------------------------
     @Override
     public void connect(CastDevice castDevice) {
         if (mCastControlImp == null) {

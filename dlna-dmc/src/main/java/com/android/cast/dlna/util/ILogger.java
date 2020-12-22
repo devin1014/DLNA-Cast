@@ -26,7 +26,7 @@ public interface ILogger {
         private final boolean DEBUG;
 
         public DefaultLoggerImpl(Object object) {
-            this(object.getClass().getSimpleName() + "@" + Integer.toHexString(object.hashCode()));
+            this(object.getClass().getSimpleName());
         }
 
         public DefaultLoggerImpl(String tag) {
