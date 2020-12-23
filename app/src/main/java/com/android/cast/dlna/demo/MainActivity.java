@@ -6,13 +6,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View.OnClickListener;
-import android.widget.SeekBar;
-import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -20,16 +17,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.cast.dlna.DLNACastManager;
-import com.android.cast.dlna.controller.CastObject;
-import com.android.cast.dlna.controller.ICastEventListener;
 import com.android.cast.dlna.demo.DeviceAdapter.OnItemSelectedListener;
 import com.android.cast.dlna.device.CastDevice;
-import com.android.cast.dlna.util.CastUtils;
 import com.permissionx.guolindev.PermissionX;
 
-import org.fourthline.cling.support.model.MediaInfo;
-import org.fourthline.cling.support.model.PositionInfo;
-import org.fourthline.cling.support.model.TransportInfo;
+import org.fourthline.cling.model.meta.Action;
+import org.fourthline.cling.model.meta.Device;
+import org.fourthline.cling.model.meta.Service;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,87 +34,71 @@ import java.util.logging.Logger;
 public class MainActivity extends AppCompatActivity {
 
     private DeviceAdapter mDeviceAdapter;
+    private RadioGroup mControlMode;
     private TextView mCastDeviceInfo;
-    private TextView mCastMediaInfo;
-    private TextView mCastStatusInfo;
-    private TextView mCastPosition;
-    private SeekBar mVolumeBar;
-    private SeekBar mDurationBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_main);
-
         if (BuildConfig.DEBUG) {
             Logger.getLogger("org.fourthline.cling").setLevel(Level.FINEST);
         }
+
+        setContentView(R.layout.activity_main);
 
         initComponent();
 
         PermissionX.init(this)
                 .permissions(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
-                .request((allGranted, grantedList, deniedList) ->
-                        ((TextView) findViewById(R.id.cast_network_info)).setText(NetworkUtils.getActiveNetworkInfo(MainActivity.this))
-                );
-
-        // DLNACastManager.getInstance().bindCastService(this);
+                .request((allGranted, grantedList, deniedList) -> resetToolbar());
     }
 
     private void initComponent() {
         setSupportActionBar(findViewById(R.id.toolbar));
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("DLNA Cast");
-        }
-
         mCastDeviceInfo = findViewById(R.id.cast_device_info);
-        mCastMediaInfo = findViewById(R.id.cast_media_info);
-        mCastStatusInfo = findViewById(R.id.cast_status_info);
-        mCastPosition = findViewById(R.id.cast_position);
 
-        findViewById(R.id.btn_cast).setOnClickListener(mControlClickListener);
-        findViewById(R.id.btn_cast_pause).setOnClickListener(mControlClickListener);
-        findViewById(R.id.btn_cast_resume).setOnClickListener(mControlClickListener);
-        findViewById(R.id.btn_cast_stop).setOnClickListener(mControlClickListener);
-
-        mDurationBar = findViewById(R.id.seek_cast_duration);
-        mDurationBar.setOnSeekBarChangeListener(mOnSeekBarChangeListener);
-        mVolumeBar = findViewById(R.id.seek_cast_volume);
-        mVolumeBar.setOnSeekBarChangeListener(mOnSeekBarChangeListener);
+        mControlMode = findViewById(R.id.cast_type_group);
+        mControlMode.setOnCheckedChangeListener(mOnCheckedChangeListener);
 
         RecyclerView recyclerView = findViewById(R.id.cast_device_list);
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         recyclerView.setAdapter(mDeviceAdapter = new DeviceAdapter(this, mOnClickListener));
-
-        DLNACastManager.getInstance().addCastEventListener(mControlListener);
         DLNACastManager.getInstance().addRegistryDeviceListener(mDeviceAdapter);
+    }
+
+    private void resetToolbar() {
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("DLNA Cast");
+            getSupportActionBar().setSubtitle(NetworkUtils.getWiFiSSID(this));
+        }
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        resetToolbar();
         DLNACastManager.getInstance().bindCastService(this);
     }
 
     @Override
     protected void onStop() {
-        super.onStop();
+        showCastDeviceInformation(null);
+        mDeviceAdapter.setSelectedDevice(null);
         DLNACastManager.getInstance().unbindCastService(this);
+        super.onStop();
     }
 
     @Override
     protected void onDestroy() {
-        DLNACastManager.getInstance().disconnect();
         DLNACastManager.getInstance().removeRegistryListener(mDeviceAdapter);
-        DLNACastManager.getInstance().removeCastEventListener(mControlListener);
         super.onDestroy();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.main_options, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -129,11 +107,10 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_search_start) {
             Toast.makeText(this, "开始搜索", Toast.LENGTH_SHORT).show();
-            DLNACastManager.getInstance().clear(); //TODO, need clear first?
-            //NLUpnpCastManager.getInstance().search();
+            DLNACastManager.getInstance().clear();
             DLNACastManager.getInstance().search(DLNACastManager.DEVICE_TYPE_DMR, 60);
         } else if (item.getItemId() == R.id.menu_link_detail) {
-            startActivity(new Intent(this, DetailActivity.class));
+            startActivity(new Intent(this, CastControlActivity.class));
         }
         return super.onOptionsItemSelected(item);
     }
@@ -141,149 +118,71 @@ public class MainActivity extends AppCompatActivity {
     private final OnItemSelectedListener mOnClickListener = new OnItemSelectedListener() {
         @Override
         public void onItemSelected(CastDevice castDevice, boolean selected) {
-            if (selected) {
-                mDeviceAdapter.setSelectedDevice(castDevice);
-                DLNACastManager.getInstance().connect(castDevice);
-                mCastDeviceInfo.setText(String.format("当前设备：%s", castDevice.getName()));
+            mDeviceAdapter.setSelectedDevice(selected ? castDevice : null);
+
+            if (mControlMode.getCheckedRadioButtonId() == R.id.cast_type_info) {
+                if (selected) {
+                    showCastDeviceInformation(castDevice);
+                } else {
+                    showCastDeviceInformation(null);
+                }
             } else {
-                mDeviceAdapter.setSelectedDevice(null);
-                DLNACastManager.getInstance().disconnect();
-                mCastDeviceInfo.setText(String.format("当前设备: %s", ""));
-            }
-        }
-    };
-
-    @SuppressLint("NonConstantResourceId")
-    private final OnClickListener mControlClickListener = v -> {
-        switch (v.getId()) {
-            case R.id.btn_cast: {
-                DLNACastManager.getInstance().cast(
-                        CastObject
-                                .newInstance(Constants.CAST_URL, Constants.CAST_ID, Constants.CAST_NAME)
-                                .setDuration(Constants.CAST_VIDEO_DURATION));
-                break;
-            }
-            case R.id.btn_cast_stop: {
-                DLNACastManager.getInstance().stop();
-                break;
-            }
-            case R.id.btn_cast_resume: {
-                DLNACastManager.getInstance().start();
-                break;
-            }
-            case R.id.btn_cast_pause: {
-                DLNACastManager.getInstance().pause();
-                break;
-            }
-        }
-    };
-
-    private final OnSeekBarChangeListener mOnSeekBarChangeListener = new OnSeekBarChangeListener() {
-        @Override
-        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        }
-
-        @Override
-        public void onStartTrackingTouch(SeekBar seekBar) {
-        }
-
-        @SuppressLint("NonConstantResourceId")
-        @Override
-        public void onStopTrackingTouch(SeekBar seekBar) {
-            switch (seekBar.getId()) {
-                case R.id.seek_cast_volume: {
-                    DLNACastManager.getInstance().setVolume((int) (seekBar.getProgress() * 100f / seekBar.getMax()));
-                    break;
-                }
-                case R.id.seek_cast_duration: {
-                    int position = (int) ((seekBar.getProgress() * 1f / seekBar.getMax()) * Constants.CAST_VIDEO_DURATION);
-                    DLNACastManager.getInstance().seekTo(position);
-                    break;
+                if (selected) {
+                    DLNACastManager.getInstance().connect(castDevice);
+                    startActivity(new Intent(MainActivity.this, CastControlActivity.class));
+                } else {
+                    DLNACastManager.getInstance().disconnect();
                 }
             }
         }
     };
-    // --------------------------------------------------------------------------------------------------------
-    // Listener
-    // --------------------------------------------------------------------------------------------------------
-    private final ICastEventListener mControlListener = new ICastEventListener() {
+
+    private final RadioGroup.OnCheckedChangeListener mOnCheckedChangeListener = new RadioGroup.OnCheckedChangeListener() {
         @Override
-        public void onConnecting(@NonNull CastDevice castDevice) {
-            mCastDeviceInfo.setText(String.format("设备状态: [%s] [正在连接]", castDevice.getName()));
-            Toast.makeText(MainActivity.this, "正在连接", Toast.LENGTH_SHORT).show();
+        public void onCheckedChanged(RadioGroup group, int checkedId) {
+            if (mDeviceAdapter.getCastDevice() != null) {
+                if (checkedId == R.id.cast_type_ctrl) {
+                    DLNACastManager.getInstance().connect(mDeviceAdapter.getCastDevice());
+                    startActivity(new Intent(MainActivity.this, CastControlActivity.class));
+                } else if (checkedId == R.id.cast_type_info) {
+                    showCastDeviceInformation(mDeviceAdapter.getCastDevice());
+                }
+            }
+        }
+    };
+
+    private void showCastDeviceInformation(@Nullable CastDevice castDevice) {
+        if (castDevice == null) {
+            mCastDeviceInfo.setText("");
+            return;
         }
 
-        @Override
-        public void onConnected(@NonNull CastDevice castDevice, @NonNull TransportInfo transportInfo, @Nullable MediaInfo mediaInfo, int volume) {
-            mCastDeviceInfo.setText(String.format("设备状态: [%s] [已连接]", castDevice.getName()));
-            mCastStatusInfo.setText(String.format("播放状态: [%s]", transportInfo.getCurrentTransportState().getValue()));
-            mCastMediaInfo.setText(String.format("视频信息: [%s]", mediaInfo != null ? mediaInfo.getCurrentURI() : "NULL"));
-            mVolumeBar.setProgress(volume);
-            mDeviceAdapter.setSelectedDevice(castDevice);
-            Toast.makeText(MainActivity.this, "已连接", Toast.LENGTH_SHORT).show();
-        }
+        StringBuilder builder = new StringBuilder();
+        Device<?, ?, ?> device = castDevice.getDevice();
+        builder.append("URL: ").append(device.getDetails().getBaseURL().toString()).append("\n");
+        builder.append("DeviceType: ").append(device.getType().getType()).append("\n");
+        builder.append("ModelName: ").append(device.getDetails().getModelDetails().getModelName()).append("\n");
+        builder.append("ModelDescription: ").append(device.getDetails().getModelDetails().getModelDescription()).append("\n");
+        builder.append("ModelURL: ").append(device.getDetails().getModelDetails().getModelURI().toString()).append("\n");
 
-        @Override
-        public void onDisconnect() {
-            mCastDeviceInfo.setText(String.format("设备状态: [%s]", "断开连接"));
-            mDeviceAdapter.setSelectedDevice(null);
-            Toast.makeText(MainActivity.this, "断开连接", Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onCast(CastObject castObject) {
-            Toast.makeText(MainActivity.this, "开始投射 " + castObject.url, Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onStart() {
-            Toast.makeText(MainActivity.this, "开始播放", Toast.LENGTH_SHORT).show();
-            mCastStatusInfo.setText(String.format("播放状态: [%s]", "开始播放"));
-        }
-
-        @Override
-        public void onPause() {
-            Toast.makeText(MainActivity.this, "暂停播放", Toast.LENGTH_SHORT).show();
-            mCastStatusInfo.setText(String.format("播放状态: [%s]", "暂停播放"));
-        }
-
-        @Override
-        public void onStop() {
-            Toast.makeText(MainActivity.this, "停止投射", Toast.LENGTH_SHORT).show();
-            //clear all UI
-            {
-                mCastStatusInfo.setText("播放状态: ");
-                mCastMediaInfo.setText("视频信息: ");
-                mDurationBar.setProgress(0);
-                mCastPosition.setText("");
+        Service<?, ?>[] services = device.getServices();
+        if (services != null) {
+            for (Service<?, ?> service : services) {
+                builder.append("\n");
+                builder.append("ServiceId: ").append(service.getServiceId().getId()).append("\n");
+                builder.append("ServiceType: ").append(service.getServiceType().getType()).append("\n");
+                Action<?>[] actions = service.getActions();
+                if (actions != null) {
+                    builder.append("Action: ");
+                    for (Action<?> action : actions) {
+                        builder.append(action.getName()).append(", ");
+                    }
+                    builder.append("\n");
+                }
             }
         }
 
-        @Override
-        public void onSeekTo(long position) {
-            Toast.makeText(MainActivity.this, "快进 " + CastUtils.getStringTime(position), Toast.LENGTH_SHORT).show();
-        }
+        mCastDeviceInfo.setText(builder.toString());
+    }
 
-        @Override
-        public void onError(String errorMsg) {
-            Toast.makeText(MainActivity.this, "错误：" + errorMsg, Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onVolume(int volume) {
-            Toast.makeText(MainActivity.this, "音量：" + volume, Toast.LENGTH_SHORT).show();
-            mVolumeBar.setProgress(volume);
-        }
-
-        @Override
-        public void onBrightness(int brightness) {
-            Toast.makeText(MainActivity.this, "亮度：" + brightness, Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onUpdatePositionInfo(PositionInfo positionInfo) {
-            mCastPosition.setText(String.format("%s/%s", positionInfo.getRelTime(), positionInfo.getTrackDuration()));
-            mDurationBar.setProgress((int) (positionInfo.getElapsedPercent() / 100f * mDurationBar.getMax()));
-        }
-    };
 }

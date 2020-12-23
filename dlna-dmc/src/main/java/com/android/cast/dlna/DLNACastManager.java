@@ -46,6 +46,7 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
     public static final DeviceType DEVICE_TYPE_DMR = new UDADeviceType("MediaRenderer");
     public static final ServiceType SERVICE_AV_TRANSPORT = new UDAServiceType("AVTransport");
     public static final ServiceType SERVICE_RENDERING_CONTROL = new UDAServiceType("RenderingControl");
+    public static final ServiceType SERVICE_CONNECTION_MANAGER = new UDAServiceType("ConnectionManager");
 
     private static class Holder {
         private static final DLNACastManager INSTANCE = new DLNACastManager();
@@ -284,6 +285,11 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
     @Override
     public boolean isConnected() {
         return mCastControlImp != null && mCastControlImp.isConnected();
+    }
+
+    @Override
+    public CastDevice getCastDevice() {
+        return mCastControlImp != null ? mCastControlImp.getCastDevice() : null;
     }
 
     @Override

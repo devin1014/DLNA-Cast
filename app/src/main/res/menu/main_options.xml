@@ -8,15 +8,15 @@
         android:icon="@android:drawable/ic_menu_search"
         android:orderInCategory="100"
         android:title="开始搜索"
-        app:showAsAction="always"
+        app:showAsAction="never"
         tools:ignore="HardcodedText" />
 
     <item
         android:id="@+id/menu_link_detail"
         android:icon="@android:drawable/ic_menu_directions"
-        android:orderInCategory="100"
+        android:orderInCategory="200"
         android:title="详细信息"
-        app:showAsAction="always"
+        app:showAsAction="never"
         tools:ignore="AlwaysShowAction,HardcodedText" />
 
 </menu>

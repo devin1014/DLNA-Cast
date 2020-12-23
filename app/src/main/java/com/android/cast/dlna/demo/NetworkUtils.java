@@ -15,7 +15,7 @@ public class NetworkUtils {
         if (connectivityManager != null) {
             NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
             if (networkInfo != null && networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
-                return getWifiInfo(context);
+                return getWiFiSSID(context);
             } else if (networkInfo != null && networkInfo.getType() == ConnectivityManager.TYPE_MOBILE) {
                 return context.getResources().getString(R.string.not_connect_wifi);
             }
@@ -23,12 +23,18 @@ public class NetworkUtils {
         return null;
     }
 
-    private static String getWifiInfo(Context context) {
+    public static String getWiFiSSID(Context context) {
+        WifiManager wifiManager = getSystemService(context, Context.WIFI_SERVICE);
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        return String.format("WIFI: %s", wifiInfo.getSSID().replaceAll("\"", ""));
+    }
+
+    public static String getWiFiIPAddress(Context context) {
         WifiManager wifiManager = getSystemService(context, Context.WIFI_SERVICE);
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
         int address = wifiInfo.getIpAddress();
         String ip = (address & 0xFF) + "." + ((address >> 8) & 0xFF) + "." + ((address >> 16) & 0xFF) + "." + (address >> 24 & 0xFF);
-        return String.format("WIFI: %s\nIP: %s", wifiInfo.getSSID().replaceAll("\"", ""), ip);
+        return String.format("IP: %s", ip);
     }
 
     @SuppressWarnings({"unchecked", "TypeParameterExplicitlyExtendsObject"})

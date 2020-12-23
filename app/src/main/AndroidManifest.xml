@@ -25,7 +25,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".DetailActivity" />
+        <activity android:name=".CastControlActivity" />
 
         <activity
             android:name="com.android.cast.dlna.demo.light.LightActivity"

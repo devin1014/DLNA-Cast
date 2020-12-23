@@ -53,7 +53,10 @@ public class DLNACastService extends AndroidUpnpServiceImpl {
 
         @Override
         public ServiceType[] getExclusiveServiceTypes() {
-            return new ServiceType[]{DLNACastManager.SERVICE_RENDERING_CONTROL, DLNACastManager.SERVICE_AV_TRANSPORT};
+            return new ServiceType[]{
+                    DLNACastManager.SERVICE_RENDERING_CONTROL,
+                    DLNACastManager.SERVICE_AV_TRANSPORT,
+                    DLNACastManager.SERVICE_CONNECTION_MANAGER};
         }
     }
 }

@@ -33,7 +33,7 @@ public class CastDevice implements IDLNACastDevice<Device<?, ?, ?>> {
 
     @Override
     public String getDescription() {
-        return mDevice.getDetails().getModelDetails().getModelName();
+        return mDevice.getDetails().getManufacturerDetails().getManufacturer();
     }
 
     @Override

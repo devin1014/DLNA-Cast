@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RadioGroup
+        android:id="@+id/cast_url_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <RadioButton
+            android:id="@+id/cast_url_mp4"
+            android:layout_width="360dp"
+            android:layout_height="40dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:checked="true"
+            android:text="MP4"
+            tools:ignore="HardcodedText" />
+
+        <RadioButton
+            android:id="@+id/cast_url_hls_1"
+            android:layout_width="360dp"
+            android:layout_height="40dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:text="M3u8: BT"
+            tools:ignore="HardcodedText" />
+
+        <RadioButton
+            android:id="@+id/cast_url_hls_2"
+            android:layout_width="360dp"
+            android:layout_height="40dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:text="M3u8: CC"
+            tools:ignore="HardcodedText" />
+
+        <RadioButton
+            android:id="@+id/cast_url_hls_3"
+            android:layout_width="360dp"
+            android:layout_height="40dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:text="M3u8: Iphone Sample"
+            tools:ignore="HardcodedText" />
+
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/cast_url_ok"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_gravity="right"
+        android:text="@string/OK"
+        android:textColor="@color/colorAccent"
+        android:textStyle="bold" />
+
+</LinearLayout>

@@ -29,6 +29,8 @@ public interface ICastControl {
 
     boolean isConnected();
 
+    CastDevice getCastDevice();
+
     // media control
     void cast(CastObject castObject);
 

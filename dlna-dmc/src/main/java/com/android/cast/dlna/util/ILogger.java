@@ -1,8 +1,9 @@
 package com.android.cast.dlna.util;
 
+import android.text.TextUtils;
 import android.util.Log;
 
-import com.android.cast.dlna.Constants;
+import com.android.cast.dlna.BuildConfig;
 
 
 /**
@@ -26,15 +27,19 @@ public interface ILogger {
         private final boolean DEBUG;
 
         public DefaultLoggerImpl(Object object) {
-            this(object.getClass().getSimpleName());
+            this(object, BuildConfig.DEBUG);
         }
 
-        public DefaultLoggerImpl(String tag) {
-            this(tag, Constants.DEBUG);
-        }
-
-        public DefaultLoggerImpl(String tag, boolean debug) {
-            TAG = PREFIX_TAG + tag;
+        public DefaultLoggerImpl(Object object, boolean debug) {
+            String className = object.getClass().getSimpleName();
+            if (TextUtils.isEmpty(className)) {
+                if (object.getClass().getSuperclass() != null) {
+                    className = object.getClass().getSuperclass().getSimpleName();
+                } else {
+                    className = "$1";
+                }
+            }
+            TAG = PREFIX_TAG + className;
             DEBUG = debug;
         }
 

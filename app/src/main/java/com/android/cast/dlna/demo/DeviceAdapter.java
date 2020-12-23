@@ -20,9 +20,9 @@ import java.util.List;
  *
  */
 public class DeviceAdapter extends Adapter<DeviceHolder> implements OnDeviceRegistryListener {
-    private final List<CastDevice> mDeviceList = new ArrayList<>();
     private final LayoutInflater mLayoutInflater;
     private final Handler mHandler = new Handler(Looper.getMainLooper());
+    private final List<CastDevice> mDeviceList = new ArrayList<>();
     private final OnItemSelectedListener mOnItemSelectedListener;
 
     private CastDevice mSelectedDevice;
@@ -57,47 +57,31 @@ public class DeviceAdapter extends Adapter<DeviceHolder> implements OnDeviceRegi
     }
 
     public void setSelectedDevice(CastDevice device) {
-        // Notify: remove code here!
-        //        if (mSelectedDevice != null && device != null && mSelectedDevice.getId().equals(device.getId()))
-        //        {
-        //            return;
-        //        }
         mSelectedDevice = device;
         notifyDataSetChanged();
+    }
+
+    public CastDevice getCastDevice() {
+        return mSelectedDevice;
     }
 
     private boolean isSelected(int position) {
         CastDevice device = getItem(position);
         if (device != null && mSelectedDevice != null) {
-            return device == mSelectedDevice || device.getId().equals(mSelectedDevice.getId());
+            return device.getId().equals(mSelectedDevice.getId());
         }
         return false;
     }
 
     @Override
     public void onDeviceAdded(CastDevice device) {
-        boolean added = false;
-        for (CastDevice castDevice : mDeviceList) {
-            if (castDevice.getId().equals(device.getId())) {
-                castDevice = new CastDevice(device.getDevice());
-                added = true;
-                break;
-            }
-        }
-
-        if (!added) {
+        if (!mDeviceList.contains(device)) {
             mDeviceList.add(device);
-        }
-
-        if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    notifyDataSetChanged();
-                }
-            });
-        } else {
-            notifyDataSetChanged();
+            if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
+                mHandler.post(this::notifyDataSetChanged);
+            } else {
+                notifyDataSetChanged();
+            }
         }
     }
 
@@ -107,23 +91,10 @@ public class DeviceAdapter extends Adapter<DeviceHolder> implements OnDeviceRegi
 
     @Override
     public void onDeviceRemoved(CastDevice device) {
-        CastDevice removeDevice = null;
-        for (CastDevice castDevice : mDeviceList) {
-            if (castDevice.getId().equals(device.getId())) {
-                removeDevice = castDevice;
-                break;
-            }
-        }
-
-        if (removeDevice != null) {
-            mDeviceList.remove(removeDevice);
+        if (mDeviceList.contains(device)) {
+            mDeviceList.remove(device);
             if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        notifyDataSetChanged();
-                    }
-                });
+                mHandler.post(this::notifyDataSetChanged);
             } else {
                 notifyDataSetChanged();
             }

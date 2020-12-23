@@ -15,123 +15,59 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <RadioGroup
+            android:id="@+id/cast_type_group"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/cast_type_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:padding="6dp"
+                android:text="@string/mode_info"
+                android:textSize="16dp" />
+
+            <RadioButton
+                android:id="@+id/cast_type_ctrl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="6dp"
+                android:text="@string/mode_ctrl"
+                android:textSize="16dp" />
+
+        </RadioGroup>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="#888888" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/cast_device_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
         <TextView
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="bottom"
+            android:padding="4dp"
+            android:text="@string/device_info"
+            android:textColor="#000000"
+            android:textSize="16dp"
+            android:textStyle="bold" />
+
+        <TextView
             android:id="@+id/cast_device_info"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
+            android:layout_height="match_parent"
             android:padding="4dp"
-            android:text="设备信息："
             android:textColor="#000000"
-            android:textSize="14dp" />
-
-        <TextView
-            android:id="@+id/cast_media_info"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:padding="4dp"
-            android:text="视频信息："
-            android:textColor="#000000"
-            android:textSize="14dp" />
-
-        <TextView
-            android:id="@+id/cast_status_info"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:padding="4dp"
-            android:text="连接信息："
-            android:textColor="#000000"
-            android:textSize="14dp" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:background="#888888" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="4dp"
-            android:text="播放控制"
-            android:textSize="14dp" />
-
-        <include layout="@layout/layout_control" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:background="#888888" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="4dp"
-                android:text="播放进度"
-                android:textSize="14dp" />
-
-            <TextView
-                android:id="@+id/cast_position"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="4dp"
-                android:textSize="14dp" />
-
-        </LinearLayout>
-
-        <SeekBar
-            android:id="@+id/seek_cast_duration"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="4dp" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:background="#888888" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="4dp"
-            android:text="音量设置"
-            android:textSize="14dp" />
-
-        <SeekBar
-            android:id="@+id/seek_cast_volume"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="4dp" />
-
-        <!--<View-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="1px"-->
-        <!--android:background="#888888" />-->
-
-        <!--<TextView-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:padding="4dp"-->
-        <!--android:text="屏幕亮度"-->
-        <!--android:textSize="14dp" />-->
-
-        <!--<SeekBar-->
-        <!--android:id="@+id/seek_cast_brightness"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:padding="4dp" />-->
+            android:textSize="16dp" />
 
     </LinearLayout>
 
