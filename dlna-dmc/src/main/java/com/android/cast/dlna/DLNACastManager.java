@@ -11,6 +11,7 @@ import android.os.IBinder;
 
 import androidx.annotation.NonNull;
 
+import com.android.cast.dlna.control.ControlImpl;
 import com.android.cast.dlna.controller.CastControlImp;
 import com.android.cast.dlna.controller.CastEventListenerListWrapper;
 import com.android.cast.dlna.controller.CastObject;
@@ -263,6 +264,8 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
         }
     }
 
+    private ControlImpl mCtrl222;
+
     // -----------------------------------------------------------------------------------------
     // ---- control
     // -----------------------------------------------------------------------------------------
@@ -273,12 +276,19 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
         }
 
         mCastControlImp.connect(castDevice);
+
+        mCtrl222 = new ControlImpl(mDLNACastService, castDevice.getDevice());
+        mCtrl222.sync();
     }
 
     @Override
     public void disconnect() {
         if (mCastControlImp != null) {
             mCastControlImp.disconnect();
+        }
+
+        if (mCtrl222 != null) {
+            mCtrl222.release();
         }
     }
 

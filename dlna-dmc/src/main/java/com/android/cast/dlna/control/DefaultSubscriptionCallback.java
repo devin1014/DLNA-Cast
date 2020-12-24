@@ -1,4 +1,4 @@
-package com.android.cast.dlna.controller;
+package com.android.cast.dlna.control;
 
 import androidx.annotation.CallSuper;
 
@@ -14,12 +14,16 @@ import org.fourthline.cling.model.meta.Service;
 /**
  *
  */
-public abstract class AbstractSubscriptionCallback extends SubscriptionCallback {
+class DefaultSubscriptionCallback extends SubscriptionCallback implements ISubscriptionListener {
 
     protected final ILogger mLogger = new DefaultLoggerImpl(this);
-    protected final EventCallbackListener mEventCallback;
+    protected final ISubscriptionListener mEventCallback;
 
-    AbstractSubscriptionCallback(Service service, int requestedDurationSeconds, EventCallbackListener eventCallback) {
+    public DefaultSubscriptionCallback(Service service, int requestedDurationSeconds) {
+        this(service, requestedDurationSeconds, null);
+    }
+
+    public DefaultSubscriptionCallback(Service service, int requestedDurationSeconds, ISubscriptionListener eventCallback) {
         super(service, requestedDurationSeconds);
         mEventCallback = eventCallback;
     }
@@ -29,8 +33,9 @@ public abstract class AbstractSubscriptionCallback extends SubscriptionCallback 
     protected void failed(GENASubscription subscription, UpnpResponse responseStatus, Exception exception, String defaultMsg) {
         mLogger.e(String.format("[%s GENASubscription failed]: %s, %s", subscription.getService().getServiceType().getType(), responseStatus, defaultMsg));
         if (mEventCallback != null) {
-            mEventCallback.failed(subscription, responseStatus, exception, defaultMsg);
+            mEventCallback.onSubscriptionFinished(subscription, responseStatus, defaultMsg);
         }
+        onSubscriptionFinished(subscription, responseStatus, defaultMsg);
     }
 
     @Override
@@ -38,8 +43,9 @@ public abstract class AbstractSubscriptionCallback extends SubscriptionCallback 
     protected void established(GENASubscription subscription) {
         mLogger.i(String.format("[%s] [established]", subscription.getService().getServiceType().getType()));
         if (mEventCallback != null) {
-            mEventCallback.established(subscription);
+            mEventCallback.onSubscriptionEstablished(subscription);
         }
+        onSubscriptionEstablished(subscription);
     }
 
     @Override
@@ -47,8 +53,9 @@ public abstract class AbstractSubscriptionCallback extends SubscriptionCallback 
     protected void ended(GENASubscription subscription, CancelReason reason, UpnpResponse responseStatus) {
         mLogger.i(String.format("[%s GENASubscription ended]: %s, %s", subscription.getService().getServiceType().getType(), responseStatus, reason));
         if (mEventCallback != null) {
-            mEventCallback.ended(subscription, reason, responseStatus);
+            mEventCallback.onSubscriptionFinished(subscription, responseStatus, reason.toString());
         }
+        onSubscriptionFinished(subscription, responseStatus, reason.toString());
     }
 
     @Override
@@ -59,51 +66,24 @@ public abstract class AbstractSubscriptionCallback extends SubscriptionCallback 
     @Override
     protected void eventReceived(GENASubscription subscription) {
         mLogger.i(String.format("[%s GENASubscription eventReceived]", subscription.getService().getServiceType().getType()));
-
         if (subscription.getCurrentValues() != null) {
             mLogger.i(String.format("currentValues: %s", subscription.getCurrentValues()));
         }
-
-        // String lastChange = parseLastChange(subscription);
-        //
-        // if (!TextUtils.isEmpty(lastChange)) {
-        //     LastChange action = null;
-        //
-        //     try {
-        //         action = new LastChange(getLastChangeParser(), lastChange);
-        //     } catch (Exception e) {
-        //         e.printStackTrace();
-        //
-        //         mLogger.e(e.getMessage());
-        //     }
-        //
-        //     if (action != null) {
-        //         processLastChange(action);
-        //     }
-        // }
+        if (mEventCallback != null) {
+            mEventCallback.onSubscriptionEventReceived(subscription);
+        }
+        onSubscriptionEventReceived(subscription);
     }
 
-    // protected void processLastChange(@NonNull LastChange lastChange) {
-    //     //mLogger.d("\r" + lastChange.toString());
-    // }
+    @Override
+    public void onSubscriptionEstablished(GENASubscription<?> subscription) {
+    }
 
-    // protected abstract LastChangeParser getLastChangeParser();
+    @Override
+    public void onSubscriptionEventReceived(GENASubscription<?> subscription) {
+    }
 
-    // protected String parseLastChange(GENASubscription<?> subscription) {
-    //     Map currentValues = subscription.getCurrentValues();
-    //
-    //     if (currentValues != null && currentValues.containsKey("LastChange")) {
-    //         return currentValues.get("LastChange").toString();
-    //     }
-    //
-    //     return null;
-    // }
-
-    public interface EventCallbackListener {
-        void established(GENASubscription<?> subscription);
-
-        void ended(GENASubscription<?> subscription, CancelReason reason, UpnpResponse responseStatus);
-
-        void failed(GENASubscription<?> subscription, UpnpResponse responseStatus, Exception exception, String defaultMsg);
+    @Override
+    public void onSubscriptionFinished(GENASubscription<?> subscription, UpnpResponse responseStatus, String defaultMsg) {
     }
 }

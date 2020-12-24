@@ -50,11 +50,11 @@ public class CastControlImp implements ICastControl, OnDeviceRegistryListener {
         mControlPoint = service.getControlPoint();
 
         if (isConnected()) {
-            if (mConnectSession == null) {
-                mConnectSession = new ConnectSession(mControlPoint, mCastActionFactory, mConnectSessionCallback);
-            }
-
-            mConnectSession.start();
+            // if (mConnectSession == null) {
+            //     mConnectSession = new ConnectSession(mControlPoint, mCastActionFactory, mConnectSessionCallback);
+            // }
+            //
+            // mConnectSession.start();
         }
     }
 
@@ -294,9 +294,9 @@ public class CastControlImp implements ICastControl, OnDeviceRegistryListener {
             mMediaSession.stop();
         }
 
-        mMediaSession = new MediaSession(mControlPoint, mCastActionFactory, mCastEventListener);
-
-        mMediaSession.start();
+        // mMediaSession = new MediaSession(mControlPoint, mCastActionFactory, mCastEventListener);
+        //
+        // mMediaSession.start();
     }
 
     private void endMediaSession() {
