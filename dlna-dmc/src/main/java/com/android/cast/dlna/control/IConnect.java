@@ -8,4 +8,10 @@ public interface IConnect {
     void disconnect();
 
     boolean isConnected();
+
+    interface IConnectCallback {
+        void onDeviceConnected(CastDevice device);
+
+        void onDeviceDisconnected(CastDevice device);
+    }
 }

@@ -44,6 +44,8 @@ public interface ICastControl {
 
     void setVolume(int percent);
 
+    void setMute(boolean mute);
+
     void setBrightness(int percent);
 
     @CastStatus

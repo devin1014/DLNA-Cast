@@ -22,7 +22,7 @@
             android:padding="4dp"
             android:text="设备信息："
             android:textColor="#000000"
-            android:textSize="14dp" />
+            android:textSize="16dp" />
 
         <TextView
             android:id="@+id/cast_media_info"
@@ -32,7 +32,7 @@
             android:padding="4dp"
             android:text="视频信息："
             android:textColor="#000000"
-            android:textSize="14dp" />
+            android:textSize="16dp" />
 
         <TextView
             android:id="@+id/cast_status_info"
@@ -42,25 +42,29 @@
             android:padding="4dp"
             android:text="连接信息："
             android:textColor="#000000"
-            android:textSize="14dp" />
+            android:textSize="16dp" />
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="1px"
+            android:layout_height="1dp"
+            android:layout_marginTop="12dp"
             android:background="#888888" />
 
         <TextView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
             android:padding="4dp"
-            android:text="播放控制"
-            android:textSize="14dp" />
+            android:text="控制"
+            android:textColor="#000000"
+            android:textSize="16dp" />
 
         <include layout="@layout/layout_control" />
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="1px"
+            android:layout_height="1dp"
+            android:layout_marginTop="12dp"
             android:background="#888888" />
 
         <LinearLayout
@@ -71,17 +75,19 @@
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
+                android:gravity="center_vertical"
                 android:padding="4dp"
-                android:text="播放进度"
-                android:textSize="14dp" />
+                android:text="进度"
+                android:textColor="#000000"
+                android:textSize="16dp" />
 
             <TextView
                 android:id="@+id/cast_position"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="4dp"
-                android:textSize="14dp" />
+                android:textSize="16dp" />
 
         </LinearLayout>
 
@@ -93,20 +99,42 @@
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="1px"
+            android:layout_height="1dp"
+            android:layout_marginTop="12dp"
             android:background="#888888" />
 
-        <TextView
-            android:layout_width="wrap_content"
+        <!--Volume-->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="4dp"
-            android:text="音量设置"
-            android:textSize="14dp" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:gravity="center_vertical"
+                android:padding="4dp"
+                android:text="音量"
+                android:textColor="#000000"
+                android:textSize="16dp" />
+
+            <ImageView
+                android:id="@+id/btn_volume_mute"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:contentDescription="@null"
+                android:padding="6dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/baseline_volume_mute" />
+
+        </LinearLayout>
 
         <SeekBar
             android:id="@+id/seek_cast_volume"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
             android:padding="4dp" />
 
     </LinearLayout>

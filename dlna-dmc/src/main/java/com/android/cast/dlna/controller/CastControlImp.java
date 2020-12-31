@@ -257,6 +257,20 @@ public class CastControlImp implements ICastControl, OnDeviceRegistryListener {
     }
 
     @Override
+    public void setMute(boolean mute) {
+        if (checkConnection()) {
+            ActionCallback action = mCastActionFactory.getRenderService().setMuteAction(new ActionCallbackListener() {
+                @Override
+                public void success(ActionInvocation<?> invocation, Object... received) {
+                    //TODO
+                }
+            }, mute);
+
+            mControlPoint.execute(action);
+        }
+    }
+
+    @Override
     public void setBrightness(int percent) {
         if (checkConnection()) {
             ActionCallback action = mCastActionFactory.getRenderService().setBrightnessAction(new ActionCallbackListener() {

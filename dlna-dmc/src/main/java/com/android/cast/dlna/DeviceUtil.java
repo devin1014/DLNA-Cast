@@ -6,6 +6,10 @@ import org.fourthline.cling.model.meta.Action;
 import org.fourthline.cling.model.meta.RemoteDevice;
 import org.fourthline.cling.model.meta.RemoteService;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  *
  */
@@ -28,7 +32,9 @@ final class DeviceUtil {
             builder.append("\nservice:").append(service.getServiceType().getType());
             if (service.hasActions()) {
                 builder.append("\nactions: ");
-                for (Action<?> action : service.getActions()) {
+                List<Action<?>> list = Arrays.asList(service.getActions());
+                Collections.sort(list, (o1, o2) -> o1.getName().compareTo(o2.getName()));
+                for (Action<?> action : list) {
                     builder.append(action.getName()).append(", ");
                 }
             }

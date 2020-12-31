@@ -12,10 +12,10 @@ import android.os.IBinder;
 import androidx.annotation.NonNull;
 
 import com.android.cast.dlna.control.ControlImpl;
+import com.android.cast.dlna.control.IConnect;
+import com.android.cast.dlna.control.SyncDataManager;
 import com.android.cast.dlna.controller.CastControlImp;
-import com.android.cast.dlna.controller.CastEventListenerListWrapper;
 import com.android.cast.dlna.controller.CastObject;
-import com.android.cast.dlna.controller.ICastEventListener;
 import com.android.cast.dlna.device.CastDevice;
 import com.android.cast.dlna.util.ILogger;
 import com.android.cast.dlna.util.ILogger.DefaultLoggerImpl;
@@ -232,20 +232,8 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
         return mSearchDeviceType == null || mSearchDeviceType.equals(device.getType());
     }
 
-    private final List<ICastEventListener> mCastEventListenerList = new ArrayList<>();
-
-    public void addCastEventListener(@NonNull ICastEventListener listener) {
-        if (!mCastEventListenerList.contains(listener)) {
-            mCastEventListenerList.add(listener);
-        }
-    }
-
-    public void removeCastEventListener(@NonNull ICastEventListener listener) {
-        mCastEventListenerList.remove(listener);
-    }
-
     // -----------------------------------------------------------------------------------------
-    // ---- service
+    // ---- search
     // -----------------------------------------------------------------------------------------
     @Override
     public void search(DeviceType type, int maxSeconds) {
@@ -267,29 +255,44 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
     private ControlImpl mCtrl222;
 
     // -----------------------------------------------------------------------------------------
-    // ---- control
+    // ---- connect
     // -----------------------------------------------------------------------------------------
+    private final List<IConnect.IConnectCallback> mDeviceConnectionCallbackList = new ArrayList<>();
+
+    public void addCastEventListener(@NonNull IConnect.IConnectCallback listener) {
+        if (!mDeviceConnectionCallbackList.contains(listener)) {
+            mDeviceConnectionCallbackList.add(listener);
+        }
+    }
+
+    public void removeCastEventListener(@NonNull IConnect.IConnectCallback listener) {
+        mDeviceConnectionCallbackList.remove(listener);
+    }
+
     @Override
     public void connect(CastDevice castDevice) {
-        if (mCastControlImp == null) {
-            mCastControlImp = new CastControlImp(mDLNACastService, new CastEventListenerListWrapper(mCastEventListenerList));
-        }
+        if (mCtrl222 != null) mCtrl222.release();
+        mCtrl222 = new ControlImpl(mDLNACastService, castDevice, new SyncDataManager.SubscriptionCallback() {
+            @Override
+            public void onSubscriptionSuccess() {
+                for (IConnect.IConnectCallback callback : mDeviceConnectionCallbackList) {
+                    callback.onDeviceConnected(castDevice);
+                }
+            }
 
-        mCastControlImp.connect(castDevice);
-
-        mCtrl222 = new ControlImpl(mDLNACastService, castDevice.getDevice());
+            @Override
+            public void onSubscriptionFailed(String msg) {
+                for (IConnect.IConnectCallback callback : mDeviceConnectionCallbackList) {
+                    callback.onDeviceDisconnected(castDevice);
+                }
+            }
+        });
         mCtrl222.sync();
     }
 
     @Override
     public void disconnect() {
-        if (mCastControlImp != null) {
-            mCastControlImp.disconnect();
-        }
-
-        if (mCtrl222 != null) {
-            mCtrl222.release();
-        }
+        if (mCtrl222 != null) mCtrl222.release();
     }
 
     @Override
@@ -302,6 +305,9 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
         return mCastControlImp != null ? mCastControlImp.getCastDevice() : null;
     }
 
+    // -----------------------------------------------------------------------------------------
+    // ---- cast
+    // -----------------------------------------------------------------------------------------
     @Override
     public void cast(CastObject castObject) {
         if (mCastControlImp != null) {
@@ -341,6 +347,13 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
     public void setVolume(int percent) {
         if (mCastControlImp != null) {
             mCastControlImp.setVolume(percent);
+        }
+    }
+
+    @Override
+    public void setMute(boolean mute) {
+        if (mCastControlImp != null) {
+            mCastControlImp.setMute(mute);
         }
     }
 

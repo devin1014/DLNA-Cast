@@ -53,9 +53,9 @@ class DefaultSubscriptionCallback extends SubscriptionCallback implements ISubsc
     protected void ended(GENASubscription subscription, CancelReason reason, UpnpResponse responseStatus) {
         mLogger.i(String.format("[%s GENASubscription ended]: %s, %s", subscription.getService().getServiceType().getType(), responseStatus, reason));
         if (mEventCallback != null) {
-            mEventCallback.onSubscriptionFinished(subscription, responseStatus, reason.toString());
+            mEventCallback.onSubscriptionFinished(subscription, responseStatus, reason != null ? reason.toString() : "");
         }
-        onSubscriptionFinished(subscription, responseStatus, reason.toString());
+        onSubscriptionFinished(subscription, responseStatus, reason != null ? reason.toString() : "");
     }
 
     @Override

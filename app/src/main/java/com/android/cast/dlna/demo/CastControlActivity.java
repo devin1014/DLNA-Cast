@@ -3,6 +3,7 @@ package com.android.cast.dlna.demo;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,15 +28,15 @@ public class CastControlActivity extends AppCompatActivity {
     private TextView mCastMediaInfo;
     private TextView mCastStatusInfo;
     private TextView mCastPosition;
+    private ImageView mVolumeMute;
     private SeekBar mVolumeBar;
     private SeekBar mDurationBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_cast_control);
-
+        DLNACastManager.getInstance().bindCastService(this);
         initComponent();
     }
 
@@ -61,26 +62,14 @@ public class CastControlActivity extends AppCompatActivity {
         mDurationBar.setOnSeekBarChangeListener(mOnSeekBarChangeListener);
         mVolumeBar = findViewById(R.id.seek_cast_volume);
         mVolumeBar.setOnSeekBarChangeListener(mOnSeekBarChangeListener);
-
-        DLNACastManager.getInstance().addCastEventListener(mControlListener);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        DLNACastManager.getInstance().bindCastService(this);
-    }
-
-    @Override
-    protected void onStop() {
-        DLNACastManager.getInstance().unbindCastService(this);
-        super.onStop();
+        mVolumeMute = findViewById(R.id.btn_volume_mute);
+        mVolumeMute.setOnClickListener(mControlClickListener);
     }
 
     @Override
     protected void onDestroy() {
         DLNACastManager.getInstance().disconnect();
-        DLNACastManager.getInstance().removeCastEventListener(mControlListener);
+        DLNACastManager.getInstance().unbindCastService(this);
         super.onDestroy();
     }
 
@@ -89,10 +78,7 @@ public class CastControlActivity extends AppCompatActivity {
         switch (v.getId()) {
             case R.id.btn_cast: {
                 new CastFragment()
-                        .setCallback(url ->
-                                DLNACastManager.getInstance()
-                                        .cast(CastObject.newInstance(url, Constants.CAST_ID, Constants.CAST_NAME))
-                        )
+                        .setCallback(url -> DLNACastManager.getInstance().cast(CastObject.newInstance(url, Constants.CAST_ID, Constants.CAST_NAME)))
                         .show(getSupportFragmentManager(), "CastFragment");
                 break;
             }
@@ -106,6 +92,10 @@ public class CastControlActivity extends AppCompatActivity {
             }
             case R.id.btn_cast_pause: {
                 DLNACastManager.getInstance().pause();
+                break;
+            }
+            case R.id.btn_volume_mute: {
+                DLNACastManager.getInstance().setMute(true); //TODO, always true?
                 break;
             }
         }
@@ -142,23 +132,28 @@ public class CastControlActivity extends AppCompatActivity {
     private final ICastEventListener mControlListener = new ICastEventListener() {
         @Override
         public void onConnecting(@NonNull CastDevice castDevice) {
-            mCastDeviceInfo.setText(String.format("设备状态: [%s] [正在连接]", castDevice.getName()));
             Toast.makeText(CastControlActivity.this, "正在连接", Toast.LENGTH_SHORT).show();
+            mCastDeviceInfo.setText(String.format("设备状态: [%s] [正在连接]", castDevice.getName()));
         }
 
         @Override
         public void onConnected(@NonNull CastDevice castDevice, @NonNull TransportInfo transportInfo, @Nullable MediaInfo mediaInfo, int volume) {
+            Toast.makeText(CastControlActivity.this, "已连接", Toast.LENGTH_SHORT).show();
             mCastDeviceInfo.setText(String.format("设备状态: [%s] [已连接]", castDevice.getName()));
             mCastStatusInfo.setText(String.format("播放状态: [%s]", transportInfo.getCurrentTransportState().getValue()));
             mCastMediaInfo.setText(String.format("视频信息: [%s]", mediaInfo != null ? mediaInfo.getCurrentURI() : "NULL"));
             mVolumeBar.setProgress(volume);
-            Toast.makeText(CastControlActivity.this, "已连接", Toast.LENGTH_SHORT).show();
+
+            boolean getMute = castDevice.supportAction("GetMute");
+            mVolumeMute.setEnabled(getMute);
+            mVolumeMute.setImageResource(getMute ? R.drawable.baseline_volume_mute : R.drawable.baseline_volume_off);
+            mVolumeBar.setEnabled(getMute);
         }
 
         @Override
         public void onDisconnect() {
-            mCastDeviceInfo.setText(String.format("设备状态: [%s]", "断开连接"));
             Toast.makeText(CastControlActivity.this, "断开连接", Toast.LENGTH_SHORT).show();
+            mCastDeviceInfo.setText(String.format("设备状态: [%s]", "断开连接"));
         }
 
         @Override

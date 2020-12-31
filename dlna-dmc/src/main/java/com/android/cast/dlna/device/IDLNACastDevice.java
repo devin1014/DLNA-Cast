@@ -16,4 +16,6 @@ public interface IDLNACastDevice<T extends Device<?, ?, ?>> {
     String getName();
 
     String getDescription();
+
+    boolean supportAction(String name);
 }

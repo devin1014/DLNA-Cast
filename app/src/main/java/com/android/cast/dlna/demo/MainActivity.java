@@ -25,6 +25,9 @@ import org.fourthline.cling.model.meta.Action;
 import org.fourthline.cling.model.meta.Device;
 import org.fourthline.cling.model.meta.Service;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -159,7 +162,9 @@ public class MainActivity extends AppCompatActivity {
 
         StringBuilder builder = new StringBuilder();
         Device<?, ?, ?> device = castDevice.getDevice();
-        builder.append("URL: ").append(device.getDetails().getBaseURL().toString()).append("\n");
+        if (device.getDetails().getBaseURL() != null) {
+            builder.append("URL: ").append(device.getDetails().getBaseURL().toString()).append("\n");
+        }
         builder.append("DeviceType: ").append(device.getType().getType()).append("\n");
         builder.append("ModelName: ").append(device.getDetails().getModelDetails().getModelName()).append("\n");
         builder.append("ModelDescription: ").append(device.getDetails().getModelDetails().getModelDescription()).append("\n");
@@ -171,14 +176,13 @@ public class MainActivity extends AppCompatActivity {
                 builder.append("\n");
                 builder.append("ServiceId: ").append(service.getServiceId().getId()).append("\n");
                 builder.append("ServiceType: ").append(service.getServiceType().getType()).append("\n");
-                Action<?>[] actions = service.getActions();
-                if (actions != null) {
-                    builder.append("Action: ");
-                    for (Action<?> action : actions) {
-                        builder.append(action.getName()).append(", ");
-                    }
-                    builder.append("\n");
+                List<Action<?>> list = Arrays.asList(service.getActions());
+                Collections.sort(list, (o1, o2) -> o1.getName().compareTo(o2.getName()));
+                builder.append("Action: ");
+                for (Action<?> action : list) {
+                    builder.append(action.getName()).append(", ");
                 }
+                builder.append("\n");
             }
         }
 
