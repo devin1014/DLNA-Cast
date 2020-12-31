@@ -13,7 +13,6 @@ import androidx.annotation.NonNull;
 
 import com.android.cast.dlna.control.ControlImpl;
 import com.android.cast.dlna.control.IConnect;
-import com.android.cast.dlna.control.SyncDataManager;
 import com.android.cast.dlna.controller.CastControlImp;
 import com.android.cast.dlna.controller.CastObject;
 import com.android.cast.dlna.device.CastDevice;
@@ -271,28 +270,25 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
 
     @Override
     public void connect(CastDevice castDevice) {
-        if (mCtrl222 != null) mCtrl222.release();
-        mCtrl222 = new ControlImpl(mDLNACastService, castDevice, new SyncDataManager.SubscriptionCallback() {
+        if (mCtrl222 == null) {
+            mCtrl222 = new ControlImpl(mDLNACastService);
+        }
+        mCtrl222.connect(castDevice, new IConnect.IConnectCallback() {
             @Override
-            public void onSubscriptionSuccess() {
-                for (IConnect.IConnectCallback callback : mDeviceConnectionCallbackList) {
-                    callback.onDeviceConnected(castDevice);
-                }
+            public void onDeviceConnected(CastDevice device) {
+                //TODO
             }
 
             @Override
-            public void onSubscriptionFailed(String msg) {
-                for (IConnect.IConnectCallback callback : mDeviceConnectionCallbackList) {
-                    callback.onDeviceDisconnected(castDevice);
-                }
+            public void onDeviceDisconnected(CastDevice device, String errMsg) {
+
             }
         });
-        mCtrl222.sync();
     }
 
     @Override
     public void disconnect() {
-        if (mCtrl222 != null) mCtrl222.release();
+        if (mCtrl222 != null) mCtrl222.disconnect();
     }
 
     @Override

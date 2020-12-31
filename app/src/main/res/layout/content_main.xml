@@ -1,74 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView
+<merge
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.android.cast.dlna.demo.MainActivity"
     tools:ignore="HardcodedText,SpUsage"
     tools:showIn="@layout/activity_main">
 
-    <LinearLayout
+    <RadioGroup
+        android:id="@+id/cast_type_group"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="48dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-        <RadioGroup
-            android:id="@+id/cast_type_group"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <RadioButton
-                android:id="@+id/cast_type_info"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:padding="6dp"
-                android:text="@string/mode_info"
-                android:textSize="16dp" />
-
-            <RadioButton
-                android:id="@+id/cast_type_ctrl"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="6dp"
-                android:text="@string/mode_ctrl"
-                android:textSize="16dp" />
-
-        </RadioGroup>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:background="#888888" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/cast_device_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:gravity="bottom"
-            android:padding="4dp"
-            android:text="@string/device_info"
-            android:textColor="#000000"
-            android:textSize="16dp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/cast_device_info"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="4dp"
-            android:textColor="#000000"
+        <RadioButton
+            android:id="@+id/cast_type_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="6dp"
+            android:text="@string/mode_info"
             android:textSize="16dp" />
 
-    </LinearLayout>
+        <RadioButton
+            android:id="@+id/cast_type_ctrl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="6dp"
+            android:text="@string/mode_ctrl"
+            android:textSize="16dp" />
 
-</androidx.core.widget.NestedScrollView>
+    </RadioGroup>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/cast_device_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <fragment
+                    android:id="@+id/fragment_information"
+                    class="com.android.cast.dlna.demo.InfoFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <fragment
+                    android:id="@+id/fragment_control"
+                    class="com.android.cast.dlna.demo.ControlFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</merge>

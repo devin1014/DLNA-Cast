@@ -5,6 +5,7 @@
     <string name="mode_info">查询模式</string>
     <string name="mode_ctrl">控制器模式</string>
     <string name="device_info">设备信息</string>
+    <string name="device_control">控制器</string>
 
     <string name="switchRouter">Network On/Off</string>
     <string name="toggleDebugLogging">Toggle debug logging</string>

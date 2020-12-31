@@ -19,59 +19,51 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public final class SyncDataManager {
+final class SyncDataManager {
 
-    public interface SubscriptionCallback {
+    interface SubscriptionCallback {
         void onSubscriptionSuccess();
 
         void onSubscriptionFailed(String msg);
     }
 
-    private final ControlPoint mControlPoint;
-    private final Service<?, ?> mAvService;
-    private final Service<?, ?> mRendererService;
-    private final SubscriptionCallback mSubscriptionCallback;
-    private final ICastInfoListener<?>[] mListeners;
-
-    public SyncDataManager(ControlPoint controlPoint,
-                           Device<?, ?, ?> device,
-                           SubscriptionCallback subscriptionCallback,
-                           ICastInfoListener<?>... listeners) {
-        mControlPoint = controlPoint;
-        mSubscriptionCallback = subscriptionCallback;
-        mListeners = listeners;
-        mAvService = device.findService(DLNACastManager.SERVICE_AV_TRANSPORT);
-        mRendererService = device.findService(DLNACastManager.SERVICE_RENDERING_CONTROL);
+    public SyncDataManager() {
     }
 
     private final AtomicInteger mSyncNumber = new AtomicInteger();
     private BaseSubscription mAvSubscription;
     private BaseSubscription mRendererSubscription;
 
-    public synchronized void sync() {
+    public synchronized void sync(ControlPoint controlPoint,
+                                  Device<?, ?, ?> device,
+                                  SubscriptionCallback subscriptionCallback,
+                                  ICastInfoListener<?>... listeners) {
         release();
         final int currentNumber = mSyncNumber.incrementAndGet();
         SubscriptionCallback callbackImp = new SubscriptionCallback() {
 
             @Override
             public void onSubscriptionSuccess() {
-                if (currentNumber == mSyncNumber.get() && mSubscriptionCallback != null) {
-                    mSubscriptionCallback.onSubscriptionSuccess();
+                if (currentNumber == mSyncNumber.get() && subscriptionCallback != null) {
+                    subscriptionCallback.onSubscriptionSuccess();
                 }
             }
 
             @Override
             public void onSubscriptionFailed(String msg) {
-                if (currentNumber == mSyncNumber.get() && mSubscriptionCallback != null) {
-                    mSubscriptionCallback.onSubscriptionFailed(msg);
+                if (currentNumber == mSyncNumber.get() && subscriptionCallback != null) {
+                    subscriptionCallback.onSubscriptionFailed(msg);
                 }
             }
         };
-        mControlPoint.execute(mAvSubscription = new AvTransportSubscription(mAvService, callbackImp, mListeners));
-        mControlPoint.execute(mRendererSubscription = new RendererSubscription(mRendererService, mListeners));
+        Service<?, ?> avService = device.findService(DLNACastManager.SERVICE_AV_TRANSPORT);
+        Service<?, ?> rendererService = device.findService(DLNACastManager.SERVICE_RENDERING_CONTROL);
+        controlPoint.execute(mAvSubscription = new AvTransportSubscription(avService, callbackImp, listeners));
+        controlPoint.execute(mRendererSubscription = new RendererSubscription(rendererService, listeners));
     }
 
     public synchronized void release() {
+        mSyncNumber.incrementAndGet();
         if (mAvSubscription != null) mAvSubscription.stop();
         if (mRendererSubscription != null) mRendererSubscription.stop();
     }
@@ -119,8 +111,8 @@ public final class SyncDataManager {
         private SyncMediaInfo mediaInfo;
         private final SubscriptionCallback subscriptionCallback;
         private ICastInfoListener<TransportInfo> transportListener;
-        private ICastInfoListener<PositionInfo> positionListener;
-        private ICastInfoListener<MediaInfo> mediaListener;
+        private final ICastInfoListener<PositionInfo> positionListener;
+        private final ICastInfoListener<MediaInfo> mediaListener;
 
         public AvTransportSubscription(Service service,
                                        SubscriptionCallback subscriptionCallback,
