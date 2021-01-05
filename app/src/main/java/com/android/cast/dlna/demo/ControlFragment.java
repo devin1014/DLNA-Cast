@@ -12,8 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.android.cast.dlna.CastObject;
 import com.android.cast.dlna.DLNACastManager;
-import com.android.cast.dlna.controller.CastObject;
 import com.android.cast.dlna.device.CastDevice;
 
 public class ControlFragment extends Fragment implements IDisplayDevice {
@@ -45,7 +45,7 @@ public class ControlFragment extends Fragment implements IDisplayDevice {
                         .setCallback(url -> DLNACastManager.getInstance().cast(CastObject.newInstance(url, Constants.CAST_ID, Constants.CAST_NAME)))
                         .show(getChildFragmentManager(), "CastFragment"));
         view.findViewById(R.id.btn_cast_pause).setOnClickListener(v -> DLNACastManager.getInstance().pause());
-        view.findViewById(R.id.btn_cast_resume).setOnClickListener(v -> DLNACastManager.getInstance().start());
+        view.findViewById(R.id.btn_cast_resume).setOnClickListener(v -> DLNACastManager.getInstance().play());
         view.findViewById(R.id.btn_cast_stop).setOnClickListener(v -> DLNACastManager.getInstance().stop());
         view.findViewById(R.id.btn_cast_mute).setOnClickListener(v -> DLNACastManager.getInstance().setMute(true));
 

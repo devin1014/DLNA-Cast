@@ -1,4 +1,4 @@
-package com.android.cast.dlna.controller;
+package com.android.cast.dlna;
 
 /**
  *

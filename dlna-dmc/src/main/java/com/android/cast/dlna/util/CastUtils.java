@@ -2,7 +2,7 @@ package com.android.cast.dlna.util;
 
 import android.text.TextUtils;
 
-import com.android.cast.dlna.controller.CastObject;
+import com.android.cast.dlna.CastObject;
 import com.android.cast.dlna.device.CastDevice;
 
 import org.fourthline.cling.model.meta.Action;

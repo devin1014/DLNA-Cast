@@ -8,7 +8,7 @@ import org.fourthline.cling.model.meta.Service;
 /**
  *
  */
-public class CastDevice implements IDLNACastDevice<Device<?, ?, ?>> {
+public class CastDevice {
     private final Device<?, ?, ?> mDevice;
 
     public CastDevice(Device<?, ?, ?> device) {
@@ -16,28 +16,23 @@ public class CastDevice implements IDLNACastDevice<Device<?, ?, ?>> {
         if (device == null) throw new IllegalArgumentException("device can not be NULL!");
     }
 
-    @Override
     public Device<?, ?, ?> getDevice() {
         return mDevice;
     }
 
     @NonNull
-    @Override
     public String getId() {
         return mDevice.getIdentity().getUdn().getIdentifierString();
     }
 
-    @Override
     public String getName() {
         return mDevice.getDetails().getFriendlyName();
     }
 
-    @Override
     public String getDescription() {
         return mDevice.getDetails().getManufacturerDetails().getManufacturer();
     }
 
-    @Override
     public boolean supportAction(String name) {
         if (mDevice.getServices() != null) {
             for (Service<?, ?> service : mDevice.getServices()) {

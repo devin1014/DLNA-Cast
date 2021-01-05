@@ -6,7 +6,7 @@ import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.android.cast.dlna.controller.CastObject;
+import com.android.cast.dlna.CastObject;
 import com.android.cast.dlna.device.CastDevice;
 import com.android.cast.dlna.util.ILogger;
 

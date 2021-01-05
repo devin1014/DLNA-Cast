@@ -1,6 +1,6 @@
 package com.android.cast.dlna.control;
 
-import com.android.cast.dlna.controller.CastObject;
+import com.android.cast.dlna.CastObject;
 
 public interface IControl {
     void cast(CastObject castObject);

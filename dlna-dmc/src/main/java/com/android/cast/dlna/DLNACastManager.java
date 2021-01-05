@@ -10,11 +10,11 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.android.cast.dlna.control.ControlImpl;
 import com.android.cast.dlna.control.IConnect;
-import com.android.cast.dlna.controller.CastControlImp;
-import com.android.cast.dlna.controller.CastObject;
+import com.android.cast.dlna.control.IControl;
 import com.android.cast.dlna.device.CastDevice;
 import com.android.cast.dlna.util.ILogger;
 import com.android.cast.dlna.util.ILogger.DefaultLoggerImpl;
@@ -31,8 +31,6 @@ import org.fourthline.cling.model.types.ServiceType;
 import org.fourthline.cling.model.types.UDADeviceType;
 import org.fourthline.cling.model.types.UDAServiceType;
 import org.fourthline.cling.registry.RegistryListener;
-import org.fourthline.cling.support.model.MediaInfo;
-import org.fourthline.cling.support.model.PositionInfo;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,7 +39,7 @@ import java.util.List;
 /**
  *
  */
-public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListener {
+public final class DLNACastManager implements IControl, IConnect, OnDeviceRegistryListener {
 
     public static final DeviceType DEVICE_TYPE_DMR = new UDADeviceType("MediaRenderer");
     public static final ServiceType SERVICE_AV_TRANSPORT = new UDAServiceType("AVTransport");
@@ -61,12 +59,10 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
     private final DeviceRegistryImpl mDeviceRegistryImpl = new DeviceRegistryImpl(this);
 
     private DeviceType mSearchDeviceType;
-    private CastControlImp mCastControlImp;
 
     private DLNACastManager() {
     }
 
-    @Override
     public void bindCastService(@NonNull Context context) {
         if (context instanceof Application || context instanceof Activity) {
             context.bindService(new Intent(context, DLNACastService.class), mServiceConnection, Service.BIND_AUTO_CREATE);
@@ -75,7 +71,6 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
         }
     }
 
-    @Override
     public void unbindCastService(@NonNull Context context) {
         if (context instanceof Application || context instanceof Activity) {
             context.unbindService(mServiceConnection);
@@ -111,10 +106,6 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
                     mDeviceRegistryImpl.deviceAdded(mDLNACastService.getRegistry(), device);
                 }
             }
-
-            if (mCastControlImp != null) {
-                mCastControlImp.bindNLUpnpCastService(mDLNACastService);
-            }
         }
 
         @Override
@@ -128,10 +119,6 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
                 if (collection != null && collection.contains(mDeviceRegistryImpl)) {
                     mDLNACastService.getRegistry().removeListener(mDeviceRegistryImpl);
                 }
-            }
-
-            if (mCastControlImp != null) {
-                mCastControlImp.unbindNLUpnpCastService();
             }
 
             mDLNACastService = null;
@@ -193,9 +180,9 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
                     listener.onDeviceAdded(device);
                 }
             }
-            if (mCastControlImp != null) {
-                mCastControlImp.onDeviceAdded(device);
-            }
+            // if (mCastControlImp != null) {
+            //     mCastControlImp.onDeviceAdded(device);
+            // }
         }
     }
 
@@ -207,9 +194,9 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
                     listener.onDeviceUpdated(device);
                 }
             }
-            if (mCastControlImp != null) {
-                mCastControlImp.onDeviceUpdated(device);
-            }
+            // if (mCastControlImp != null) {
+            //     mCastControlImp.onDeviceUpdated(device);
+            // }
         }
     }
 
@@ -221,9 +208,9 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
                     listener.onDeviceRemoved(device);
                 }
             }
-            if (mCastControlImp != null) {
-                mCastControlImp.onDeviceRemoved(device);
-            }
+            // if (mCastControlImp != null) {
+            //     mCastControlImp.onDeviceRemoved(device);
+            // }
         }
     }
 
@@ -234,7 +221,6 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
     // -----------------------------------------------------------------------------------------
     // ---- search
     // -----------------------------------------------------------------------------------------
-    @Override
     public void search(DeviceType type, int maxSeconds) {
         mSearchDeviceType = type;
 
@@ -244,7 +230,6 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
         }
     }
 
-    @Override
     public void clear() {
         if (mDLNACastService != null) {
             mDLNACastService.get().getRegistry().removeAllRemoteDevices();
@@ -268,7 +253,6 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
         mDeviceConnectionCallbackList.remove(listener);
     }
 
-    @Override
     public void connect(CastDevice castDevice) {
         // check device has been connected.
         if (mControlImpl != null && mControlImpl.isConnected(castDevice.getDevice())) return;
@@ -281,18 +265,16 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
     }
 
     @Override
+    public void connect(@Nullable IConnectCallback callback) {
+
+    }
+
     public void disconnect() {
         if (mControlImpl != null) mControlImpl.disconnect();
     }
 
-    @Override
-    public boolean isConnected() {
-        return mCastControlImp != null && mControlImpl.isConnected(null);
-    }
-
-    @Override
-    public CastDevice getCastDevice() {
-        return mCastControlImp != null ? mCastControlImp.getCastDevice() : null;
+    public boolean isConnected(Device<?, ?, ?> device) {
+        return mControlImpl != null && mControlImpl.isConnected(device);
     }
 
     // -----------------------------------------------------------------------------------------
@@ -306,7 +288,7 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
     }
 
     @Override
-    public void start() {
+    public void play() {
         if (mControlImpl != null) {
             mControlImpl.play();
         }
@@ -335,8 +317,8 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
 
     @Override
     public void setVolume(int percent) {
-        if (mCastControlImp != null) {
-            mCastControlImp.setVolume(percent);
+        if (mControlImpl != null) {
+            mControlImpl.setVolume(percent);
         }
     }
 
@@ -352,33 +334,6 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
         if (mControlImpl != null) {
             mControlImpl.setBrightness(percent);
         }
-    }
-
-    @Override
-    public int getCastStatus() {
-        if (mCastControlImp != null) {
-            return mCastControlImp.getCastStatus();
-        }
-
-        return CastControlImp.IDLE;
-    }
-
-    @Override
-    public PositionInfo getPosition() {
-        if (mCastControlImp != null) {
-            return mCastControlImp.getPosition();
-        }
-
-        return null;
-    }
-
-    @Override
-    public MediaInfo getMedia() {
-        if (mCastControlImp != null) {
-            return mCastControlImp.getMedia();
-        }
-
-        return null;
     }
 
 }
