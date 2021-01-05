@@ -251,7 +251,7 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
         }
     }
 
-    private ControlImpl mCtrl222;
+    private ControlImpl mControlImpl;
 
     // -----------------------------------------------------------------------------------------
     // ---- connect
@@ -270,30 +270,24 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
 
     @Override
     public void connect(CastDevice castDevice) {
-        if (mCtrl222 == null) {
-            mCtrl222 = new ControlImpl(mDLNACastService);
+        // check device has been connected.
+        if (mControlImpl != null && mControlImpl.isConnected(castDevice.getDevice())) return;
+
+        if (mControlImpl == null) {
+            mControlImpl = new ControlImpl(mDLNACastService, castDevice);
         }
-        mCtrl222.connect(castDevice, new IConnect.IConnectCallback() {
-            @Override
-            public void onDeviceConnected(CastDevice device) {
-                //TODO
-            }
-
-            @Override
-            public void onDeviceDisconnected(CastDevice device, String errMsg) {
-
-            }
-        });
+        // always auto disconnected previous one if necessary
+        mControlImpl.connect(null);
     }
 
     @Override
     public void disconnect() {
-        if (mCtrl222 != null) mCtrl222.disconnect();
+        if (mControlImpl != null) mControlImpl.disconnect();
     }
 
     @Override
     public boolean isConnected() {
-        return mCastControlImp != null && mCastControlImp.isConnected();
+        return mCastControlImp != null && mControlImpl.isConnected(null);
     }
 
     @Override
@@ -306,8 +300,8 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
     // -----------------------------------------------------------------------------------------
     @Override
     public void cast(CastObject castObject) {
-        if (mCastControlImp != null) {
-            mCastControlImp.cast(castObject);
+        if (mControlImpl != null) {
+            mControlImpl.cast(castObject);
         }
     }
 

@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="48dp"
     android:gravity="center_vertical"
     android:orientation="horizontal"
     tools:ignore="HardcodedText,SpUsage">
@@ -53,6 +53,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="暂停"
+        android:textSize="12dp" />
+
+    <View
+        android:layout_width="1px"
+        android:layout_height="24dp"
+        android:background="#888888" />
+
+    <Button
+        android:id="@+id/btn_cast_mute"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="静音"
         android:textSize="12dp" />
 
 </LinearLayout>

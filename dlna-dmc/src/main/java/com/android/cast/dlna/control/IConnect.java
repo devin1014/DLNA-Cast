@@ -1,19 +1,19 @@
 package com.android.cast.dlna.control;
 
-import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
-import com.android.cast.dlna.device.CastDevice;
+import org.fourthline.cling.model.meta.Device;
 
 public interface IConnect {
-    void connect(@NonNull CastDevice device, @NonNull IConnectCallback callback);
+    void connect(@Nullable IConnectCallback callback);
 
     void disconnect();
 
-    boolean isConnected();
+    boolean isConnected(@Nullable Device<?, ?, ?> device);
 
     interface IConnectCallback {
-        void onDeviceConnected(CastDevice device);
+        void onDeviceConnected(Device<?, ?, ?> device);
 
-        void onDeviceDisconnected(CastDevice device, String errMsg);
+        void onDeviceDisconnected(Device<?, ?, ?> device, String errMsg);
     }
 }

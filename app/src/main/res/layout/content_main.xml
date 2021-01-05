@@ -33,6 +33,11 @@
 
     </RadioGroup>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="#888888" />
+
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -46,7 +51,8 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/cast_device_list"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:minHeight="128dp" />
 
             <FrameLayout
                 android:layout_width="match_parent"

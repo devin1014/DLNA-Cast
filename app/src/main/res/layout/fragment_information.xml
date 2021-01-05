@@ -10,8 +10,8 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="64dp"
-        android:gravity="center_vertical"
         android:background="#55888888"
+        android:gravity="center_vertical"
         android:padding="4dp"
         android:text="@string/device_info"
         android:textColor="#000000"
@@ -19,11 +19,15 @@
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/cast_device_info"
+        android:id="@+id/ctrl_device_status"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="4dp"
         android:textColor="#000000"
         android:textSize="16dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="60dp" />
 
 </LinearLayout>

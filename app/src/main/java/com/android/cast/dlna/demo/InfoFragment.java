@@ -16,6 +16,7 @@ import org.fourthline.cling.model.meta.Action;
 import org.fourthline.cling.model.meta.Device;
 import org.fourthline.cling.model.meta.Service;
 
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -38,7 +39,7 @@ public class InfoFragment extends Fragment implements IDisplayDevice {
     }
 
     private void initComponent(View view) {
-        mCastDeviceInfo = view.findViewById(R.id.cast_device_info);
+        mCastDeviceInfo = view.findViewById(R.id.ctrl_device_status);
     }
 
     @Override
@@ -50,9 +51,8 @@ public class InfoFragment extends Fragment implements IDisplayDevice {
 
         StringBuilder builder = new StringBuilder();
         Device<?, ?, ?> device = castDevice.getDevice();
-        if (device.getDetails().getBaseURL() != null) {
-            builder.append("URL: ").append(device.getDetails().getBaseURL().toString()).append("\n");
-        }
+        URL url = device.getDetails().getBaseURL();
+        builder.append("URL: ").append(url != null ? url.toString() : "null").append("\n");
         builder.append("DeviceType: ").append(device.getType().getType()).append("\n");
         builder.append("ModelName: ").append(device.getDetails().getModelDetails().getModelName()).append("\n");
         builder.append("ModelDescription: ").append(device.getDetails().getModelDetails().getModelDescription()).append("\n");
