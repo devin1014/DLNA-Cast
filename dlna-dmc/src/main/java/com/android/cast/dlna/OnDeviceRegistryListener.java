@@ -1,14 +1,14 @@
 package com.android.cast.dlna;
 
-import com.android.cast.dlna.device.CastDevice;
+import org.fourthline.cling.model.meta.Device;
 
 /**
  * this listener call in UI thread.
  */
 public interface OnDeviceRegistryListener {
-    void onDeviceAdded(CastDevice device);
+    void onDeviceAdded(Device<?, ?, ?> device);
 
-    void onDeviceUpdated(CastDevice device);
+    void onDeviceUpdated(Device<?, ?, ?> device);
 
-    void onDeviceRemoved(CastDevice device);
+    void onDeviceRemoved(Device<?, ?, ?> device);
 }

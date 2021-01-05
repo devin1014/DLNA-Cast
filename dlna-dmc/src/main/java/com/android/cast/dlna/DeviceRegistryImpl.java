@@ -5,7 +5,6 @@ import android.os.Looper;
 
 import androidx.annotation.NonNull;
 
-import com.android.cast.dlna.device.CastDevice;
 import com.android.cast.dlna.util.ILogger;
 import com.android.cast.dlna.util.ILogger.DefaultLoggerImpl;
 
@@ -74,15 +73,15 @@ final class DeviceRegistryImpl extends DefaultRegistryListener {
     }
 
     private void notifyDeviceAdd(final Device<?, ?, ?> device) {
-        mHandler.post(() -> mOnDeviceRegistryListener.onDeviceAdded(new CastDevice(device)));
+        mHandler.post(() -> mOnDeviceRegistryListener.onDeviceAdded(device));
     }
 
     @SuppressWarnings("unused")
     private void notifyDeviceUpdate(final Device<?, ?, ?> device) {
-        mHandler.post(() -> mOnDeviceRegistryListener.onDeviceUpdated(new CastDevice(device)));
+        mHandler.post(() -> mOnDeviceRegistryListener.onDeviceUpdated(device));
     }
 
     private void notifyDeviceRemove(final Device<?, ?, ?> device) {
-        mHandler.post(() -> mOnDeviceRegistryListener.onDeviceRemoved(new CastDevice(device)));
+        mHandler.post(() -> mOnDeviceRegistryListener.onDeviceRemoved(device));
     }
 }

@@ -7,7 +7,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.android.cast.dlna.CastObject;
-import com.android.cast.dlna.device.CastDevice;
 import com.android.cast.dlna.util.ILogger;
 
 import org.fourthline.cling.android.AndroidUpnpService;
@@ -24,10 +23,10 @@ public class ControlImpl implements IConnect, IControl {
     private final IServiceFactory mServiceFactory;
     private final Device<?, ?, ?> mDevice;
 
-    public ControlImpl(@NonNull AndroidUpnpService upnpService, @NonNull CastDevice castDevice) {
+    public ControlImpl(@NonNull AndroidUpnpService upnpService, @NonNull Device<?, ?, ?> device) {
         mService = upnpService;
-        mDevice = castDevice.getDevice();
-        mServiceFactory = new IServiceFactory.ServiceFactoryImpl(upnpService.getControlPoint(), castDevice.getDevice());
+        mDevice = device;
+        mServiceFactory = new IServiceFactory.ServiceFactoryImpl(upnpService.getControlPoint(), device);
     }
 
     private volatile boolean mConnected = false;

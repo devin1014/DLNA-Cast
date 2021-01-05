@@ -11,7 +11,8 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
 import com.android.cast.dlna.demo.DeviceAdapter.OnItemSelectedListener;
-import com.android.cast.dlna.device.CastDevice;
+
+import org.fourthline.cling.model.meta.Device;
 
 /**
  *
@@ -22,7 +23,7 @@ public class DeviceHolder extends ViewHolder implements OnClickListener, OnCheck
     private final TextView id;
     private final CheckBox selector;
     private final OnItemSelectedListener mOnItemSelectedListener;
-    private CastDevice mCastDevice;
+    private Device<?, ?, ?> mCastDevice;
     private boolean mBinding = false;
 
     DeviceHolder(final View itemView, OnItemSelectedListener listener) {
@@ -38,13 +39,13 @@ public class DeviceHolder extends ViewHolder implements OnClickListener, OnCheck
         selector.setOnCheckedChangeListener(this);
     }
 
-    public void setData(@Nullable CastDevice castDevice, boolean isSelected) {
+    public void setData(@Nullable Device<?, ?, ?> castDevice, boolean isSelected) {
         if (castDevice == null) return;
         mBinding = true;
         mCastDevice = castDevice;
-        name.setText(castDevice.getName());
-        description.setText(castDevice.getDescription());
-        id.setText(castDevice.getId());
+        name.setText(castDevice.getDetails().getFriendlyName());
+        description.setText(castDevice.getDetails().getManufacturerDetails().getManufacturer());
+        id.setText(castDevice.getIdentity().getUdn().getIdentifierString());
         selector.setChecked(isSelected);
         mBinding = false;
     }

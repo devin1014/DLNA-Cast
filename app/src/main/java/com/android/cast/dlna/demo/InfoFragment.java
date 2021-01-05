@@ -10,8 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.android.cast.dlna.device.CastDevice;
-
 import org.fourthline.cling.model.meta.Action;
 import org.fourthline.cling.model.meta.Device;
 import org.fourthline.cling.model.meta.Service;
@@ -43,14 +41,13 @@ public class InfoFragment extends Fragment implements IDisplayDevice {
     }
 
     @Override
-    public void setCastDevice(CastDevice castDevice) {
-        if (castDevice == null) {
+    public void setCastDevice(Device<?, ?, ?> device) {
+        if (device == null) {
             mCastDeviceInfo.setText("");
             return;
         }
 
         StringBuilder builder = new StringBuilder();
-        Device<?, ?, ?> device = castDevice.getDevice();
         URL url = device.getDetails().getBaseURL();
         builder.append("URL: ").append(url != null ? url.toString() : "null").append("\n");
         builder.append("DeviceType: ").append(device.getType().getType()).append("\n");

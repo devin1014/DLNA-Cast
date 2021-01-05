@@ -3,9 +3,9 @@ package com.android.cast.dlna.util;
 import android.text.TextUtils;
 
 import com.android.cast.dlna.CastObject;
-import com.android.cast.dlna.device.CastDevice;
 
 import org.fourthline.cling.model.meta.Action;
+import org.fourthline.cling.model.meta.Device;
 import org.fourthline.cling.model.meta.Service;
 import org.fourthline.cling.support.model.DIDLObject;
 import org.fourthline.cling.support.model.ProtocolInfo;
@@ -152,18 +152,18 @@ public class CastUtils {
         return metadata.toString();
     }
 
-    private static void printDeviceSupportServiceAndAction(CastDevice castDevice, ILogger logger) {
+    private static void printDeviceSupportServiceAndAction(Device<?, ?, ?> castDevice, ILogger logger) {
         // device support services and actions
-        Service[] services = castDevice.getDevice().getServices();
+        Service<?, ?>[] services = castDevice.getServices();
 
         if (services != null) {
-            for (Service service : services) {
-                Action[] actions = service.getActions();
+            for (Service<?, ?> service : services) {
+                Action<?>[] actions = service.getActions();
 
                 if (actions != null) {
-                    String device = castDevice.getDevice().getDisplayString();
+                    String device = castDevice.getDisplayString();
 
-                    for (Action action : actions) {
+                    for (Action<?> action : actions) {
                         logger.d(String.format("Device[%s],Service[%s],Action[%s]", device, service.getServiceType().getType(), action.getName()));
                     }
                 }

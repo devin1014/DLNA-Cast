@@ -14,7 +14,8 @@ import androidx.fragment.app.Fragment;
 
 import com.android.cast.dlna.CastObject;
 import com.android.cast.dlna.DLNACastManager;
-import com.android.cast.dlna.device.CastDevice;
+
+import org.fourthline.cling.model.meta.Device;
 
 public class ControlFragment extends Fragment implements IDisplayDevice {
 
@@ -84,7 +85,7 @@ public class ControlFragment extends Fragment implements IDisplayDevice {
     };
 
     @Override
-    public void setCastDevice(CastDevice device) {
+    public void setCastDevice(Device<?, ?, ?> device) {
         if (device == null) DLNACastManager.getInstance().disconnect();
         else DLNACastManager.getInstance().connect(device);
     }

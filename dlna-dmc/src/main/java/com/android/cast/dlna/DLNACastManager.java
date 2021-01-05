@@ -15,7 +15,6 @@ import androidx.annotation.Nullable;
 import com.android.cast.dlna.control.ControlImpl;
 import com.android.cast.dlna.control.IConnect;
 import com.android.cast.dlna.control.IControl;
-import com.android.cast.dlna.device.CastDevice;
 import com.android.cast.dlna.util.ILogger;
 import com.android.cast.dlna.util.ILogger.DefaultLoggerImpl;
 
@@ -173,8 +172,8 @@ public final class DLNACastManager implements IControl, IConnect, OnDeviceRegist
     }
 
     @Override
-    public void onDeviceAdded(CastDevice device) {
-        if (checkDeviceType(device.getDevice())) {
+    public void onDeviceAdded(Device<?, ?, ?> device) {
+        if (checkDeviceType(device)) {
             synchronized (mLock) {
                 for (OnDeviceRegistryListener listener : mRegisterDeviceListenerList) {
                     listener.onDeviceAdded(device);
@@ -187,8 +186,8 @@ public final class DLNACastManager implements IControl, IConnect, OnDeviceRegist
     }
 
     @Override
-    public void onDeviceUpdated(CastDevice device) {
-        if (checkDeviceType(device.getDevice())) {
+    public void onDeviceUpdated(Device<?, ?, ?> device) {
+        if (checkDeviceType(device)) {
             synchronized (mLock) {
                 for (OnDeviceRegistryListener listener : mRegisterDeviceListenerList) {
                     listener.onDeviceUpdated(device);
@@ -201,8 +200,8 @@ public final class DLNACastManager implements IControl, IConnect, OnDeviceRegist
     }
 
     @Override
-    public void onDeviceRemoved(CastDevice device) {
-        if (checkDeviceType(device.getDevice())) {
+    public void onDeviceRemoved(Device<?, ?, ?> device) {
+        if (checkDeviceType(device)) {
             synchronized (mLock) {
                 for (OnDeviceRegistryListener listener : mRegisterDeviceListenerList) {
                     listener.onDeviceRemoved(device);
@@ -253,12 +252,12 @@ public final class DLNACastManager implements IControl, IConnect, OnDeviceRegist
         mDeviceConnectionCallbackList.remove(listener);
     }
 
-    public void connect(CastDevice castDevice) {
+    public void connect(Device<?, ?, ?> device) {
         // check device has been connected.
-        if (mControlImpl != null && mControlImpl.isConnected(castDevice.getDevice())) return;
+        if (mControlImpl != null && mControlImpl.isConnected(device)) return;
 
         if (mControlImpl == null) {
-            mControlImpl = new ControlImpl(mDLNACastService, castDevice);
+            mControlImpl = new ControlImpl(mDLNACastService, device);
         }
         // always auto disconnected previous one if necessary
         mControlImpl.connect(null);

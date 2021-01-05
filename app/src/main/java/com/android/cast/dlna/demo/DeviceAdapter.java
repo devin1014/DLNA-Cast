@@ -10,7 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView.Adapter;
 
 import com.android.cast.dlna.OnDeviceRegistryListener;
-import com.android.cast.dlna.device.CastDevice;
+
+import org.fourthline.cling.model.meta.Device;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,10 +23,10 @@ import java.util.List;
 public class DeviceAdapter extends Adapter<DeviceHolder> implements OnDeviceRegistryListener {
     private final LayoutInflater mLayoutInflater;
     private final Handler mHandler = new Handler(Looper.getMainLooper());
-    private final List<CastDevice> mDeviceList = new ArrayList<>();
+    private final List<Device<?, ?, ?>> mDeviceList = new ArrayList<>();
     private final OnItemSelectedListener mOnItemSelectedListener;
 
-    private CastDevice mSelectedDevice;
+    private Device<?, ?, ?> mSelectedDevice;
 
     public DeviceAdapter(Activity activity, OnItemSelectedListener listener) {
         mLayoutInflater = activity.getLayoutInflater();
@@ -48,7 +49,7 @@ public class DeviceAdapter extends Adapter<DeviceHolder> implements OnDeviceRegi
         return mDeviceList.size();
     }
 
-    private CastDevice getItem(int position) {
+    private Device<?, ?, ?> getItem(int position) {
         if (position < 0 || position >= getItemCount()) {
             return null;
         }
@@ -56,25 +57,25 @@ public class DeviceAdapter extends Adapter<DeviceHolder> implements OnDeviceRegi
         return mDeviceList.get(position);
     }
 
-    public void setSelectedDevice(CastDevice device) {
+    public void setSelectedDevice(Device<?, ?, ?> device) {
         mSelectedDevice = device;
         notifyDataSetChanged();
     }
 
-    public CastDevice getCastDevice() {
+    public Device<?, ?, ?> getCastDevice() {
         return mSelectedDevice;
     }
 
     private boolean isSelected(int position) {
-        CastDevice device = getItem(position);
+        Device<?, ?, ?> device = getItem(position);
         if (device != null && mSelectedDevice != null) {
-            return device.getId().equals(mSelectedDevice.getId());
+            return device.getIdentity().getUdn().getIdentifierString().equals(mSelectedDevice.getIdentity().getUdn().getIdentifierString());
         }
         return false;
     }
 
     @Override
-    public void onDeviceAdded(CastDevice device) {
+    public void onDeviceAdded(Device<?, ?, ?> device) {
         if (!mDeviceList.contains(device)) {
             mDeviceList.add(device);
             if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
@@ -86,11 +87,11 @@ public class DeviceAdapter extends Adapter<DeviceHolder> implements OnDeviceRegi
     }
 
     @Override
-    public void onDeviceUpdated(CastDevice device) {
+    public void onDeviceUpdated(Device<?, ?, ?> device) {
     }
 
     @Override
-    public void onDeviceRemoved(CastDevice device) {
+    public void onDeviceRemoved(Device<?, ?, ?> device) {
         if (mDeviceList.contains(device)) {
             mDeviceList.remove(device);
             if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
@@ -102,6 +103,6 @@ public class DeviceAdapter extends Adapter<DeviceHolder> implements OnDeviceRegi
     }
 
     public interface OnItemSelectedListener {
-        void onItemSelected(CastDevice castDevice, boolean selected);
+        void onItemSelected(Device<?, ?, ?> castDevice, boolean selected);
     }
 }
