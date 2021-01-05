@@ -1,4 +1,4 @@
-package com.android.cast.dlna.controller.action;
+package com.android.cast.dlna.action;
 
 import org.fourthline.cling.controlpoint.ActionCallback;
 import org.fourthline.cling.model.action.ActionException;

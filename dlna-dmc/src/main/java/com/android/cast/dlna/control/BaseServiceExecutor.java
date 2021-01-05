@@ -6,8 +6,8 @@ import android.os.Looper;
 
 import androidx.annotation.Nullable;
 
-import com.android.cast.dlna.controller.action.GetBrightness;
-import com.android.cast.dlna.controller.action.SetBrightness;
+import com.android.cast.dlna.action.GetBrightness;
+import com.android.cast.dlna.action.SetBrightness;
 import com.android.cast.dlna.util.CastUtils;
 
 import org.fourthline.cling.controlpoint.ActionCallback;

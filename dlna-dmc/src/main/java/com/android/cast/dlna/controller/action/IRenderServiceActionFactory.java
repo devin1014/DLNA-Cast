@@ -1,5 +1,7 @@
 package com.android.cast.dlna.controller.action;
 
+import com.android.cast.dlna.action.GetBrightness;
+import com.android.cast.dlna.action.SetBrightness;
 import com.android.cast.dlna.controller.BaseCastEventSubscription.EventCallbackListener;
 import com.android.cast.dlna.controller.BaseCastEventSubscription.RenderSubscription;
 import com.android.cast.dlna.controller.ICastControlListener;
