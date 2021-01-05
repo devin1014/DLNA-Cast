@@ -1,7 +1,13 @@
 package com.android.cast.dlna;
 
+import android.content.ComponentName;
+import android.os.IBinder;
+
 import androidx.annotation.NonNull;
 
+import com.android.cast.dlna.util.ILogger;
+
+import org.fourthline.cling.android.AndroidUpnpService;
 import org.fourthline.cling.model.meta.Action;
 import org.fourthline.cling.model.meta.RemoteDevice;
 import org.fourthline.cling.model.meta.RemoteService;
@@ -13,7 +19,7 @@ import java.util.List;
 /**
  *
  */
-final class DeviceUtil {
+final class Utils {
     /**
      * @return device information like: [deviceType][name][manufacturer][udn]
      */
@@ -40,5 +46,14 @@ final class DeviceUtil {
             }
         }
         return builder.toString();
+    }
+
+    public static void logServiceConnected(ILogger mLogger, AndroidUpnpService upnpService, ComponentName componentName, IBinder iBinder) {
+        mLogger.i("-------------------------------------------------------------------");
+        mLogger.i(String.format("[%s] onServiceConnected, %s@%s", componentName.getShortClassName(), iBinder.getClass().getName(), iBinder.hashCode()));
+        mLogger.i(String.format("[UpnpService]: %s@%s", upnpService.get().getClass().getName(), upnpService.get().hashCode()));
+        mLogger.i(String.format("[Registry]: %s@%s", upnpService.getRegistry().getClass().getName(), upnpService.getRegistry().hashCode()));
+        mLogger.i(String.format("[ControlPoint]: %s@%s", upnpService.getControlPoint().getClass().getName(), upnpService.getControlPoint().hashCode()));
+        mLogger.i("-------------------------------------------------------------------");
     }
 }

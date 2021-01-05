@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.cast.dlna.DLNACastManager;
+import com.android.cast.dlna.demo.detail.DetailActivity;
 import com.permissionx.guolindev.PermissionX;
 
 import java.util.logging.Level;
@@ -106,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
             DLNACastManager.getInstance().clear();
             DLNACastManager.getInstance().search(DLNACastManager.DEVICE_TYPE_DMR, 60);
         } else if (item.getItemId() == R.id.menu_link_detail) {
-            startActivity(new Intent(this, ControlFragment.class));
+            startActivity(new Intent(this, DetailActivity.class));
         }
         return super.onOptionsItemSelected(item);
     }

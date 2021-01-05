@@ -29,6 +29,7 @@ import org.fourthline.cling.model.types.DeviceType;
 import org.fourthline.cling.model.types.ServiceType;
 import org.fourthline.cling.model.types.UDADeviceType;
 import org.fourthline.cling.model.types.UDAServiceType;
+import org.fourthline.cling.registry.Registry;
 import org.fourthline.cling.registry.RegistryListener;
 
 import java.util.ArrayList;
@@ -81,28 +82,29 @@ public final class DLNACastManager implements IControl, IConnect, OnDeviceRegist
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            mDLNACastService = (AndroidUpnpService) iBinder;
-            mLogger.i("-------------------------------------------------------------------");
-            mLogger.i(String.format("[%s] onServiceConnected, %s@%s", componentName.getShortClassName(), iBinder.getClass().getName(), iBinder.hashCode()));
-            mLogger.i(String.format("[UpnpService]: %s@%s", mDLNACastService.get().getClass().getName(), mDLNACastService.get().hashCode()));
-            mLogger.i(String.format("[Registry]: %s@%s", mDLNACastService.getRegistry().getClass().getName(), mDLNACastService.getRegistry().hashCode()));
-            mLogger.i(String.format("[ControlPoint]: %s@%s", mDLNACastService.getControlPoint().getClass().getName(), mDLNACastService.getControlPoint().hashCode()));
-            mLogger.i("-------------------------------------------------------------------");
+            AndroidUpnpService upnpService = (AndroidUpnpService) iBinder;
+
+            mDLNACastService = upnpService;
+
+            Utils.logServiceConnected(mLogger, upnpService, componentName, iBinder);
+
+            Registry registry = upnpService.getRegistry();
+
             // add registry listener
-            Collection<RegistryListener> collection = mDLNACastService.getRegistry().getListeners();
+            Collection<RegistryListener> collection = registry.getListeners();
 
             if (collection == null || !collection.contains(mDeviceRegistryImpl)) {
-                mDLNACastService.getRegistry().addListener(mDeviceRegistryImpl);
+                registry.addListener(mDeviceRegistryImpl);
             }
 
             // Now add all devices to the list we already know about
             for (Device<?, ?, ?> device : mDLNACastService.getRegistry().getDevices()) {
                 if (device instanceof RemoteDevice) {
-                    mDeviceRegistryImpl.remoteDeviceAdded(mDLNACastService.getRegistry(), (RemoteDevice) device);
+                    mDeviceRegistryImpl.remoteDeviceAdded(registry, (RemoteDevice) device);
                 } else if (device instanceof LocalDevice) {
-                    mDeviceRegistryImpl.localDeviceAdded(mDLNACastService.getRegistry(), (LocalDevice) device);
+                    mDeviceRegistryImpl.localDeviceAdded(registry, (LocalDevice) device);
                 } else {
-                    mDeviceRegistryImpl.deviceAdded(mDLNACastService.getRegistry(), device);
+                    mDeviceRegistryImpl.deviceAdded(registry, device);
                 }
             }
         }

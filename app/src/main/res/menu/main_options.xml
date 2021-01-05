@@ -7,7 +7,7 @@
         android:id="@+id/menu_search_start"
         android:icon="@android:drawable/ic_menu_search"
         android:orderInCategory="100"
-        android:title="开始搜索"
+        android:title="搜索设备"
         app:showAsAction="never"
         tools:ignore="HardcodedText" />
 
@@ -15,7 +15,7 @@
         android:id="@+id/menu_link_detail"
         android:icon="@android:drawable/ic_menu_directions"
         android:orderInCategory="200"
-        android:title="详细信息"
+        android:title="控制器"
         app:showAsAction="never"
         tools:ignore="AlwaysShowAction,HardcodedText" />
 

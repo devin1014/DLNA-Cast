@@ -22,9 +22,15 @@ final class DeviceRegistryImpl extends DefaultRegistryListener {
     private final OnDeviceRegistryListener mOnDeviceRegistryListener;
     private final ILogger mLogger = new DefaultLoggerImpl(this);
     private final Handler mHandler = new Handler(Looper.getMainLooper());
+    private volatile boolean mIgnoreUpdate = true;
 
     public DeviceRegistryImpl(@NonNull OnDeviceRegistryListener listener) {
         mOnDeviceRegistryListener = listener;
+        setIgnoreUpdateEvent(true);
+    }
+
+    public void setIgnoreUpdateEvent(boolean ignoreUpdate) {
+        mIgnoreUpdate = ignoreUpdate;
     }
 
     // Discovery performance optimization for very slow Android devices!
@@ -44,20 +50,22 @@ final class DeviceRegistryImpl extends DefaultRegistryListener {
     // remote device
     @Override
     public void remoteDeviceAdded(Registry registry, RemoteDevice device) {
-        mLogger.i("remoteDeviceAdded: " + DeviceUtil.parseDeviceInfo(device));
-        mLogger.i(DeviceUtil.parseDeviceService(device));
+        mLogger.i("remoteDeviceAdded: " + Utils.parseDeviceInfo(device));
+        mLogger.i(Utils.parseDeviceService(device));
         notifyDeviceAdd(device);
     }
 
     @Override
     public void remoteDeviceUpdated(Registry registry, RemoteDevice device) {
-        // mLogger.d("remoteDeviceUpdated: " + DeviceUtil.parseDeviceInfo(device));
-        // notifyDeviceUpdate(device);
+        if (!mIgnoreUpdate) {
+            mLogger.d("remoteDeviceUpdated: " + Utils.parseDeviceInfo(device));
+            notifyDeviceUpdate(device);
+        }
     }
 
     @Override
     public void remoteDeviceRemoved(Registry registry, RemoteDevice device) {
-        mLogger.w("remoteDeviceRemoved: " + DeviceUtil.parseDeviceInfo(device));
+        mLogger.w("remoteDeviceRemoved: " + Utils.parseDeviceInfo(device));
         notifyDeviceRemove(device);
     }
 
@@ -76,7 +84,6 @@ final class DeviceRegistryImpl extends DefaultRegistryListener {
         mHandler.post(() -> mOnDeviceRegistryListener.onDeviceAdded(device));
     }
 
-    @SuppressWarnings("unused")
     private void notifyDeviceUpdate(final Device<?, ?, ?> device) {
         mHandler.post(() -> mOnDeviceRegistryListener.onDeviceUpdated(device));
     }
