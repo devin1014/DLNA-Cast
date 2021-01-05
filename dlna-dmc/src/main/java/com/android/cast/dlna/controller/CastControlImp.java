@@ -109,7 +109,7 @@ public class CastControlImp implements ICastControl, OnDeviceRegistryListener {
 
         mCastDevice = castDevice;
         mCastEventListener.onConnecting(mCastDevice);
-        mCastActionFactory = new CastActionFactory(castDevice);
+        mCastActionFactory = new CastActionFactory(castDevice.getDevice());
         mConnectSession = new ConnectSession(mControlPoint, mCastActionFactory, mConnectSessionCallback);
         mConnectSession.start();
         mSessionTimeoutDevice = null;

@@ -307,29 +307,29 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
 
     @Override
     public void start() {
-        if (mCastControlImp != null) {
-            mCastControlImp.start();
+        if (mControlImpl != null) {
+            mControlImpl.play();
         }
     }
 
     @Override
     public void pause() {
-        if (mCastControlImp != null) {
-            mCastControlImp.pause();
+        if (mControlImpl != null) {
+            mControlImpl.pause();
         }
     }
 
     @Override
     public void stop() {
-        if (mCastControlImp != null) {
-            mCastControlImp.stop();
+        if (mControlImpl != null) {
+            mControlImpl.stop();
         }
     }
 
     @Override
     public void seekTo(long position) {
-        if (mCastControlImp != null) {
-            mCastControlImp.seekTo(position);
+        if (mControlImpl != null) {
+            mControlImpl.seekTo(position);
         }
     }
 
@@ -342,15 +342,15 @@ public final class DLNACastManager implements IDLNACast, OnDeviceRegistryListene
 
     @Override
     public void setMute(boolean mute) {
-        if (mCastControlImp != null) {
-            mCastControlImp.setMute(mute);
+        if (mControlImpl != null) {
+            mControlImpl.setMute(mute);
         }
     }
 
     @Override
     public void setBrightness(int percent) {
-        if (mCastControlImp != null) {
-            mCastControlImp.setBrightness(percent);
+        if (mControlImpl != null) {
+            mControlImpl.setBrightness(percent);
         }
     }
 

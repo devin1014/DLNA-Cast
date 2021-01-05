@@ -3,7 +3,8 @@ package com.android.cast.dlna.controller.action;
 import com.android.cast.dlna.DLNACastManager;
 import com.android.cast.dlna.controller.action.IAVServiceActionFactory.AvServiceActionFactory;
 import com.android.cast.dlna.controller.action.IRenderServiceActionFactory.RenderServiceActionFactory;
-import com.android.cast.dlna.device.CastDevice;
+
+import org.fourthline.cling.model.meta.Device;
 
 /**
  *
@@ -16,13 +17,13 @@ public interface ICastActionFactory {
     // ------------------------------------------------------------------------------------------
     // Implement
     // ------------------------------------------------------------------------------------------
-    class CastActionFactory implements ICastActionFactory {
+    final class CastActionFactory implements ICastActionFactory {
         private final IAVServiceActionFactory mAvService;
         private final IRenderServiceActionFactory mRenderService;
 
-        public CastActionFactory(CastDevice castDevice) {
-            mAvService = new AvServiceActionFactory(castDevice.getDevice().findService(DLNACastManager.SERVICE_AV_TRANSPORT));
-            mRenderService = new RenderServiceActionFactory(castDevice.getDevice().findService(DLNACastManager.SERVICE_RENDERING_CONTROL));
+        public CastActionFactory(Device<?, ?, ?> device) {
+            mAvService = new AvServiceActionFactory(device.findService(DLNACastManager.SERVICE_AV_TRANSPORT));
+            mRenderService = new RenderServiceActionFactory(device.findService(DLNACastManager.SERVICE_RENDERING_CONTROL));
         }
 
         @Override

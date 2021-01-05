@@ -6,17 +6,12 @@ import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.android.cast.dlna.DLNACastManager;
 import com.android.cast.dlna.controller.CastObject;
 import com.android.cast.dlna.device.CastDevice;
 import com.android.cast.dlna.util.ILogger;
 
 import org.fourthline.cling.android.AndroidUpnpService;
-import org.fourthline.cling.model.action.ActionInvocation;
-import org.fourthline.cling.model.message.UpnpResponse;
 import org.fourthline.cling.model.meta.Device;
-import org.fourthline.cling.model.meta.Service;
-import org.fourthline.cling.support.avtransport.callback.SetAVTransportURI;
 import org.fourthline.cling.support.model.MediaInfo;
 import org.fourthline.cling.support.model.PositionInfo;
 import org.fourthline.cling.support.model.TransportInfo;
@@ -26,15 +21,13 @@ public class ControlImpl implements IConnect, IControl {
     private final Handler mHandler = new Handler(Looper.getMainLooper());
     private final ILogger mLogger = new ILogger.DefaultLoggerImpl(this);
     private final AndroidUpnpService mService;
+    private final IServiceFactory mServiceFactory;
     private final Device<?, ?, ?> mDevice;
-    private final Service<?, ?> mAvService;
-    private final Service<?, ?> mRendererService;
 
     public ControlImpl(@NonNull AndroidUpnpService upnpService, @NonNull CastDevice castDevice) {
         mService = upnpService;
         mDevice = castDevice.getDevice();
-        mAvService = mDevice.findService(DLNACastManager.SERVICE_AV_TRANSPORT);
-        mRendererService = mDevice.findService(DLNACastManager.SERVICE_RENDERING_CONTROL);
+        mServiceFactory = new IServiceFactory.ServiceFactoryImpl(upnpService.getControlPoint(), castDevice.getDevice());
     }
 
     private volatile boolean mConnected = false;
@@ -88,18 +81,41 @@ public class ControlImpl implements IConnect, IControl {
 
     @Override
     public void cast(CastObject castObject) {
-        if (!isConnected(mDevice)) return;
-        mService.getControlPoint().execute(new SetAVTransportURI(mAvService, castObject.url, "") {
+        mServiceFactory.getAvService().cast(null, castObject.url, "");
+    }
 
-            @Override
-            public void success(ActionInvocation invocation) {
-                super.success(invocation);
-            }
+    @Override
+    public void play() {
+        mServiceFactory.getAvService().play(null);
+    }
 
-            @Override
-            public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
+    @Override
+    public void pause() {
+        mServiceFactory.getAvService().pause(null);
+    }
 
-            }
-        });
+    @Override
+    public void stop() {
+        mServiceFactory.getAvService().stop(null);
+    }
+
+    @Override
+    public void seekTo(long position) {
+        mServiceFactory.getAvService().seek(null, position);
+    }
+
+    @Override
+    public void setVolume(int percent) {
+        mServiceFactory.getRenderService().setVolume(null, percent);
+    }
+
+    @Override
+    public void setMute(boolean mute) {
+        mServiceFactory.getRenderService().setMute(null, mute);
+    }
+
+    @Override
+    public void setBrightness(int percent) {
+        mServiceFactory.getRenderService().setBrightness(null, percent);
     }
 }
