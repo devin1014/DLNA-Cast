@@ -3,7 +3,7 @@ package com.android.cast.dlna.control;
 import androidx.annotation.NonNull;
 
 import com.android.cast.dlna.CastObject;
-import com.android.cast.dlna.util.ILogger;
+import com.android.cast.dlna.ILogger;
 
 import org.fourthline.cling.android.AndroidUpnpService;
 import org.fourthline.cling.model.meta.Device;
@@ -23,7 +23,7 @@ public class ControlImpl implements ICastInterface.IControl {
         mService = upnpService;
         mDevice = device;
         mServiceFactory = new IServiceFactory.ServiceFactoryImpl(upnpService.getControlPoint(), device);
-        mServiceFactory.getAvService().cast(new ServiceAction.IServiceActionCallback<String>() {
+        mServiceFactory.getAvService().cast(new IServiceAction.IServiceActionCallback<String>() {
             @Override
             public void onSuccess(String result) {
                 sync();

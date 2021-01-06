@@ -2,7 +2,7 @@ package com.android.cast.dlna.demo;
 
 import android.app.Application;
 
-import com.android.cast.dlna.util.ILogger;
+import com.android.cast.dlna.ILogger;
 
 public class CastApplication extends Application {
     @Override

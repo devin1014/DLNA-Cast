@@ -6,7 +6,7 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.android.cast.dlna.util.ILogger;
+import com.android.cast.dlna.ILogger;
 
 import org.fourthline.cling.controlpoint.ActionCallback;
 import org.fourthline.cling.controlpoint.ControlPoint;

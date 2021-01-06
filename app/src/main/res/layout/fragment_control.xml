@@ -22,14 +22,14 @@
         android:textStyle="bold" />
 
     <!--control-->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:gravity="center_vertical"
-        android:padding="4dp"
-        android:text="控制"
-        android:textColor="#000000"
-        android:textSize="16dp" />
+    <!--<TextView-->
+    <!--    android:layout_width="match_parent"-->
+    <!--    android:layout_height="48dp"-->
+    <!--    android:gravity="center_vertical"-->
+    <!--    android:padding="4dp"-->
+    <!--    android:text="控制"-->
+    <!--    android:textColor="#000000"-->
+    <!--    android:textSize="16dp" />-->
 
     <include layout="@layout/layout_control" />
 

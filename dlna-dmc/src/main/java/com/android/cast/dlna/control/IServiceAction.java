@@ -4,7 +4,7 @@ import org.fourthline.cling.support.model.MediaInfo;
 import org.fourthline.cling.support.model.PositionInfo;
 import org.fourthline.cling.support.model.TransportInfo;
 
-interface ServiceAction {
+interface IServiceAction {
 
     interface IServiceActionCallback<T> {
         void onSuccess(T result);

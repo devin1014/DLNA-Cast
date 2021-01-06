@@ -10,16 +10,16 @@ import org.fourthline.cling.model.meta.Service;
  *
  */
 interface IServiceFactory {
-    ServiceAction.IAVServiceAction getAvService();
+    IServiceAction.IAVServiceAction getAvService();
 
-    ServiceAction.IRendererServiceAction getRenderService();
+    IServiceAction.IRendererServiceAction getRenderService();
 
     // ------------------------------------------------------------------------------------------
     // Implement
     // ------------------------------------------------------------------------------------------
     final class ServiceFactoryImpl implements IServiceFactory {
-        private final ServiceAction.IAVServiceAction mAvAction;
-        private final ServiceAction.IRendererServiceAction mRenderAction;
+        private final IServiceAction.IAVServiceAction mAvAction;
+        private final IServiceAction.IRendererServiceAction mRenderAction;
 
         public ServiceFactoryImpl(ControlPoint controlPoint, Device<?, ?, ?> device) {
             Service<?, ?> avService = device.findService(DLNACastManager.SERVICE_AV_TRANSPORT);
@@ -29,12 +29,12 @@ interface IServiceFactory {
         }
 
         @Override
-        public ServiceAction.IAVServiceAction getAvService() {
+        public IServiceAction.IAVServiceAction getAvService() {
             return mAvAction;
         }
 
         @Override
-        public ServiceAction.IRendererServiceAction getRenderService() {
+        public IServiceAction.IRendererServiceAction getRenderService() {
             return mRenderAction;
         }
     }

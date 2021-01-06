@@ -5,8 +5,7 @@ import android.os.Looper;
 
 import androidx.annotation.NonNull;
 
-import com.android.cast.dlna.util.ILogger;
-import com.android.cast.dlna.util.ILogger.DefaultLoggerImpl;
+import com.android.cast.dlna.ILogger.DefaultLoggerImpl;
 
 import org.fourthline.cling.model.meta.Device;
 import org.fourthline.cling.model.meta.LocalDevice;

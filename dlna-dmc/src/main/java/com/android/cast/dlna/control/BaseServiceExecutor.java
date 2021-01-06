@@ -6,9 +6,9 @@ import android.os.Looper;
 
 import androidx.annotation.Nullable;
 
+import com.android.cast.dlna.Utils;
 import com.android.cast.dlna.action.GetBrightness;
 import com.android.cast.dlna.action.SetBrightness;
-import com.android.cast.dlna.util.CastUtils;
 
 import org.fourthline.cling.controlpoint.ActionCallback;
 import org.fourthline.cling.controlpoint.ControlPoint;
@@ -56,11 +56,11 @@ abstract class BaseServiceExecutor {
         mControlPoint.execute(actionCallback);
     }
 
-    protected final <T> void notifySuccess(@Nullable ServiceAction.IServiceActionCallback<T> listener, T t) {
+    protected final <T> void notifySuccess(@Nullable IServiceAction.IServiceActionCallback<T> listener, T t) {
         if (listener != null) notify(() -> listener.onSuccess(t));
     }
 
-    protected final void notifyFailure(@Nullable ServiceAction.IServiceActionCallback<?> listener, String errMsg) {
+    protected final void notifyFailure(@Nullable IServiceAction.IServiceActionCallback<?> listener, String errMsg) {
         if (listener != null) notify(() -> listener.onFailed(errMsg != null ? errMsg : "error"));
     }
 
@@ -75,14 +75,14 @@ abstract class BaseServiceExecutor {
     // ---------------------------------------------------------------------------------------------------------
     // Implement
     // ---------------------------------------------------------------------------------------------------------
-    static final class AVServiceExecutorImpl extends BaseServiceExecutor implements ServiceAction.IAVServiceAction {
+    static final class AVServiceExecutorImpl extends BaseServiceExecutor implements IServiceAction.IAVServiceAction {
 
         public AVServiceExecutorImpl(ControlPoint controlPoint, Service<?, ?> service) {
             super(controlPoint, service);
         }
 
         @Override
-        public void cast(ServiceAction.IServiceActionCallback<String> listener, String uri, String metadata) {
+        public void cast(IServiceAction.IServiceActionCallback<String> listener, String uri, String metadata) {
             if (invalidServiceAction("SetAVTransportURI")) return;
 
             execute(new SetAVTransportURI(getService(), uri, metadata) {
@@ -99,7 +99,7 @@ abstract class BaseServiceExecutor {
         }
 
         @Override
-        public void play(ServiceAction.IServiceActionCallback<Void> listener) {
+        public void play(IServiceAction.IServiceActionCallback<Void> listener) {
             if (invalidServiceAction("Play")) return;
 
             execute(new Play(getService()) {
@@ -116,7 +116,7 @@ abstract class BaseServiceExecutor {
         }
 
         @Override
-        public void pause(ServiceAction.IServiceActionCallback<Void> listener) {
+        public void pause(IServiceAction.IServiceActionCallback<Void> listener) {
             if (invalidServiceAction("Pause")) return;
 
             execute(new Pause(getService()) {
@@ -133,7 +133,7 @@ abstract class BaseServiceExecutor {
         }
 
         @Override
-        public void stop(ServiceAction.IServiceActionCallback<Void> listener) {
+        public void stop(IServiceAction.IServiceActionCallback<Void> listener) {
             if (invalidServiceAction("Stop")) return;
 
             execute(new Stop(getService()) {
@@ -150,10 +150,10 @@ abstract class BaseServiceExecutor {
         }
 
         @Override
-        public void seek(ServiceAction.IServiceActionCallback<Long> listener, long position) {
+        public void seek(IServiceAction.IServiceActionCallback<Long> listener, long position) {
             if (invalidServiceAction("Seek")) return;
 
-            execute(new Seek(getService(), CastUtils.getStringTime(position)) {
+            execute(new Seek(getService(), Utils.getStringTime(position)) {
                 @Override
                 public void success(final ActionInvocation invocation) {
                     notifySuccess(listener, position);
@@ -167,7 +167,7 @@ abstract class BaseServiceExecutor {
         }
 
         @Override
-        public void getPositionInfo(ServiceAction.IServiceActionCallback<PositionInfo> listener) {
+        public void getPositionInfo(IServiceAction.IServiceActionCallback<PositionInfo> listener) {
             if (invalidServiceAction("GetPositionInfo")) return;
 
             execute(new GetPositionInfo(getService()) {
@@ -184,7 +184,7 @@ abstract class BaseServiceExecutor {
         }
 
         @Override
-        public void getMediaInfo(ServiceAction.IServiceActionCallback<MediaInfo> listener) {
+        public void getMediaInfo(IServiceAction.IServiceActionCallback<MediaInfo> listener) {
             if (invalidServiceAction("GetMediaInfo")) return;
 
             execute(new GetMediaInfo(getService()) {
@@ -201,7 +201,7 @@ abstract class BaseServiceExecutor {
         }
 
         @Override
-        public void getTransportInfo(ServiceAction.IServiceActionCallback<TransportInfo> listener) {
+        public void getTransportInfo(IServiceAction.IServiceActionCallback<TransportInfo> listener) {
             if (invalidServiceAction("GetTransportInfo")) return;
 
             execute(new GetTransportInfo(getService()) {
@@ -221,14 +221,14 @@ abstract class BaseServiceExecutor {
     // ---------------------------------------------------------------------------------------------------------
     // Implement
     // ---------------------------------------------------------------------------------------------------------
-    static class RendererServiceExecutorImpl extends BaseServiceExecutor implements ServiceAction.IRendererServiceAction {
+    static class RendererServiceExecutorImpl extends BaseServiceExecutor implements IServiceAction.IRendererServiceAction {
 
         public RendererServiceExecutorImpl(ControlPoint controlPoint, Service<?, ?> service) {
             super(controlPoint, service);
         }
 
         @Override
-        public void setVolume(ServiceAction.IServiceActionCallback<Integer> listener, int volume) {
+        public void setVolume(IServiceAction.IServiceActionCallback<Integer> listener, int volume) {
             if (invalidServiceAction("SetVolume")) return;
 
             execute(new SetVolume(getService(), volume) {
@@ -245,7 +245,7 @@ abstract class BaseServiceExecutor {
         }
 
         @Override
-        public void getVolume(ServiceAction.IServiceActionCallback<Integer> listener) {
+        public void getVolume(IServiceAction.IServiceActionCallback<Integer> listener) {
             if (invalidServiceAction("GetVolume")) return;
 
             execute(new GetVolume(getService()) {
@@ -262,7 +262,7 @@ abstract class BaseServiceExecutor {
         }
 
         @Override
-        public void setMute(ServiceAction.IServiceActionCallback<Boolean> listener, boolean mute) {
+        public void setMute(IServiceAction.IServiceActionCallback<Boolean> listener, boolean mute) {
             if (invalidServiceAction("SetMute")) return;
 
             execute(new SetMute(getService(), mute) {
@@ -279,7 +279,7 @@ abstract class BaseServiceExecutor {
         }
 
         @Override
-        public void isMute(ServiceAction.IServiceActionCallback<Boolean> listener) {
+        public void isMute(IServiceAction.IServiceActionCallback<Boolean> listener) {
             if (invalidServiceAction("GetMute")) return;
 
             execute(new GetMute(getService()) {
@@ -296,7 +296,7 @@ abstract class BaseServiceExecutor {
         }
 
         @Override
-        public void setBrightness(ServiceAction.IServiceActionCallback<Integer> listener, int percent) {
+        public void setBrightness(IServiceAction.IServiceActionCallback<Integer> listener, int percent) {
             if (invalidServiceAction("SetBrightness")) return;
 
             execute(new SetBrightness(getService(), percent) {
@@ -313,7 +313,7 @@ abstract class BaseServiceExecutor {
         }
 
         @Override
-        public void getBrightness(ServiceAction.IServiceActionCallback<Integer> listener) {
+        public void getBrightness(IServiceAction.IServiceActionCallback<Integer> listener) {
             if (invalidServiceAction("GetBrightness")) return;
 
             execute(new GetBrightness(getService()) {

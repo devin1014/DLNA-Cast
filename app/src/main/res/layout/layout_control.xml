@@ -3,9 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="48dp"
+    android:layout_height="wrap_content"
     android:gravity="center_vertical"
     android:orientation="horizontal"
+    android:padding="6dp"
     tools:ignore="HardcodedText,SpUsage">
 
     <Button
@@ -14,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="投射"
-        android:textSize="12dp" />
+        android:textSize="14dp" />
 
     <View
         android:layout_width="1px"
@@ -27,7 +28,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="停止"
-        android:textSize="12dp" />
+        android:textSize="14dp" />
 
     <View
         android:layout_width="1px"
@@ -40,7 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="播放"
-        android:textSize="12dp" />
+        android:textSize="14dp" />
 
     <View
         android:layout_width="1px"
@@ -53,7 +54,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="暂停"
-        android:textSize="12dp" />
+        android:textSize="14dp" />
 
     <View
         android:layout_width="1px"
@@ -66,6 +67,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="静音"
-        android:textSize="12dp" />
+        android:textSize="14dp" />
 
 </LinearLayout>

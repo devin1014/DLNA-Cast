@@ -2,8 +2,8 @@ package com.android.cast.dlna.control;
 
 import androidx.annotation.CallSuper;
 
-import com.android.cast.dlna.util.ILogger;
-import com.android.cast.dlna.util.ILogger.DefaultLoggerImpl;
+import com.android.cast.dlna.ILogger;
+import com.android.cast.dlna.ILogger.DefaultLoggerImpl;
 
 import org.fourthline.cling.controlpoint.SubscriptionCallback;
 import org.fourthline.cling.model.gena.CancelReason;
