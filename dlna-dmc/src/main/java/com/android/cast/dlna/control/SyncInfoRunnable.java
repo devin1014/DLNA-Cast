@@ -24,7 +24,7 @@ abstract class SyncInfoRunnable<T> implements Runnable {
 
     private final ControlPoint controlPoint;
     private final Service<?, ?> service;
-    private final ICastInfoListener<T> listener;
+    private final ICastInterface.ICastInfoListener<T> listener;
     private final Object[] result = new Object[1];
     private final ILogger logger = new ILogger.DefaultLoggerImpl(this);
 
@@ -33,7 +33,7 @@ abstract class SyncInfoRunnable<T> implements Runnable {
 
     public SyncInfoRunnable(@NonNull ControlPoint controlPoint,
                             @NonNull Service<?, ?> service,
-                            @Nullable ICastInfoListener<T> listener) {
+                            @Nullable ICastInterface.ICastInfoListener<T> listener) {
         this.controlPoint = controlPoint;
         this.service = service;
         this.listener = listener;

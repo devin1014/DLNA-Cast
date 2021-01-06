@@ -14,7 +14,7 @@ final class SyncVolumeInfo extends SyncInfoRunnable<Integer> {
 
     public SyncVolumeInfo(@NonNull ControlPoint controlPoint,
                           @NonNull Service<?, ?> service,
-                          @Nullable ICastInfoListener<Integer> listener) {
+                          @Nullable ICastInterface.ICastInfoListener<Integer> listener) {
         super(controlPoint, service, listener);
     }
 

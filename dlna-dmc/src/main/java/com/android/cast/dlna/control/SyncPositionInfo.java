@@ -15,7 +15,7 @@ final class SyncPositionInfo extends SyncInfoRunnable<PositionInfo> {
 
     public SyncPositionInfo(@NonNull ControlPoint controlPoint,
                             @NonNull Service<?, ?> service,
-                            @Nullable ICastInfoListener<PositionInfo> listener) {
+                            @Nullable ICastInterface.ICastInfoListener<PositionInfo> listener) {
         super(controlPoint, service, listener);
     }
 

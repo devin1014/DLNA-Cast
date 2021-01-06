@@ -15,6 +15,7 @@ import org.fourthline.cling.model.meta.RemoteService;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 /**
  *
@@ -49,11 +50,17 @@ final class Utils {
     }
 
     public static void logServiceConnected(ILogger mLogger, AndroidUpnpService upnpService, ComponentName componentName, IBinder iBinder) {
+        mLogger.i("---------------------------------------------------------------------------");
+        mLogger.i("---------------------------------------------------------------------------");
+        mLogger.i(String.format("[%s] connected %s", componentName.getShortClassName(), iBinder.getClass().getName()));
+        mLogger.i(String.format("[UpnpService]: %s@0x%s", upnpService.get().getClass().getName(), toHexString(upnpService.get().hashCode())));
+        mLogger.i(String.format("[Registry]: listener=%s, devices=%s", upnpService.getRegistry().getListeners().size(), upnpService.getRegistry().getDevices().size()));
         mLogger.i("-------------------------------------------------------------------");
-        mLogger.i(String.format("[%s] onServiceConnected, %s@%s", componentName.getShortClassName(), iBinder.getClass().getName(), iBinder.hashCode()));
-        mLogger.i(String.format("[UpnpService]: %s@%s", upnpService.get().getClass().getName(), upnpService.get().hashCode()));
-        mLogger.i(String.format("[Registry]: %s@%s", upnpService.getRegistry().getClass().getName(), upnpService.getRegistry().hashCode()));
-        mLogger.i(String.format("[ControlPoint]: %s@%s", upnpService.getControlPoint().getClass().getName(), upnpService.getControlPoint().hashCode()));
-        mLogger.i("-------------------------------------------------------------------");
+        mLogger.i("---------------------------------------------------------------------------");
+        mLogger.i("---------------------------------------------------------------------------");
+    }
+
+    private static String toHexString(int hashCode) {
+        return Integer.toHexString(hashCode).toUpperCase(Locale.US);
     }
 }

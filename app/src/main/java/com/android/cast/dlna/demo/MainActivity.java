@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
             ((IDisplayDevice) mInformationFragment).setCastDevice(selected ? castDevice : null);
             ((IDisplayDevice) mControlFragment).setCastDevice(selected ? castDevice : null);
         }));
-        DLNACastManager.getInstance().addRegistryDeviceListener(mDeviceListAdapter);
+        DLNACastManager.getInstance().registerDeviceListener(mDeviceListAdapter);
     }
 
     private void resetToolbar() {
@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        DLNACastManager.getInstance().removeRegistryListener(mDeviceListAdapter);
+        DLNACastManager.getInstance().unregisterListener(mDeviceListAdapter);
         super.onDestroy();
     }
 
@@ -104,7 +104,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_search_start) {
             Toast.makeText(this, "开始搜索", Toast.LENGTH_SHORT).show();
-            DLNACastManager.getInstance().clear();
             DLNACastManager.getInstance().search(DLNACastManager.DEVICE_TYPE_DMR, 60);
         } else if (item.getItemId() == R.id.menu_link_detail) {
             startActivity(new Intent(this, DetailActivity.class));

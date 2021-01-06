@@ -17,9 +17,8 @@ import com.android.cast.dlna.DLNACastManager;
 
 import org.fourthline.cling.model.meta.Device;
 
-public class ControlFragment extends Fragment implements IDisplayDevice {
+public class ControlFragment extends Fragment implements IDisplayDevice, CastFragment.Callback {
 
-    private TextView mDeviceStatus;
     private TextView mPositionInfo;
     private SeekBar mPositionSeekBar;
     private TextView mVolumeInfo;
@@ -38,13 +37,9 @@ public class ControlFragment extends Fragment implements IDisplayDevice {
     }
 
     private void initComponent(View view) {
-        mDeviceStatus = view.findViewById(R.id.ctrl_device_status);
         mPositionInfo = view.findViewById(R.id.ctrl_position_info);
 
-        view.findViewById(R.id.btn_cast).setOnClickListener(v ->
-                new CastFragment()
-                        .setCallback(url -> DLNACastManager.getInstance().cast(CastObject.newInstance(url, Constants.CAST_ID, Constants.CAST_NAME)))
-                        .show(getChildFragmentManager(), "CastFragment"));
+        view.findViewById(R.id.btn_cast).setOnClickListener(v -> new CastFragment().setCallback(this).show(getChildFragmentManager(), "CastFragment"));
         view.findViewById(R.id.btn_cast_pause).setOnClickListener(v -> DLNACastManager.getInstance().pause());
         view.findViewById(R.id.btn_cast_resume).setOnClickListener(v -> DLNACastManager.getInstance().play());
         view.findViewById(R.id.btn_cast_stop).setOnClickListener(v -> DLNACastManager.getInstance().stop());
@@ -84,9 +79,17 @@ public class ControlFragment extends Fragment implements IDisplayDevice {
         }
     };
 
+    private Device<?, ?, ?> mDevice;
+
     @Override
     public void setCastDevice(Device<?, ?, ?> device) {
-        if (device == null) DLNACastManager.getInstance().disconnect();
-        else DLNACastManager.getInstance().connect(device);
+        mDevice = device;
+    }
+
+    @Override
+    public void onCastUrl(String url) {
+        if (mDevice != null) {
+            DLNACastManager.getInstance().cast(mDevice, CastObject.newInstance(url, Constants.CAST_ID, Constants.CAST_NAME));
+        }
     }
 }

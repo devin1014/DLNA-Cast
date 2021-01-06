@@ -37,7 +37,7 @@ final class SyncDataManager {
     public synchronized void sync(ControlPoint controlPoint,
                                   Device<?, ?, ?> device,
                                   SubscriptionCallback subscriptionCallback,
-                                  ICastInfoListener<?>... listeners) {
+                                  ICastInterface.ICastInfoListener<?>... listeners) {
         release();
         final int currentNumber = mSyncNumber.incrementAndGet();
         SubscriptionCallback callbackImp = new SubscriptionCallback() {
@@ -85,14 +85,14 @@ final class SyncDataManager {
 
         public abstract void stop();
 
-        protected <T> ICastInfoListener<T> findListener(Class<T> classType, @NonNull ICastInfoListener<?>... listeners) {
-            for (ICastInfoListener<?> l : listeners) {
+        protected <T> ICastInterface.ICastInfoListener<T> findListener(Class<T> classType, @NonNull ICastInterface.ICastInfoListener<?>... listeners) {
+            for (ICastInterface.ICastInfoListener<?> l : listeners) {
                 for (Type type : l.getClass().getGenericInterfaces()) {
                     if (type instanceof ParameterizedType && ((ParameterizedType) type).getActualTypeArguments() != null) {
                         Type actualType = ((ParameterizedType) type).getActualTypeArguments()[0];
                         if (classType.getName().equals(((Class<?>) actualType).getName())) {
                             //noinspection unchecked
-                            return (ICastInfoListener<T>) l;
+                            return (ICastInterface.ICastInfoListener<T>) l;
                         }
                     }
                 }
@@ -110,13 +110,13 @@ final class SyncDataManager {
         private SyncPositionInfo positionInfo;
         private SyncMediaInfo mediaInfo;
         private final SubscriptionCallback subscriptionCallback;
-        private ICastInfoListener<TransportInfo> transportListener;
-        private final ICastInfoListener<PositionInfo> positionListener;
-        private final ICastInfoListener<MediaInfo> mediaListener;
+        private ICastInterface.ICastInfoListener<TransportInfo> transportListener;
+        private final ICastInterface.ICastInfoListener<PositionInfo> positionListener;
+        private final ICastInterface.ICastInfoListener<MediaInfo> mediaListener;
 
         public AvTransportSubscription(Service service,
                                        SubscriptionCallback subscriptionCallback,
-                                       ICastInfoListener<?>... listeners) {
+                                       ICastInterface.ICastInfoListener<?>... listeners) {
             super(service, 300);
             this.subscriptionCallback = subscriptionCallback;
             this.transportListener = findListener(TransportInfo.class, listeners);
@@ -139,7 +139,7 @@ final class SyncDataManager {
             stop();
         }
 
-        private final ICastInfoListener<TransportInfo> transportInfoICastInfoListener = info -> {
+        private final ICastInterface.ICastInfoListener<TransportInfo> transportInfoICastInfoListener = info -> {
             if (transportListener != null) {
                 transportListener.onChanged(info);
             }
@@ -159,9 +159,9 @@ final class SyncDataManager {
     private static final class RendererSubscription extends BaseSubscription {
 
         private SyncVolumeInfo syncRunnable;
-        private final ICastInfoListener<Integer> listener;
+        private final ICastInterface.ICastInfoListener<Integer> listener;
 
-        public RendererSubscription(Service service, ICastInfoListener<?>... listeners) {
+        public RendererSubscription(Service service, ICastInterface.ICastInfoListener<?>... listeners) {
             super(service, 300);
             listener = findListener(Integer.class, listeners);
         }

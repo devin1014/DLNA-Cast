@@ -1,5 +1,6 @@
 package com.android.cast.dlna.demo;
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,13 @@ public class CastFragment extends DialogFragment {
     }
 
     private Callback mCallback;
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        setStyle(DialogFragment.STYLE_NO_TITLE, getTheme());
+        return super.onCreateDialog(savedInstanceState);
+    }
 
     @Nullable
     @Override

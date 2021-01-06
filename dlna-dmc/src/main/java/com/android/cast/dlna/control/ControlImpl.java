@@ -1,10 +1,6 @@
 package com.android.cast.dlna.control;
 
-import android.os.Handler;
-import android.os.Looper;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.android.cast.dlna.CastObject;
 import com.android.cast.dlna.util.ILogger;
@@ -15,72 +11,73 @@ import org.fourthline.cling.support.model.MediaInfo;
 import org.fourthline.cling.support.model.PositionInfo;
 import org.fourthline.cling.support.model.TransportInfo;
 
-public class ControlImpl implements IConnect, IControl {
+public class ControlImpl implements ICastInterface.IControl {
 
-    private final Handler mHandler = new Handler(Looper.getMainLooper());
     private final ILogger mLogger = new ILogger.DefaultLoggerImpl(this);
     private final AndroidUpnpService mService;
     private final IServiceFactory mServiceFactory;
     private final Device<?, ?, ?> mDevice;
+    private SyncDataManager mSyncDataManager;
 
-    public ControlImpl(@NonNull AndroidUpnpService upnpService, @NonNull Device<?, ?, ?> device) {
+    public ControlImpl(@NonNull AndroidUpnpService upnpService, @NonNull Device<?, ?, ?> device, CastObject castObject) {
         mService = upnpService;
         mDevice = device;
         mServiceFactory = new IServiceFactory.ServiceFactoryImpl(upnpService.getControlPoint(), device);
+        mServiceFactory.getAvService().cast(new ServiceAction.IServiceActionCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                sync();
+            }
+
+            @Override
+            public void onFailed(String errMsg) {
+            }
+        }, castObject.url, "");
     }
 
-    private volatile boolean mConnected = false;
-    private SyncDataManager mSyncDataManager;
-
-    @Override
-    public void connect(@Nullable IConnectCallback callback) {
-        disconnect();
+    private void sync() {
+        release();
         mSyncDataManager = new SyncDataManager();
         mSyncDataManager.sync(mService.getControlPoint(), mDevice, new SyncDataManager.SubscriptionCallback() {
             @Override
             public void onSubscriptionSuccess() {
-                mConnected = true;
-                if (callback != null) mHandler.post(() -> callback.onDeviceConnected(mDevice));
             }
 
             @Override
             public void onSubscriptionFailed(String msg) {
-                mConnected = false;
-                if (callback != null) mHandler.post(() -> callback.onDeviceDisconnected(mDevice, msg));
             }
         }, mTransportInfoListener, mMediaInfoListener, mPositionInfoListener, mVolumeInfoListener);
     }
 
-    @Override
-    public void disconnect() {
-        mConnected = false;
+    public void release() {
         if (mSyncDataManager != null) mSyncDataManager.release();
     }
 
-    @Override
-    public boolean isConnected(@Nullable Device<?, ?, ?> device) {
-        return mDevice != null && mConnected && (device == null || device.getIdentity().getUdn().equals(mDevice.getIdentity().getUdn()));
-    }
-
-    private final ICastInfoListener<TransportInfo> mTransportInfoListener = info -> {
+    private final ICastInterface.ICastInfoListener<TransportInfo> mTransportInfoListener = info -> {
         mLogger.i(String.format("TransportInfo: [%s] [%s] [%s]", info.getCurrentTransportStatus(), info.getCurrentTransportState(), info.getCurrentSpeed()));
     };
 
-    private final ICastInfoListener<MediaInfo> mMediaInfoListener = info -> {
+    private final ICastInterface.ICastInfoListener<MediaInfo> mMediaInfoListener = info -> {
         mLogger.i(String.format("onMediaChanged: %s", info.getCurrentURI()));
     };
 
-    private final ICastInfoListener<PositionInfo> mPositionInfoListener = info -> {
+    private final ICastInterface.ICastInfoListener<PositionInfo> mPositionInfoListener = info -> {
         mLogger.i(String.format("onPositionChanged: %s", info));
     };
 
-    private final ICastInfoListener<Integer> mVolumeInfoListener = integer -> {
+    private final ICastInterface.ICastInfoListener<Integer> mVolumeInfoListener = integer -> {
         mLogger.i(String.format("onVolumeChanged: %s", integer));
     };
 
     @Override
-    public void cast(CastObject castObject) {
-        mServiceFactory.getAvService().cast(null, castObject.url, "");
+    public boolean isCasting(Device<?, ?, ?> device) {
+        return mDevice != null && mDevice.equals(device);
+    }
+
+    @Override
+    public void stop() {
+        release();
+        mServiceFactory.getAvService().stop(null);
     }
 
     @Override
@@ -91,11 +88,6 @@ public class ControlImpl implements IConnect, IControl {
     @Override
     public void pause() {
         mServiceFactory.getAvService().pause(null);
-    }
-
-    @Override
-    public void stop() {
-        mServiceFactory.getAvService().stop(null);
     }
 
     @Override

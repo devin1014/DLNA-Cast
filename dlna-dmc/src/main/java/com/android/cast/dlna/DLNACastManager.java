@@ -7,24 +7,22 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.android.cast.dlna.control.ControlImpl;
-import com.android.cast.dlna.control.IConnect;
-import com.android.cast.dlna.control.IControl;
+import com.android.cast.dlna.control.ICastInterface;
 import com.android.cast.dlna.util.ILogger;
 import com.android.cast.dlna.util.ILogger.DefaultLoggerImpl;
 
+import org.fourthline.cling.UpnpService;
 import org.fourthline.cling.android.AndroidUpnpService;
 import org.fourthline.cling.model.message.header.STAllHeader;
 import org.fourthline.cling.model.message.header.UDADeviceTypeHeader;
-import org.fourthline.cling.model.message.header.UpnpHeader;
 import org.fourthline.cling.model.meta.Device;
-import org.fourthline.cling.model.meta.LocalDevice;
-import org.fourthline.cling.model.meta.RemoteDevice;
 import org.fourthline.cling.model.types.DeviceType;
 import org.fourthline.cling.model.types.ServiceType;
 import org.fourthline.cling.model.types.UDADeviceType;
@@ -39,7 +37,7 @@ import java.util.List;
 /**
  *
  */
-public final class DLNACastManager implements IControl, IConnect, OnDeviceRegistryListener {
+public final class DLNACastManager implements ICastInterface.IControl, ICastInterface.ICast, OnDeviceRegistryListener {
 
     public static final DeviceType DEVICE_TYPE_DMR = new UDADeviceType("MediaRenderer");
     public static final ServiceType SERVICE_AV_TRANSPORT = new UDAServiceType("AVTransport");
@@ -57,8 +55,10 @@ public final class DLNACastManager implements IControl, IConnect, OnDeviceRegist
     private AndroidUpnpService mDLNACastService;
     private final ILogger mLogger = new DefaultLoggerImpl(this);
     private final DeviceRegistryImpl mDeviceRegistryImpl = new DeviceRegistryImpl(this);
+    private final Handler mMainHandler = new Handler(Looper.getMainLooper());
 
     private DeviceType mSearchDeviceType;
+    private ControlImpl mControlImpl;
 
     private DLNACastManager() {
     }
@@ -83,61 +83,48 @@ public final class DLNACastManager implements IControl, IConnect, OnDeviceRegist
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             AndroidUpnpService upnpService = (AndroidUpnpService) iBinder;
-
-            mDLNACastService = upnpService;
-
-            Utils.logServiceConnected(mLogger, upnpService, componentName, iBinder);
-
-            Registry registry = upnpService.getRegistry();
-
-            // add registry listener
-            Collection<RegistryListener> collection = registry.getListeners();
-
-            if (collection == null || !collection.contains(mDeviceRegistryImpl)) {
-                registry.addListener(mDeviceRegistryImpl);
-            }
-
-            // Now add all devices to the list we already know about
-            for (Device<?, ?, ?> device : mDLNACastService.getRegistry().getDevices()) {
-                if (device instanceof RemoteDevice) {
-                    mDeviceRegistryImpl.remoteDeviceAdded(registry, (RemoteDevice) device);
-                } else if (device instanceof LocalDevice) {
-                    mDeviceRegistryImpl.localDeviceAdded(registry, (LocalDevice) device);
-                } else {
-                    mDeviceRegistryImpl.deviceAdded(registry, device);
+            if (mDLNACastService != upnpService) {
+                mDLNACastService = upnpService;
+                Utils.logServiceConnected(mLogger, upnpService, componentName, iBinder);
+                Registry registry = upnpService.getRegistry();
+                // add registry listener
+                Collection<RegistryListener> collection = registry.getListeners();
+                if (collection == null || !collection.contains(mDeviceRegistryImpl)) {
+                    registry.addListener(mDeviceRegistryImpl);
                 }
+                // Now add all devices to the list we already know about
+                mDeviceRegistryImpl.setDevices(upnpService.getRegistry().getDevices());
             }
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
             mLogger.w(String.format("[%s] onServiceDisconnected", componentName != null ? componentName.getShortClassName() : "NULL"));
-
-            // clear registry listener
-            if (mDLNACastService != null) {
-                Collection<RegistryListener> collection = mDLNACastService.getRegistry().getListeners();
-
-                if (collection != null && collection.contains(mDeviceRegistryImpl)) {
-                    mDLNACastService.getRegistry().removeListener(mDeviceRegistryImpl);
-                }
-            }
-
-            mDLNACastService = null;
+            removeRegistryListener();
         }
 
         @Override
         public void onBindingDied(ComponentName componentName) {
             mLogger.e(String.format("[%s] onBindingDied", componentName.getClassName()));
+            removeRegistryListener();
+        }
+
+        private void removeRegistryListener() {
+            if (mDLNACastService != null) {
+                mDLNACastService.getRegistry().removeListener(mDeviceRegistryImpl);
+            }
+            mDLNACastService = null;
         }
     };
 
     // -----------------------------------------------------------------------------------------
-    // ---- register device listener
+    // ---- register or unregister device listener
     // -----------------------------------------------------------------------------------------
     private final byte[] mLock = new byte[0];
-    private final List<OnDeviceRegistryListener> mRegisterDeviceListenerList = new ArrayList<>();
+    private final List<OnDeviceRegistryListener> mRegisterDeviceListeners = new ArrayList<>();
 
-    public void addRegistryDeviceListener(OnDeviceRegistryListener listener) {
+    public void registerDeviceListener(OnDeviceRegistryListener listener) {
+        if (listener == null) return;
         if (mDLNACastService != null) {
             @SuppressWarnings("rawtypes") Collection<Device> devices;
 
@@ -147,29 +134,24 @@ public final class DLNACastManager implements IControl, IConnect, OnDeviceRegist
                 devices = mDLNACastService.getRegistry().getDevices(mSearchDeviceType);
             }
 
-            if (devices != null) {
-                for (Device<?, ?, ?> device : devices) {
-                    if (device instanceof RemoteDevice) {
-                        mDeviceRegistryImpl.remoteDeviceAdded(mDLNACastService.getRegistry(), (RemoteDevice) device);
-                    } else if (device instanceof LocalDevice) {
-                        mDeviceRegistryImpl.localDeviceAdded(mDLNACastService.getRegistry(), (LocalDevice) device);
-                    } else {
-                        mDeviceRegistryImpl.deviceAdded(mDLNACastService.getRegistry(), device);
-                    }
-                }
+            // if some devices has been found, notify first.
+            if (devices != null && devices.size() > 0) {
+                exeActionInUIThread(() -> {
+                    for (Device<?, ?, ?> device : devices) listener.onDeviceAdded(device);
+                });
             }
         }
 
         synchronized (mLock) {
-            if (!mRegisterDeviceListenerList.contains(listener)) {
-                mRegisterDeviceListenerList.add(listener);
+            if (!mRegisterDeviceListeners.contains(listener)) {
+                mRegisterDeviceListeners.add(listener);
             }
         }
     }
 
-    public void removeRegistryListener(OnDeviceRegistryListener listener) {
+    public void unregisterListener(OnDeviceRegistryListener listener) {
         synchronized (mLock) {
-            mRegisterDeviceListenerList.remove(listener);
+            mRegisterDeviceListeners.remove(listener);
         }
     }
 
@@ -177,13 +159,8 @@ public final class DLNACastManager implements IControl, IConnect, OnDeviceRegist
     public void onDeviceAdded(Device<?, ?, ?> device) {
         if (checkDeviceType(device)) {
             synchronized (mLock) {
-                for (OnDeviceRegistryListener listener : mRegisterDeviceListenerList) {
-                    listener.onDeviceAdded(device);
-                }
+                for (OnDeviceRegistryListener listener : mRegisterDeviceListeners) listener.onDeviceAdded(device);
             }
-            // if (mCastControlImp != null) {
-            //     mCastControlImp.onDeviceAdded(device);
-            // }
         }
     }
 
@@ -191,27 +168,21 @@ public final class DLNACastManager implements IControl, IConnect, OnDeviceRegist
     public void onDeviceUpdated(Device<?, ?, ?> device) {
         if (checkDeviceType(device)) {
             synchronized (mLock) {
-                for (OnDeviceRegistryListener listener : mRegisterDeviceListenerList) {
-                    listener.onDeviceUpdated(device);
-                }
+                for (OnDeviceRegistryListener listener : mRegisterDeviceListeners) listener.onDeviceUpdated(device);
             }
-            // if (mCastControlImp != null) {
-            //     mCastControlImp.onDeviceUpdated(device);
-            // }
         }
     }
 
     @Override
     public void onDeviceRemoved(Device<?, ?, ?> device) {
         if (checkDeviceType(device)) {
-            synchronized (mLock) {
-                for (OnDeviceRegistryListener listener : mRegisterDeviceListenerList) {
-                    listener.onDeviceRemoved(device);
-                }
+            // if this device is casting, disconnect first!
+            if (mControlImpl != null && mControlImpl.isCasting(device)) {
+                mControlImpl.release();
             }
-            // if (mCastControlImp != null) {
-            //     mCastControlImp.onDeviceRemoved(device);
-            // }
+            synchronized (mLock) {
+                for (OnDeviceRegistryListener listener : mRegisterDeviceListeners) listener.onDeviceRemoved(device);
+            }
         }
     }
 
@@ -226,114 +197,72 @@ public final class DLNACastManager implements IControl, IConnect, OnDeviceRegist
         mSearchDeviceType = type;
 
         if (mDLNACastService != null) {
-            UpnpHeader<?> header = type == null ? new STAllHeader() : new UDADeviceTypeHeader(type);
-            mDLNACastService.get().getControlPoint().search(header, maxSeconds);
+            UpnpService upnpService = mDLNACastService.get();
+            //TODO: clear all devices first? check!!!
+            upnpService.getRegistry().removeAllRemoteDevices();
+            upnpService.getControlPoint().search(type == null ? new STAllHeader() : new UDADeviceTypeHeader(type), maxSeconds);
         }
-    }
-
-    public void clear() {
-        if (mDLNACastService != null) {
-            mDLNACastService.get().getRegistry().removeAllRemoteDevices();
-        }
-    }
-
-    private ControlImpl mControlImpl;
-
-    // -----------------------------------------------------------------------------------------
-    // ---- connect
-    // -----------------------------------------------------------------------------------------
-    private final List<IConnect.IConnectCallback> mDeviceConnectionCallbackList = new ArrayList<>();
-
-    public void addCastEventListener(@NonNull IConnect.IConnectCallback listener) {
-        if (!mDeviceConnectionCallbackList.contains(listener)) {
-            mDeviceConnectionCallbackList.add(listener);
-        }
-    }
-
-    public void removeCastEventListener(@NonNull IConnect.IConnectCallback listener) {
-        mDeviceConnectionCallbackList.remove(listener);
-    }
-
-    public void connect(Device<?, ?, ?> device) {
-        // check device has been connected.
-        if (mControlImpl != null && mControlImpl.isConnected(device)) return;
-
-        if (mControlImpl == null) {
-            mControlImpl = new ControlImpl(mDLNACastService, device);
-        }
-        // always auto disconnected previous one if necessary
-        mControlImpl.connect(null);
-    }
-
-    @Override
-    public void connect(@Nullable IConnectCallback callback) {
-
-    }
-
-    public void disconnect() {
-        if (mControlImpl != null) mControlImpl.disconnect();
-    }
-
-    public boolean isConnected(Device<?, ?, ?> device) {
-        return mControlImpl != null && mControlImpl.isConnected(device);
     }
 
     // -----------------------------------------------------------------------------------------
     // ---- cast
     // -----------------------------------------------------------------------------------------
     @Override
-    public void cast(CastObject castObject) {
-        if (mControlImpl != null) {
-            mControlImpl.cast(castObject);
-        }
+    public void cast(Device<?, ?, ?> device, CastObject object) {
+        // check device has been connected.
+        if (mControlImpl != null) mControlImpl.stop();
+        //FIXME: cast same video should not stop and restart!
+        mControlImpl = new ControlImpl(mDLNACastService, device, object);
+        //mControlImpl.connect();
     }
 
     @Override
     public void play() {
-        if (mControlImpl != null) {
-            mControlImpl.play();
-        }
+        if (mControlImpl != null) mControlImpl.play();
     }
 
     @Override
     public void pause() {
-        if (mControlImpl != null) {
-            mControlImpl.pause();
-        }
+        if (mControlImpl != null) mControlImpl.pause();
+    }
+
+    @Override
+    public boolean isCasting(Device<?, ?, ?> device) {
+        return mControlImpl != null && mControlImpl.isCasting(device);
     }
 
     @Override
     public void stop() {
-        if (mControlImpl != null) {
-            mControlImpl.stop();
-        }
+        if (mControlImpl != null) mControlImpl.stop();
     }
 
     @Override
     public void seekTo(long position) {
-        if (mControlImpl != null) {
-            mControlImpl.seekTo(position);
-        }
+        if (mControlImpl != null) mControlImpl.seekTo(position);
     }
 
     @Override
     public void setVolume(int percent) {
-        if (mControlImpl != null) {
-            mControlImpl.setVolume(percent);
-        }
+        if (mControlImpl != null) mControlImpl.setVolume(percent);
     }
 
     @Override
     public void setMute(boolean mute) {
-        if (mControlImpl != null) {
-            mControlImpl.setMute(mute);
-        }
+        if (mControlImpl != null) mControlImpl.setMute(mute);
     }
 
     @Override
     public void setBrightness(int percent) {
-        if (mControlImpl != null) {
-            mControlImpl.setBrightness(percent);
+        if (mControlImpl != null) mControlImpl.setBrightness(percent);
+    }
+
+    private void exeActionInUIThread(Runnable action) {
+        if (action != null) {
+            if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
+                mMainHandler.post(action);
+            } else {
+                action.run();
+            }
         }
     }
 

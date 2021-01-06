@@ -14,16 +14,16 @@ import org.fourthline.cling.model.meta.Service;
 /**
  *
  */
-class DefaultSubscriptionCallback extends SubscriptionCallback implements ISubscriptionListener {
+class DefaultSubscriptionCallback extends SubscriptionCallback implements ICastInterface.ISubscriptionListener {
 
     protected final ILogger mLogger = new DefaultLoggerImpl(this);
-    protected final ISubscriptionListener mEventCallback;
+    protected final ICastInterface.ISubscriptionListener mEventCallback;
 
     public DefaultSubscriptionCallback(Service service, int requestedDurationSeconds) {
         this(service, requestedDurationSeconds, null);
     }
 
-    public DefaultSubscriptionCallback(Service service, int requestedDurationSeconds, ISubscriptionListener eventCallback) {
+    public DefaultSubscriptionCallback(Service service, int requestedDurationSeconds, ICastInterface.ISubscriptionListener eventCallback) {
         super(service, requestedDurationSeconds);
         mEventCallback = eventCallback;
     }

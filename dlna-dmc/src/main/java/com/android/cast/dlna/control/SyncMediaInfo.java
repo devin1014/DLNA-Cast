@@ -15,7 +15,7 @@ final class SyncMediaInfo extends SyncInfoRunnable<MediaInfo> {
 
     public SyncMediaInfo(@NonNull ControlPoint controlPoint,
                          @NonNull Service<?, ?> service,
-                         @Nullable ICastInfoListener<MediaInfo> listener) {
+                         @Nullable ICastInterface.ICastInfoListener<MediaInfo> listener) {
         super(controlPoint, service, listener);
     }
 

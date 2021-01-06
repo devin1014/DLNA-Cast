@@ -15,7 +15,7 @@ final class SyncTransportInfo extends SyncInfoRunnable<TransportInfo> {
 
     public SyncTransportInfo(@NonNull ControlPoint controlPoint,
                              @NonNull Service<?, ?> service,
-                             @Nullable ICastInfoListener<TransportInfo> listener) {
+                             @Nullable ICastInterface.ICastInfoListener<TransportInfo> listener) {
         super(controlPoint, service, listener);
     }
 

@@ -14,6 +14,8 @@ import org.fourthline.cling.model.meta.RemoteDevice;
 import org.fourthline.cling.registry.DefaultRegistryListener;
 import org.fourthline.cling.registry.Registry;
 
+import java.util.Collection;
+
 /**
  *
  */
@@ -33,17 +35,29 @@ final class DeviceRegistryImpl extends DefaultRegistryListener {
         mIgnoreUpdate = ignoreUpdate;
     }
 
+    public void setDevices(@SuppressWarnings("rawtypes") Collection<Device> collection) {
+        if (collection != null && collection.size() > 0) {
+            for (Device<?, ?, ?> device : collection) {
+                notifyDeviceAdd(device);
+            }
+        }
+    }
+
     // Discovery performance optimization for very slow Android devices!
     // This function will called early than 'remoteDeviceAdded',but the device services maybe not entirely.
     @Override
     public void remoteDeviceDiscoveryStarted(Registry registry, RemoteDevice device) {
-        mLogger.i(String.format("[%s] discovery started >>>>", device.getDetails().getFriendlyName()));
+        mLogger.i(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        mLogger.i(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        mLogger.i(String.format("[%s] discovery started...", device.getDetails().getFriendlyName()));
     }
 
     //End of optimization, you can remove the whole block if your Android handset is fast (>= 600 Mhz)
     @Override
     public void remoteDeviceDiscoveryFailed(Registry registry, final RemoteDevice device, final Exception ex) {
-        mLogger.e(String.format("[%s] discovery failed <<<<", device.getDetails().getFriendlyName()));
+        mLogger.e("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+        mLogger.e("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+        mLogger.e(String.format("[%s] discovery failed...", device.getDetails().getFriendlyName()));
         mLogger.e(ex.toString());
     }
 
