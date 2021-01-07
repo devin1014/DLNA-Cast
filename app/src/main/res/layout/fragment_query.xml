@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -14,10 +15,35 @@
         android:text="@string/device_info"
         android:textColor="#000000"
         android:textSize="16dp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        tools:ignore="SpUsage" />
 
     <TextView
-        android:id="@+id/ctrl_device_query"
+        android:id="@+id/ctrl_device_query_media_info"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="4dp"
+        android:textColor="#000000"
+        android:textSize="16dp" />
+
+    <TextView
+        android:id="@+id/ctrl_device_query_position_info"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="4dp"
+        android:textColor="#000000"
+        android:textSize="16dp" />
+
+    <TextView
+        android:id="@+id/ctrl_device_query_transport_info"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="4dp"
+        android:textColor="#000000"
+        android:textSize="16dp" />
+
+    <TextView
+        android:id="@+id/ctrl_device_query_volume_info"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="4dp"

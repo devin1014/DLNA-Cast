@@ -28,6 +28,9 @@ import org.fourthline.cling.model.types.UDADeviceType;
 import org.fourthline.cling.model.types.UDAServiceType;
 import org.fourthline.cling.registry.Registry;
 import org.fourthline.cling.registry.RegistryListener;
+import org.fourthline.cling.support.model.MediaInfo;
+import org.fourthline.cling.support.model.PositionInfo;
+import org.fourthline.cling.support.model.TransportInfo;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -265,4 +268,19 @@ public final class DLNACastManager implements ICastInterface.IControl, ICastInte
         }
     }
 
+    public void getMediaInfo(Device<?, ?, ?> device, ICastInterface.IQueryListener<MediaInfo> listener) {
+        new QueryRequest.MediaInfoRequest(device.findService(SERVICE_AV_TRANSPORT)).execute(mDLNACastService.getControlPoint(), listener);
+    }
+
+    public void getPositionInfo(Device<?, ?, ?> device, ICastInterface.IQueryListener<PositionInfo> listener) {
+        new QueryRequest.PositionInfoRequest(device.findService(SERVICE_AV_TRANSPORT)).execute(mDLNACastService.getControlPoint(), listener);
+    }
+
+    public void getTransportInfo(Device<?, ?, ?> device, ICastInterface.IQueryListener<TransportInfo> listener) {
+        new QueryRequest.TransportInfoRequest(device.findService(SERVICE_AV_TRANSPORT)).execute(mDLNACastService.getControlPoint(), listener);
+    }
+
+    public void getVolumeInfo(Device<?, ?, ?> device, ICastInterface.IQueryListener<Integer> listener) {
+        new QueryRequest.VolumeInfoRequest(device.findService(SERVICE_RENDERING_CONTROL)).execute(mDLNACastService.getControlPoint(), listener);
+    }
 }

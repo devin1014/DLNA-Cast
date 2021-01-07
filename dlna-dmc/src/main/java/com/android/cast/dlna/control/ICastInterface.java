@@ -1,6 +1,7 @@
 package com.android.cast.dlna.control;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.android.cast.dlna.CastObject;
 
@@ -49,6 +50,13 @@ public interface ICastInterface {
         void onSubscriptionEventReceived(GENASubscription<?> subscription);
 
         void onSubscriptionFinished(GENASubscription<?> subscription, UpnpResponse responseStatus, String defaultMsg);
+    }
+
+    // ------------------------------------------------------------------
+    // ---- event query
+    // ------------------------------------------------------------------
+    interface IQueryListener<T> {
+        void onQueryResult(@Nullable T t, @Nullable String errMsg);
     }
 
     // ------------------------------------------------------------------
