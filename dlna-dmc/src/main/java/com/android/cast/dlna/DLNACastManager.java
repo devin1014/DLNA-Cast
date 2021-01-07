@@ -210,7 +210,7 @@ public final class DLNACastManager implements ICastInterface.IControl, ICastInte
     // ---- cast
     // -----------------------------------------------------------------------------------------
     @Override
-    public void cast(Device<?, ?, ?> device, CastObject object) {
+    public void cast(Device<?, ?, ?> device, ICast object) {
         // check device has been connected.
         if (mControlImpl != null) mControlImpl.stop();
         //FIXME: cast same video should not stop and restart!

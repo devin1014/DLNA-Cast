@@ -88,18 +88,13 @@ final public class Utils {
         return 0L;
     }
 
-    public static String getMetadata(CastObject castObject) {
-        //TODO,the params!
-        long size = 0;
-        long bitrate = 0;
-        Res castRes = new Res(new MimeType(ProtocolInfo.WILDCARD, ProtocolInfo.WILDCARD), size, castObject.url);
-        castRes.setBitrate(bitrate);
-        castRes.setDuration(getStringTime(castObject.getDuration()));
-
+    public static String getMetadata(ICast.ICastVideo cast) {
+        Res castRes = new Res(new MimeType(ProtocolInfo.WILDCARD, ProtocolInfo.WILDCARD), cast.getSize(), cast.getUri());
+        castRes.setBitrate(cast.getBitrate());
+        castRes.setDuration(getStringTime(cast.getDurationMillSeconds()));
         String resolution = "description";
-        VideoItem videoItem = new VideoItem(castObject.id, CAST_PARENT_ID, castObject.name, CAST_CREATOR, castRes);
+        VideoItem videoItem = new VideoItem(cast.getId(), CAST_PARENT_ID, cast.getName(), CAST_CREATOR, castRes);
         videoItem.setDescription(resolution);
-
         return createItemMetadata(videoItem);
     }
 

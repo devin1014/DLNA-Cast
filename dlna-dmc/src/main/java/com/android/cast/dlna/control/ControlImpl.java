@@ -2,7 +2,7 @@ package com.android.cast.dlna.control;
 
 import androidx.annotation.NonNull;
 
-import com.android.cast.dlna.CastObject;
+import com.android.cast.dlna.ICast;
 import com.android.cast.dlna.ILogger;
 
 import org.fourthline.cling.android.AndroidUpnpService;
@@ -16,11 +16,11 @@ public class ControlImpl implements IServiceAction.IServiceActionCallback<String
     private final Device<?, ?, ?> mDevice;
     private SyncDataManager mSyncDataManager;
 
-    public ControlImpl(@NonNull AndroidUpnpService upnpService, @NonNull Device<?, ?, ?> device, CastObject castObject) {
+    public ControlImpl(@NonNull AndroidUpnpService upnpService, @NonNull Device<?, ?, ?> device, ICast castUri) {
         mService = upnpService;
         mDevice = device;
         mServiceFactory = new IServiceFactory.ServiceFactoryImpl(upnpService.getControlPoint(), device);
-        mServiceFactory.getAvService().cast(this, castObject.url, "");
+        mServiceFactory.getAvService().cast(this, castUri.getUri(), "");
     }
 
     @Override
