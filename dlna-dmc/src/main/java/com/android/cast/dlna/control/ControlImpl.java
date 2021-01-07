@@ -1,54 +1,43 @@
 package com.android.cast.dlna.control;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.android.cast.dlna.ICast;
-import com.android.cast.dlna.ILogger;
+import com.android.cast.dlna.Utils;
 
-import org.fourthline.cling.android.AndroidUpnpService;
+import org.fourthline.cling.controlpoint.ControlPoint;
 import org.fourthline.cling.model.meta.Device;
 
-public class ControlImpl implements IServiceAction.IServiceActionCallback<String>, ICastInterface.IControl {
+import java.util.Map;
 
-    private final ILogger mLogger = new ILogger.DefaultLoggerImpl(this);
-    private final AndroidUpnpService mService;
+public class ControlImpl implements ICastInterface.IControl {
+
     private final IServiceFactory mServiceFactory;
     private final Device<?, ?, ?> mDevice;
-    private SyncDataManager mSyncDataManager;
+    private final Map<String, IServiceAction.IServiceActionCallback<?>> mCallbackMap;
 
-    public ControlImpl(@NonNull AndroidUpnpService upnpService, @NonNull Device<?, ?, ?> device, ICast castUri) {
-        mService = upnpService;
+    public ControlImpl(@NonNull ControlPoint controlPoint, @NonNull Device<?, ?, ?> device, Map<String, IServiceAction.IServiceActionCallback<?>> map) {
         mDevice = device;
-        mServiceFactory = new IServiceFactory.ServiceFactoryImpl(upnpService.getControlPoint(), device);
-        mServiceFactory.getAvService().cast(this, castUri.getUri(), "");
+        mCallbackMap = map;
+        mServiceFactory = new IServiceFactory.ServiceFactoryImpl(controlPoint, device);
     }
 
     @Override
-    public void onSuccess(String result) {
-        sync();
-    }
-
-    @Override
-    public void onFailed(String errMsg) {
-        //TODO
-    }
-
-    private void sync() {
-        release();
-        mSyncDataManager = new SyncDataManager();
-        mSyncDataManager.sync(mService.getControlPoint(), mDevice, new SyncDataManager.SubscriptionCallback() {
+    public void cast(Device<?, ?, ?> device, ICast object) {
+        mServiceFactory.getAvService().cast(new ICastInterface.CastEventListener() {
             @Override
-            public void onSubscriptionSuccess() {
+            public void onSuccess(String result) {
+                IServiceAction.IServiceActionCallback<Object> listener = getCallback(IServiceAction.ServiceAction.CAST);
+                if (listener != null) listener.onSuccess(result);
             }
 
             @Override
-            public void onSubscriptionFailed(String msg) {
+            public void onFailed(String errMsg) {
+                IServiceAction.IServiceActionCallback<Object> listener = getCallback(IServiceAction.ServiceAction.CAST);
+                if (listener != null) listener.onFailed(errMsg);
             }
-        });
-    }
-
-    public void release() {
-        if (mSyncDataManager != null) mSyncDataManager.release();
+        }, object.getUri(), Utils.getMetadata(object));
     }
 
     @Override
@@ -58,37 +47,44 @@ public class ControlImpl implements IServiceAction.IServiceActionCallback<String
 
     @Override
     public void stop() {
-        release();
-        mServiceFactory.getAvService().stop(null);
+        mServiceFactory.getAvService().stop(getCallback(IServiceAction.ServiceAction.STOP));
     }
 
     @Override
     public void play() {
-        mServiceFactory.getAvService().play(null);
+        mServiceFactory.getAvService().play(getCallback(IServiceAction.ServiceAction.PLAY));
     }
 
     @Override
     public void pause() {
-        mServiceFactory.getAvService().pause(null);
+        mServiceFactory.getAvService().pause(getCallback(IServiceAction.ServiceAction.PAUSE));
     }
 
     @Override
     public void seekTo(long position) {
-        mServiceFactory.getAvService().seek(null, position);
+        mServiceFactory.getAvService().seek(getCallback(IServiceAction.ServiceAction.SEEK_TO), position);
     }
 
     @Override
     public void setVolume(int percent) {
-        mServiceFactory.getRenderService().setVolume(null, percent);
+        mServiceFactory.getRenderService().setVolume(getCallback(IServiceAction.ServiceAction.SET_VOLUME), percent);
     }
 
     @Override
     public void setMute(boolean mute) {
-        mServiceFactory.getRenderService().setMute(null, mute);
+        mServiceFactory.getRenderService().setMute(getCallback(IServiceAction.ServiceAction.SET_MUTE), mute);
     }
 
     @Override
     public void setBrightness(int percent) {
-        mServiceFactory.getRenderService().setBrightness(null, percent);
+        mServiceFactory.getRenderService().setBrightness(getCallback(IServiceAction.ServiceAction.SET_BRIGHTNESS), percent);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Nullable
+    private <T> IServiceAction.IServiceActionCallback<T> getCallback(IServiceAction.ServiceAction action) {
+        Object result = mCallbackMap.get(action.name());
+        if (result == null) return null;
+        return (IServiceAction.IServiceActionCallback<T>) result;
     }
 }

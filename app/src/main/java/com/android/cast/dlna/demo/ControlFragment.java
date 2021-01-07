@@ -7,12 +7,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.android.cast.dlna.DLNACastManager;
+import com.android.cast.dlna.control.ICastInterface;
 
 import org.fourthline.cling.model.meta.Device;
 
@@ -33,6 +35,66 @@ public class ControlFragment extends Fragment implements IDisplayDevice, CastFra
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initComponent(view);
+
+        DLNACastManager.getInstance().registerActionCallback(new ICastInterface.CastEventListener() {
+            @Override
+            public void onSuccess(String result) {
+                Toast.makeText(getActivity(), "Cast: " + result, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailed(String errMsg) {
+                Toast.makeText(getActivity(), errMsg, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        DLNACastManager.getInstance().registerActionCallback(new ICastInterface.PlayEventListener() {
+            @Override
+            public void onSuccess(Void result) {
+                Toast.makeText(getActivity(), "Play", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailed(String errMsg) {
+                Toast.makeText(getActivity(), errMsg, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        DLNACastManager.getInstance().registerActionCallback(new ICastInterface.PauseEventListener() {
+            @Override
+            public void onSuccess(Void result) {
+                Toast.makeText(getActivity(), "Pause", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailed(String errMsg) {
+                Toast.makeText(getActivity(), errMsg, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        DLNACastManager.getInstance().registerActionCallback(new ICastInterface.StopEventListener() {
+            @Override
+            public void onSuccess(Void result) {
+                Toast.makeText(getActivity(), "Stop", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailed(String errMsg) {
+                Toast.makeText(getActivity(), errMsg, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        DLNACastManager.getInstance().registerActionCallback(new ICastInterface.SeekToEventListener() {
+            @Override
+            public void onSuccess(Long result) {
+                Toast.makeText(getActivity(), "SeekTo: " + result, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailed(String errMsg) {
+                Toast.makeText(getActivity(), errMsg, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void initComponent(View view) {

@@ -88,14 +88,19 @@ final public class Utils {
         return 0L;
     }
 
-    public static String getMetadata(ICast.ICastVideo cast) {
-        Res castRes = new Res(new MimeType(ProtocolInfo.WILDCARD, ProtocolInfo.WILDCARD), cast.getSize(), cast.getUri());
-        castRes.setBitrate(cast.getBitrate());
-        castRes.setDuration(getStringTime(cast.getDurationMillSeconds()));
-        String resolution = "description";
-        VideoItem videoItem = new VideoItem(cast.getId(), CAST_PARENT_ID, cast.getName(), CAST_CREATOR, castRes);
-        videoItem.setDescription(resolution);
-        return createItemMetadata(videoItem);
+    public static String getMetadata(ICast cast) {
+        if (cast instanceof ICast.ICastVideo) {
+            ICast.ICastVideo castObj = (ICast.ICastVideo) cast;
+            Res castRes = new Res(new MimeType(ProtocolInfo.WILDCARD, ProtocolInfo.WILDCARD), castObj.getSize(), cast.getUri());
+            castRes.setBitrate(castObj.getBitrate());
+            castRes.setDuration(getStringTime(castObj.getDurationMillSeconds()));
+            String resolution = "description";
+            VideoItem videoItem = new VideoItem(cast.getId(), CAST_PARENT_ID, cast.getName(), CAST_CREATOR, castRes);
+            videoItem.setDescription(resolution);
+            return createItemMetadata(videoItem);
+        } else {
+            return "";
+        }
     }
 
     private static String createItemMetadata(DIDLObject item) {

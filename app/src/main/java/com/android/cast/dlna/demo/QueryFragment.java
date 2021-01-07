@@ -63,8 +63,14 @@ public class QueryFragment extends Fragment implements IDisplayDevice {
             DLNACastManager.getInstance().getMediaInfo(mDevice, (mediaInfo, errMsg) ->
                     mMediaInfo.setText(String.format("MediaInfo:\n%s", mediaInfo != null ? mediaInfo.getCurrentURI() : errMsg)));
 
-            DLNACastManager.getInstance().getPositionInfo(mDevice, (positionInfo, errMsg) ->
-                    mPositionInfo.setText(String.format("PositionInfo:\n%s", positionInfo != null ? positionInfo : errMsg)));
+            DLNACastManager.getInstance().getPositionInfo(mDevice, (positionInfo, errMsg) -> {
+                try {
+                    mPositionInfo.setText(String.format("PositionInfo:\n%s", positionInfo != null ? positionInfo : errMsg));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    mPositionInfo.setText(e.toString());
+                }
+            });
 
             DLNACastManager.getInstance().getTransportInfo(mDevice, (transportInfo, errMsg) ->
                     mTransportInfo.setText(String.format("TransportInfo:\n%s", transportInfo != null ? transportInfo.getCurrentTransportState() : errMsg)));

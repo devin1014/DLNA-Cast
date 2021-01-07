@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import com.android.cast.dlna.ILogger.DefaultLoggerImpl;
 import com.android.cast.dlna.control.ControlImpl;
 import com.android.cast.dlna.control.ICastInterface;
+import com.android.cast.dlna.control.IServiceAction;
 
 import org.fourthline.cling.UpnpService;
 import org.fourthline.cling.android.AndroidUpnpService;
@@ -34,12 +35,14 @@ import org.fourthline.cling.support.model.TransportInfo;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
  */
-public final class DLNACastManager implements ICastInterface.IControl, ICastInterface.ICast, OnDeviceRegistryListener {
+public final class DLNACastManager implements ICastInterface.IControl, OnDeviceRegistryListener {
 
     public static final DeviceType DEVICE_TYPE_DMR = new UDADeviceType("MediaRenderer");
     public static final ServiceType SERVICE_AV_TRANSPORT = new UDAServiceType("AVTransport");
@@ -58,6 +61,7 @@ public final class DLNACastManager implements ICastInterface.IControl, ICastInte
     private final ILogger mLogger = new DefaultLoggerImpl(this);
     private final DeviceRegistryImpl mDeviceRegistryImpl = new DeviceRegistryImpl(this);
     private final Handler mMainHandler = new Handler(Looper.getMainLooper());
+    private final Map<String, IServiceAction.IServiceActionCallback<?>> mActionEventCallbackMap = new LinkedHashMap<>();
 
     private DeviceType mSearchDeviceType;
     private ControlImpl mControlImpl;
@@ -151,6 +155,16 @@ public final class DLNACastManager implements ICastInterface.IControl, ICastInte
         }
     }
 
+    private void exeActionInUIThread(Runnable action) {
+        if (action != null) {
+            if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
+                mMainHandler.post(action);
+            } else {
+                action.run();
+            }
+        }
+    }
+
     public void unregisterListener(OnDeviceRegistryListener listener) {
         synchronized (mLock) {
             mRegisterDeviceListeners.remove(listener);
@@ -180,7 +194,8 @@ public final class DLNACastManager implements ICastInterface.IControl, ICastInte
         if (checkDeviceType(device)) {
             // if this device is casting, disconnect first!
             if (mControlImpl != null && mControlImpl.isCasting(device)) {
-                mControlImpl.release();
+                //TODO
+                // mControlImpl.release();
             }
             synchronized (mLock) {
                 for (OnDeviceRegistryListener listener : mRegisterDeviceListeners) listener.onDeviceRemoved(device);
@@ -207,15 +222,15 @@ public final class DLNACastManager implements ICastInterface.IControl, ICastInte
     }
 
     // -----------------------------------------------------------------------------------------
-    // ---- cast
+    // ---- action
     // -----------------------------------------------------------------------------------------
     @Override
     public void cast(Device<?, ?, ?> device, ICast object) {
         // check device has been connected.
         if (mControlImpl != null) mControlImpl.stop();
         //FIXME: cast same video should not stop and restart!
-        mControlImpl = new ControlImpl(mDLNACastService, device, object);
-        //mControlImpl.connect();
+        mControlImpl = new ControlImpl(mDLNACastService.getControlPoint(), device, mActionEventCallbackMap);
+        mControlImpl.cast(device, object);
     }
 
     @Override
@@ -258,29 +273,44 @@ public final class DLNACastManager implements ICastInterface.IControl, ICastInte
         if (mControlImpl != null) mControlImpl.setBrightness(percent);
     }
 
-    private void exeActionInUIThread(Runnable action) {
-        if (action != null) {
-            if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
-                mMainHandler.post(action);
-            } else {
-                action.run();
-            }
+    public void registerActionCallback(IServiceAction.IServiceActionCallback<?> callback) {
+        _innerRegisterActionCallback(callback, true);
+    }
+
+    public void unregisterActionCallback(IServiceAction.IServiceActionCallback<?> callback) {
+        _innerRegisterActionCallback(callback, false);
+    }
+
+    private void _innerRegisterActionCallback(IServiceAction.IServiceActionCallback<?> callback, boolean register) {
+        if (callback instanceof ICastInterface.CastEventListener) {
+            mActionEventCallbackMap.put(IServiceAction.ServiceAction.CAST.name(), register ? callback : null);
+        } else if (callback instanceof ICastInterface.PlayEventListener) {
+            mActionEventCallbackMap.put(IServiceAction.ServiceAction.PLAY.name(), register ? callback : null);
+        } else if (callback instanceof ICastInterface.PauseEventListener) {
+            mActionEventCallbackMap.put(IServiceAction.ServiceAction.PAUSE.name(), register ? callback : null);
+        } else if (callback instanceof ICastInterface.StopEventListener) {
+            mActionEventCallbackMap.put(IServiceAction.ServiceAction.STOP.name(), register ? callback : null);
+        } else if (callback instanceof ICastInterface.SeekToEventListener) {
+            mActionEventCallbackMap.put(IServiceAction.ServiceAction.SEEK_TO.name(), register ? callback : null);
         }
     }
 
-    public void getMediaInfo(Device<?, ?, ?> device, ICastInterface.IQueryListener<MediaInfo> listener) {
+    // -----------------------------------------------------------------------------------------
+    // ---- query
+    // -----------------------------------------------------------------------------------------
+    public void getMediaInfo(Device<?, ?, ?> device, ICastInterface.GetInfoListener<MediaInfo> listener) {
         new QueryRequest.MediaInfoRequest(device.findService(SERVICE_AV_TRANSPORT)).execute(mDLNACastService.getControlPoint(), listener);
     }
 
-    public void getPositionInfo(Device<?, ?, ?> device, ICastInterface.IQueryListener<PositionInfo> listener) {
+    public void getPositionInfo(Device<?, ?, ?> device, ICastInterface.GetInfoListener<PositionInfo> listener) {
         new QueryRequest.PositionInfoRequest(device.findService(SERVICE_AV_TRANSPORT)).execute(mDLNACastService.getControlPoint(), listener);
     }
 
-    public void getTransportInfo(Device<?, ?, ?> device, ICastInterface.IQueryListener<TransportInfo> listener) {
+    public void getTransportInfo(Device<?, ?, ?> device, ICastInterface.GetInfoListener<TransportInfo> listener) {
         new QueryRequest.TransportInfoRequest(device.findService(SERVICE_AV_TRANSPORT)).execute(mDLNACastService.getControlPoint(), listener);
     }
 
-    public void getVolumeInfo(Device<?, ?, ?> device, ICastInterface.IQueryListener<Integer> listener) {
+    public void getVolumeInfo(Device<?, ?, ?> device, ICastInterface.GetInfoListener<Integer> listener) {
         new QueryRequest.VolumeInfoRequest(device.findService(SERVICE_RENDERING_CONTROL)).execute(mDLNACastService.getControlPoint(), listener);
     }
 }

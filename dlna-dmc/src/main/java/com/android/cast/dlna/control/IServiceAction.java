@@ -4,7 +4,24 @@ import org.fourthline.cling.support.model.MediaInfo;
 import org.fourthline.cling.support.model.PositionInfo;
 import org.fourthline.cling.support.model.TransportInfo;
 
-interface IServiceAction {
+public interface IServiceAction {
+
+    enum ServiceAction {
+        CAST("cast"),
+        PLAY("play"),
+        PAUSE("pause"),
+        STOP("stop"),
+        SEEK_TO("seekTo"),
+        SET_VOLUME("setVolume"),
+        SET_MUTE("setMute"),
+        SET_BRIGHTNESS("setBrightness");
+
+        String action;
+
+        ServiceAction(String action) {
+            this.action = action;
+        }
+    }
 
     interface IServiceActionCallback<T> {
         void onSuccess(T result);

@@ -24,7 +24,7 @@ import org.fourthline.cling.support.renderingcontrol.callback.GetVolume;
 abstract class QueryRequest<T> {
 
     private final Service<?, ?> service;
-    private ICastInterface.IQueryListener<T> listener;
+    private ICastInterface.GetInfoListener<T> listener;
     private final ILogger logger = new ILogger.DefaultLoggerImpl(this);
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
@@ -43,9 +43,9 @@ abstract class QueryRequest<T> {
     protected void setResult(T t) {
         if (listener != null) {
             if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
-                mainHandler.post(() -> listener.onQueryResult(t, null));
+                mainHandler.post(() -> listener.onGetInfoResult(t, null));
             } else {
-                listener.onQueryResult(t, null);
+                listener.onGetInfoResult(t, null);
             }
         }
     }
@@ -54,14 +54,14 @@ abstract class QueryRequest<T> {
         logger.e(errorMsg != null ? errorMsg : "error");
         if (listener != null) {
             if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
-                mainHandler.post(() -> listener.onQueryResult(null, errorMsg != null ? errorMsg : "error"));
+                mainHandler.post(() -> listener.onGetInfoResult(null, errorMsg != null ? errorMsg : "error"));
             } else {
-                listener.onQueryResult(null, errorMsg != null ? errorMsg : "error");
+                listener.onGetInfoResult(null, errorMsg != null ? errorMsg : "error");
             }
         }
     }
 
-    public final void execute(ControlPoint point, ICastInterface.IQueryListener<T> listener) {
+    public final void execute(ControlPoint point, ICastInterface.GetInfoListener<T> listener) {
         this.listener = listener;
         if (TextUtils.isEmpty(getActionName())) {
             setError("not find action name!");
