@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
     private DeviceAdapter mDeviceListAdapter;
     private Fragment mInformationFragment;
+    private Fragment mQueryFragment;
     private Fragment mControlFragment;
 
     @Override
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(findViewById(R.id.toolbar));
 
         mInformationFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_information);
+        mQueryFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_query);
         mControlFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_control);
 
         RadioGroup typeGroup = findViewById(R.id.cast_type_group);
@@ -63,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
             mDeviceListAdapter.setSelectedDevice(selected ? castDevice : null);
             ((IDisplayDevice) mInformationFragment).setCastDevice(selected ? castDevice : null);
             ((IDisplayDevice) mControlFragment).setCastDevice(selected ? castDevice : null);
+            ((IDisplayDevice) mQueryFragment).setCastDevice(selected ? castDevice : null);
         }));
         DLNACastManager.getInstance().registerDeviceListener(mDeviceListAdapter);
     }
@@ -118,11 +121,19 @@ public class MainActivity extends AppCompatActivity {
                 getSupportFragmentManager().beginTransaction()
                         .show(mInformationFragment)
                         .hide(mControlFragment)
+                        .hide(mQueryFragment)
+                        .commit();
+            } else if (checkedId == R.id.cast_type_query) {
+                getSupportFragmentManager().beginTransaction()
+                        .show(mQueryFragment)
+                        .hide(mInformationFragment)
+                        .hide(mControlFragment)
                         .commit();
             } else if (checkedId == R.id.cast_type_ctrl) {
                 getSupportFragmentManager().beginTransaction()
                         .show(mControlFragment)
                         .hide(mInformationFragment)
+                        .hide(mQueryFragment)
                         .commit();
             }
         }

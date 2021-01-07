@@ -11,7 +11,7 @@ import org.fourthline.cling.support.model.MediaInfo;
 import org.fourthline.cling.support.model.PositionInfo;
 import org.fourthline.cling.support.model.TransportInfo;
 
-public class ControlImpl implements ICastInterface.IControl {
+public class ControlImpl implements IServiceAction.IServiceActionCallback<String>, ICastInterface.IControl {
 
     private final ILogger mLogger = new ILogger.DefaultLoggerImpl(this);
     private final AndroidUpnpService mService;
@@ -23,16 +23,17 @@ public class ControlImpl implements ICastInterface.IControl {
         mService = upnpService;
         mDevice = device;
         mServiceFactory = new IServiceFactory.ServiceFactoryImpl(upnpService.getControlPoint(), device);
-        mServiceFactory.getAvService().cast(new IServiceAction.IServiceActionCallback<String>() {
-            @Override
-            public void onSuccess(String result) {
-                sync();
-            }
+        mServiceFactory.getAvService().cast(this, castObject.url, "");
+    }
 
-            @Override
-            public void onFailed(String errMsg) {
-            }
-        }, castObject.url, "");
+    @Override
+    public void onSuccess(String result) {
+        sync();
+    }
+
+    @Override
+    public void onFailed(String errMsg) {
+        //TODO
     }
 
     private void sync() {
@@ -53,20 +54,36 @@ public class ControlImpl implements ICastInterface.IControl {
         if (mSyncDataManager != null) mSyncDataManager.release();
     }
 
-    private final ICastInterface.ICastInfoListener<TransportInfo> mTransportInfoListener = info -> {
-        mLogger.i(String.format("TransportInfo: [%s] [%s] [%s]", info.getCurrentTransportStatus(), info.getCurrentTransportState(), info.getCurrentSpeed()));
+    @SuppressWarnings("Convert2Lambda")
+    private final ICastInterface.ICastInfoListener<TransportInfo> mTransportInfoListener = new ICastInterface.ICastInfoListener<TransportInfo>() {
+        @Override
+        public void onChanged(@NonNull TransportInfo info) {
+            mLogger.i(String.format("TransportInfo: [%s] [%s] [%s]", info.getCurrentTransportStatus(), info.getCurrentTransportState(), info.getCurrentSpeed()));
+        }
     };
 
-    private final ICastInterface.ICastInfoListener<MediaInfo> mMediaInfoListener = info -> {
-        mLogger.i(String.format("onMediaChanged: %s", info.getCurrentURI()));
+    @SuppressWarnings("Convert2Lambda")
+    private final ICastInterface.ICastInfoListener<MediaInfo> mMediaInfoListener = new ICastInterface.ICastInfoListener<MediaInfo>() {
+        @Override
+        public void onChanged(@NonNull MediaInfo mediaInfo) {
+            mLogger.i(String.format("onMediaChanged: %s", mediaInfo.getCurrentURI()));
+        }
     };
 
-    private final ICastInterface.ICastInfoListener<PositionInfo> mPositionInfoListener = info -> {
-        mLogger.i(String.format("onPositionChanged: %s", info));
+    @SuppressWarnings("Convert2Lambda")
+    private final ICastInterface.ICastInfoListener<PositionInfo> mPositionInfoListener = new ICastInterface.ICastInfoListener<PositionInfo>() {
+        @Override
+        public void onChanged(@NonNull PositionInfo positionInfo) {
+            mLogger.i(String.format("onPositionChanged: %s", positionInfo));
+        }
     };
 
-    private final ICastInterface.ICastInfoListener<Integer> mVolumeInfoListener = integer -> {
-        mLogger.i(String.format("onVolumeChanged: %s", integer));
+    @SuppressWarnings("Convert2Lambda")
+    private final ICastInterface.ICastInfoListener<Integer> mVolumeInfoListener = new ICastInterface.ICastInfoListener<Integer>() {
+        @Override
+        public void onChanged(@NonNull Integer integer) {
+            mLogger.i(String.format("onVolumeChanged: %s", integer));
+        }
     };
 
     @Override

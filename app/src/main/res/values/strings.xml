@@ -2,8 +2,10 @@
 
     <string name="app_name">DLNA 投屏</string>
 
-    <string name="mode_info">查询模式</string>
-    <string name="mode_ctrl">控制器模式</string>
+    <string name="mode_info">设备</string>
+    <string name="mode_query">查询</string>
+    <string name="mode_ctrl">控制</string>
+
     <string name="device_info">设备信息</string>
     <string name="device_control">控制器</string>
 

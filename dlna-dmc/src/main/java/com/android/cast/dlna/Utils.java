@@ -193,7 +193,6 @@ final public class Utils {
         mLogger.i(String.format("[%s] connected %s", componentName.getShortClassName(), iBinder.getClass().getName()));
         mLogger.i(String.format("[UpnpService]: %s@0x%s", upnpService.get().getClass().getName(), toHexString(upnpService.get().hashCode())));
         mLogger.i(String.format("[Registry]: listener=%s, devices=%s", upnpService.getRegistry().getListeners().size(), upnpService.getRegistry().getDevices().size()));
-        mLogger.i("-------------------------------------------------------------------");
         mLogger.i("---------------------------------------------------------------------------");
         mLogger.i("---------------------------------------------------------------------------");
     }

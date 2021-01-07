@@ -24,6 +24,14 @@
             android:textSize="16dp" />
 
         <RadioButton
+            android:id="@+id/cast_type_query"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="6dp"
+            android:text="@string/mode_query"
+            android:textSize="16dp" />
+
+        <RadioButton
             android:id="@+id/cast_type_ctrl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -61,6 +69,12 @@
                 <fragment
                     android:id="@+id/fragment_information"
                     class="com.android.cast.dlna.demo.InfoFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <fragment
+                    android:id="@+id/fragment_query"
+                    class="com.android.cast.dlna.demo.QueryFragment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 

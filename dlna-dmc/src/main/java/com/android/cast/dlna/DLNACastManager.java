@@ -13,9 +13,9 @@ import android.os.Looper;
 
 import androidx.annotation.NonNull;
 
+import com.android.cast.dlna.ILogger.DefaultLoggerImpl;
 import com.android.cast.dlna.control.ControlImpl;
 import com.android.cast.dlna.control.ICastInterface;
-import com.android.cast.dlna.ILogger.DefaultLoggerImpl;
 
 import org.fourthline.cling.UpnpService;
 import org.fourthline.cling.android.AndroidUpnpService;
