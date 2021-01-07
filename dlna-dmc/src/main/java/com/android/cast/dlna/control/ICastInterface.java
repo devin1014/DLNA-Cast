@@ -1,6 +1,5 @@
 package com.android.cast.dlna.control;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.android.cast.dlna.CastObject;
@@ -57,12 +56,5 @@ public interface ICastInterface {
     // ------------------------------------------------------------------
     interface IQueryListener<T> {
         void onQueryResult(@Nullable T t, @Nullable String errMsg);
-    }
-
-    // ------------------------------------------------------------------
-    // ---- event changed
-    // ------------------------------------------------------------------
-    interface ICastInfoListener<T> {
-        void onChanged(@NonNull T t);
     }
 }
