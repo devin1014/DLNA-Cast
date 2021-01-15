@@ -5,6 +5,7 @@ import android.os.Looper;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.android.cast.dlna.control.ICastInterface;
 
@@ -23,15 +24,17 @@ import org.fourthline.cling.support.renderingcontrol.callback.GetVolume;
 
 abstract class QueryRequest<T> {
 
+    @Nullable
     private final Service<?, ?> service;
     private ICastInterface.GetInfoListener<T> listener;
     private final ILogger logger = new ILogger.DefaultLoggerImpl(this);
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
-    public QueryRequest(@NonNull Service<?, ?> service) {
+    public QueryRequest(@Nullable Service<?, ?> service) {
         this.service = service;
     }
 
+    @Nullable
     protected final Service<?, ?> getService() {
         return service;
     }
@@ -66,12 +69,19 @@ abstract class QueryRequest<T> {
         if (TextUtils.isEmpty(getActionName())) {
             setError("not find action name!");
             return;
+        } else if (getService() == null) {
+            setError("the service is NULL!");
+            return;
         } else if (getService().getAction(getActionName()) == null) {
             setError(String.format("this service not support '%s' action.", getActionName()));
             return;
         }
-
-        point.execute(getAction());
+        ActionCallback actionCallback = getAction();
+        if (actionCallback != null) {
+            point.execute(getAction());
+        } else {
+            setError("this service action is NULL!");
+        }
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -79,7 +89,7 @@ abstract class QueryRequest<T> {
     // ---------------------------------------------------------------------------------------------
     static class MediaInfoRequest extends QueryRequest<MediaInfo> {
 
-        public MediaInfoRequest(@NonNull Service<?, ?> service) {
+        public MediaInfoRequest(Service<?, ?> service) {
             super(service);
         }
 
@@ -90,17 +100,19 @@ abstract class QueryRequest<T> {
 
         @Override
         protected ActionCallback getAction() {
-            return new GetMediaInfo(getService()) {
-                @Override
-                public void received(ActionInvocation invocation, MediaInfo mediaInfo) {
-                    setResult(mediaInfo);
-                }
+            return getService() != null ?
+                    new GetMediaInfo(getService()) {
+                        @Override
+                        public void received(ActionInvocation invocation, MediaInfo mediaInfo) {
+                            setResult(mediaInfo);
+                        }
 
-                @Override
-                public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
-                    setError(defaultMsg);
-                }
-            };
+                        @Override
+                        public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
+                            setError(defaultMsg);
+                        }
+                    } :
+                    null;
         }
 
     }
@@ -121,17 +133,19 @@ abstract class QueryRequest<T> {
 
         @Override
         protected ActionCallback getAction() {
-            return new GetPositionInfo(getService()) {
-                @Override
-                public void received(ActionInvocation invocation, PositionInfo positionInfo) {
-                    setResult(positionInfo);
-                }
+            return getService() != null ?
+                    new GetPositionInfo(getService()) {
+                        @Override
+                        public void received(ActionInvocation invocation, PositionInfo positionInfo) {
+                            setResult(positionInfo);
+                        }
 
-                @Override
-                public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
-                    setError(defaultMsg);
-                }
-            };
+                        @Override
+                        public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
+                            setError(defaultMsg);
+                        }
+                    } :
+                    null;
         }
 
     }
@@ -152,17 +166,19 @@ abstract class QueryRequest<T> {
 
         @Override
         protected ActionCallback getAction() {
-            return new GetTransportInfo(getService()) {
-                @Override
-                public void received(ActionInvocation invocation, TransportInfo transportInfo) {
-                    setResult(transportInfo);
-                }
+            return getService() != null ?
+                    new GetTransportInfo(getService()) {
+                        @Override
+                        public void received(ActionInvocation invocation, TransportInfo transportInfo) {
+                            setResult(transportInfo);
+                        }
 
-                @Override
-                public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
-                    setError(defaultMsg);
-                }
-            };
+                        @Override
+                        public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
+                            setError(defaultMsg);
+                        }
+                    } :
+                    null;
         }
 
     }
@@ -183,17 +199,19 @@ abstract class QueryRequest<T> {
 
         @Override
         protected ActionCallback getAction() {
-            return new GetVolume(getService()) {
-                @Override
-                public void received(ActionInvocation actionInvocation, int currentVolume) {
-                    setResult(currentVolume);
-                }
+            return getService() != null ?
+                    new GetVolume(getService()) {
+                        @Override
+                        public void received(ActionInvocation actionInvocation, int currentVolume) {
+                            setResult(currentVolume);
+                        }
 
-                @Override
-                public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
-                    setError(defaultMsg);
-                }
-            };
+                        @Override
+                        public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
+                            setError(defaultMsg);
+                        }
+                    } :
+                    null;
         }
 
     }

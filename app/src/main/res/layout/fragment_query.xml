@@ -4,19 +4,38 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:ignore="SpUsage">
 
-    <TextView
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="64dp"
-        android:background="#55888888"
-        android:gravity="center_vertical"
-        android:padding="4dp"
-        android:text="@string/device_info"
-        android:textColor="#000000"
-        android:textSize="16dp"
-        android:textStyle="bold"
-        tools:ignore="SpUsage" />
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:background="#55888888"
+            android:gravity="center_vertical"
+            android:padding="4dp"
+            android:text="@string/device_info"
+            android:textColor="#000000"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            tools:ignore="SpUsage" />
+
+        <Button
+            android:id="@+id/ctrl_device_query_refresh"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
+            android:layout_margin="4dp"
+            android:text="@string/device_info_refresh"
+            android:textColor="#000000"
+            android:textSize="16dp"
+            android:textStyle="bold" />
+
+    </FrameLayout>
 
     <TextView
         android:id="@+id/ctrl_device_query_media_info"

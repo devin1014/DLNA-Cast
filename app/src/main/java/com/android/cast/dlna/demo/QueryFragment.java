@@ -38,6 +38,7 @@ public class QueryFragment extends Fragment implements IDisplayDevice {
         mPositionInfo = view.findViewById(R.id.ctrl_device_query_position_info);
         mTransportInfo = view.findViewById(R.id.ctrl_device_query_transport_info);
         mVolumeInfo = view.findViewById(R.id.ctrl_device_query_volume_info);
+        view.findViewById(R.id.ctrl_device_query_refresh).setOnClickListener((v -> setInfo()));
     }
 
     private Device<?, ?, ?> mDevice;
