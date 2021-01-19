@@ -118,6 +118,12 @@ public class ControlFragment extends Fragment implements IDisplayDevice, CastFra
         mVolumeSeekBar.setOnSeekBarChangeListener(mOnSeekBarChangeListener);
     }
 
+    @Override
+    public void onDestroyView() {
+        DLNACastManager.getInstance().unregisterActionCallbacks();
+        super.onDestroyView();
+    }
+
     private final SeekBar.OnSeekBarChangeListener mOnSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
