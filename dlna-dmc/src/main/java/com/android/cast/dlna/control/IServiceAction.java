@@ -32,6 +32,7 @@ public interface IServiceAction {
     // --------------------------------------------------------------------------------
     // ---- AvService
     // --------------------------------------------------------------------------------
+    @SuppressWarnings("unused")
     interface IAVServiceAction {
 
         void cast(IServiceActionCallback<String> listener, String uri, String metadata);
@@ -54,6 +55,7 @@ public interface IServiceAction {
     // --------------------------------------------------------------------------------
     // ---- RendererService
     // --------------------------------------------------------------------------------
+    @SuppressWarnings("unused")
     interface IRendererServiceAction {
         void setVolume(IServiceActionCallback<Integer> listener, final int volume);
 

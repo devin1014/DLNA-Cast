@@ -24,6 +24,9 @@ public interface ICastInterface {
 
         void pause();
 
+        /**
+         * @param position, current watch time(ms)
+         */
         void seekTo(long position);
 
         void setVolume(int percent);

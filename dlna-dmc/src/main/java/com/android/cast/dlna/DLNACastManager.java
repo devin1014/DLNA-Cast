@@ -35,6 +35,7 @@ import org.fourthline.cling.support.model.TransportInfo;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +62,7 @@ public final class DLNACastManager implements ICastInterface.IControl, OnDeviceR
     private final ILogger mLogger = new DefaultLoggerImpl(this);
     private final DeviceRegistryImpl mDeviceRegistryImpl = new DeviceRegistryImpl(this);
     private final Handler mMainHandler = new Handler(Looper.getMainLooper());
+    private final Map<String, Map<String, IServiceAction.IServiceActionCallback<?>>> mTagMap = new HashMap<>();
     private final Map<String, IServiceAction.IServiceActionCallback<?>> mActionEventCallbackMap = new LinkedHashMap<>();
 
     private DeviceType mSearchDeviceType;
@@ -273,27 +275,54 @@ public final class DLNACastManager implements ICastInterface.IControl, OnDeviceR
         if (mControlImpl != null) mControlImpl.setBrightness(percent);
     }
 
-    public void registerActionCallback(IServiceAction.IServiceActionCallback<?> callback) {
-        _innerRegisterActionCallback(callback, true);
+    public void registerActionCallbacks(IServiceAction.IServiceActionCallback<?>... callbacks) {
+        _innerRegisterActionCallback(callbacks);
     }
 
-    public void unregisterActionCallback(IServiceAction.IServiceActionCallback<?> callback) {
-        _innerRegisterActionCallback(callback, false);
-    }
-
-    private void _innerRegisterActionCallback(IServiceAction.IServiceActionCallback<?> callback, boolean register) {
-        if (callback instanceof ICastInterface.CastEventListener) {
-            mActionEventCallbackMap.put(IServiceAction.ServiceAction.CAST.name(), register ? callback : null);
-        } else if (callback instanceof ICastInterface.PlayEventListener) {
-            mActionEventCallbackMap.put(IServiceAction.ServiceAction.PLAY.name(), register ? callback : null);
-        } else if (callback instanceof ICastInterface.PauseEventListener) {
-            mActionEventCallbackMap.put(IServiceAction.ServiceAction.PAUSE.name(), register ? callback : null);
-        } else if (callback instanceof ICastInterface.StopEventListener) {
-            mActionEventCallbackMap.put(IServiceAction.ServiceAction.STOP.name(), register ? callback : null);
-        } else if (callback instanceof ICastInterface.SeekToEventListener) {
-            mActionEventCallbackMap.put(IServiceAction.ServiceAction.SEEK_TO.name(), register ? callback : null);
+    public void unregisterActionCallbacks() {
+        if (mActionEventCallbackMap.size() > 0) {
+            mActionEventCallbackMap.clear();
         }
     }
+
+    private void _innerRegisterActionCallback(IServiceAction.IServiceActionCallback<?>... callbacks) {
+        if (callbacks != null && callbacks.length > 0) {
+            for (IServiceAction.IServiceActionCallback<?> callback : callbacks) {
+                if (callback instanceof ICastInterface.CastEventListener) {
+                    mActionEventCallbackMap.put(IServiceAction.ServiceAction.CAST.name(), callback);
+                } else if (callback instanceof ICastInterface.PlayEventListener) {
+                    mActionEventCallbackMap.put(IServiceAction.ServiceAction.PLAY.name(), callback);
+                } else if (callback instanceof ICastInterface.PauseEventListener) {
+                    mActionEventCallbackMap.put(IServiceAction.ServiceAction.PAUSE.name(), callback);
+                } else if (callback instanceof ICastInterface.StopEventListener) {
+                    mActionEventCallbackMap.put(IServiceAction.ServiceAction.STOP.name(), callback);
+                } else if (callback instanceof ICastInterface.SeekToEventListener) {
+                    mActionEventCallbackMap.put(IServiceAction.ServiceAction.SEEK_TO.name(), callback);
+                }
+            }
+        }
+    }
+
+    // final static class ServiceActionCallbackWrapper<T> implements IServiceAction.IServiceActionCallback<T> {
+    //
+    //     final String tag;
+    //     final IServiceAction.IServiceActionCallback<T> callback;
+    //
+    //     public ServiceActionCallbackWrapper(String tag, IServiceAction.IServiceActionCallback<T> callback) {
+    //         this.tag = tag;
+    //         this.callback = callback;
+    //     }
+    //
+    //     @Override
+    //     public void onSuccess(T result) {
+    //         if (callback != null) callback.onSuccess(result);
+    //     }
+    //
+    //     @Override
+    //     public void onFailed(String errMsg) {
+    //         if (callback != null) callback.onFailed(errMsg);
+    //     }
+    // }
 
     // -----------------------------------------------------------------------------------------
     // ---- query

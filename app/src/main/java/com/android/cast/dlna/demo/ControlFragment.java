@@ -2,6 +2,9 @@ package com.android.cast.dlna.demo;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.android.cast.dlna.DLNACastManager;
+import com.android.cast.dlna.Utils;
 import com.android.cast.dlna.control.ICastInterface;
 
 import org.fourthline.cling.model.meta.Device;
@@ -36,65 +40,65 @@ public class ControlFragment extends Fragment implements IDisplayDevice, CastFra
         super.onViewCreated(view, savedInstanceState);
         initComponent(view);
 
-        DLNACastManager.getInstance().registerActionCallback(new ICastInterface.CastEventListener() {
-            @Override
-            public void onSuccess(String result) {
-                Toast.makeText(getActivity(), "Cast: " + result, Toast.LENGTH_SHORT).show();
-            }
+        DLNACastManager.getInstance().registerActionCallbacks(
+                new ICastInterface.CastEventListener() {
+                    @Override
+                    public void onSuccess(String result) {
+                        Toast.makeText(getActivity(), "Cast: " + result, Toast.LENGTH_SHORT).show();
+                        mCircleMsgHandler.start(0);
+                    }
 
-            @Override
-            public void onFailed(String errMsg) {
-                Toast.makeText(getActivity(), errMsg, Toast.LENGTH_SHORT).show();
-            }
-        });
+                    @Override
+                    public void onFailed(String errMsg) {
+                        Toast.makeText(getActivity(), errMsg, Toast.LENGTH_SHORT).show();
+                    }
+                },
+                new ICastInterface.PlayEventListener() {
+                    @Override
+                    public void onSuccess(Void result) {
+                        Toast.makeText(getActivity(), "Play", Toast.LENGTH_SHORT).show();
+                    }
 
-        DLNACastManager.getInstance().registerActionCallback(new ICastInterface.PlayEventListener() {
-            @Override
-            public void onSuccess(Void result) {
-                Toast.makeText(getActivity(), "Play", Toast.LENGTH_SHORT).show();
-            }
+                    @Override
+                    public void onFailed(String errMsg) {
+                        Toast.makeText(getActivity(), errMsg, Toast.LENGTH_SHORT).show();
+                    }
+                },
+                new ICastInterface.PauseEventListener() {
+                    @Override
+                    public void onSuccess(Void result) {
+                        Toast.makeText(getActivity(), "Pause", Toast.LENGTH_SHORT).show();
+                    }
 
-            @Override
-            public void onFailed(String errMsg) {
-                Toast.makeText(getActivity(), errMsg, Toast.LENGTH_SHORT).show();
-            }
-        });
+                    @Override
+                    public void onFailed(String errMsg) {
+                        Toast.makeText(getActivity(), errMsg, Toast.LENGTH_SHORT).show();
+                    }
+                },
+                new ICastInterface.StopEventListener() {
+                    @Override
+                    public void onSuccess(Void result) {
+                        Toast.makeText(getActivity(), "Stop", Toast.LENGTH_SHORT).show();
+                        mCircleMsgHandler.stop();
+                    }
 
-        DLNACastManager.getInstance().registerActionCallback(new ICastInterface.PauseEventListener() {
-            @Override
-            public void onSuccess(Void result) {
-                Toast.makeText(getActivity(), "Pause", Toast.LENGTH_SHORT).show();
-            }
+                    @Override
+                    public void onFailed(String errMsg) {
+                        Toast.makeText(getActivity(), errMsg, Toast.LENGTH_SHORT).show();
+                    }
+                },
+                new ICastInterface.SeekToEventListener() {
+                    @Override
+                    public void onSuccess(Long result) {
+                        Toast.makeText(getActivity(), "SeekTo: " + Utils.getStringTime(result), Toast.LENGTH_SHORT).show();
+                    }
 
-            @Override
-            public void onFailed(String errMsg) {
-                Toast.makeText(getActivity(), errMsg, Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        DLNACastManager.getInstance().registerActionCallback(new ICastInterface.StopEventListener() {
-            @Override
-            public void onSuccess(Void result) {
-                Toast.makeText(getActivity(), "Stop", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onFailed(String errMsg) {
-                Toast.makeText(getActivity(), errMsg, Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        DLNACastManager.getInstance().registerActionCallback(new ICastInterface.SeekToEventListener() {
-            @Override
-            public void onSuccess(Long result) {
-                Toast.makeText(getActivity(), "SeekTo: " + result, Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onFailed(String errMsg) {
-                Toast.makeText(getActivity(), errMsg, Toast.LENGTH_SHORT).show();
-            }
-        });
+                    @Override
+                    public void onFailed(String errMsg) {
+                        Toast.makeText(getActivity(), errMsg, Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
     }
 
     private void initComponent(View view) {
@@ -132,8 +136,10 @@ public class ControlFragment extends Fragment implements IDisplayDevice, CastFra
                     break;
                 }
                 case R.id.ctrl_seek_position: {
-                    int position = (int) ((seekBar.getProgress() * 1f / seekBar.getMax()) * Constants.CAST_VIDEO_DURATION);
-                    DLNACastManager.getInstance().seekTo(position);
+                    if (mDurationMillSeconds > 0) {
+                        int position = (int) ((seekBar.getProgress() * 1f / seekBar.getMax()) * mDurationMillSeconds);
+                        DLNACastManager.getInstance().seekTo(position);
+                    }
                     break;
                 }
             }
@@ -151,6 +157,56 @@ public class ControlFragment extends Fragment implements IDisplayDevice, CastFra
     public void onCastUrl(String url) {
         if (mDevice != null) {
             DLNACastManager.getInstance().cast(mDevice, CastObject.newInstance(url, Constants.CAST_ID, Constants.CAST_NAME));
+        }
+    }
+
+    private long mDurationMillSeconds = 0;
+
+    private final Runnable mRefreshUIRunnable = () -> {
+        if (mDevice == null) return;
+        DLNACastManager.getInstance().getPositionInfo(mDevice, (positionInfo, errMsg) -> {
+            if (positionInfo != null) {
+                mPositionInfo.setText(String.format("%s:%s", positionInfo.getRelTime(), positionInfo.getTrackDuration()));
+                if (positionInfo.getTrackDurationSeconds() != 0) {
+                    mDurationMillSeconds = positionInfo.getTrackDurationSeconds() * 1000;
+                    mPositionSeekBar.setProgress((int) (positionInfo.getTrackElapsedSeconds() * 100 / positionInfo.getTrackDurationSeconds()));
+                } else {
+                    mPositionSeekBar.setProgress(0);
+                }
+            } else {
+                mPositionInfo.setText(errMsg);
+            }
+        });
+
+    };
+
+    private final CircleMessageHandler mCircleMsgHandler = new CircleMessageHandler(1000, mRefreshUIRunnable);
+
+    private static class CircleMessageHandler extends Handler {
+        private static final int MSG = 101;
+
+        private final long duration;
+        private final Runnable runnable;
+
+        public CircleMessageHandler(long duration, @NonNull Runnable runnable) {
+            super(Looper.getMainLooper());
+            this.duration = duration;
+            this.runnable = runnable;
+        }
+
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            runnable.run();
+            sendEmptyMessageDelayed(MSG, duration);
+        }
+
+        public void start(long delay) {
+            stop();
+            sendEmptyMessageDelayed(MSG, delay);
+        }
+
+        public void stop() {
+            removeMessages(MSG);
         }
     }
 }
