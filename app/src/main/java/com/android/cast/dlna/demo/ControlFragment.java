@@ -1,6 +1,8 @@
 package com.android.cast.dlna.demo;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -45,7 +47,8 @@ public class ControlFragment extends Fragment implements IDisplayDevice, CastFra
                     @Override
                     public void onSuccess(String result) {
                         Toast.makeText(getActivity(), "Cast: " + result, Toast.LENGTH_SHORT).show();
-                        mCircleMsgHandler.start(0);
+                        mPositionMsgHandler.start(0);
+                        mVolumeMsgHandler.start(0);
                     }
 
                     @Override
@@ -79,7 +82,8 @@ public class ControlFragment extends Fragment implements IDisplayDevice, CastFra
                     @Override
                     public void onSuccess(Void result) {
                         Toast.makeText(getActivity(), "Stop", Toast.LENGTH_SHORT).show();
-                        mCircleMsgHandler.stop();
+                        mPositionMsgHandler.stop();
+                        mVolumeMsgHandler.stop();
                     }
 
                     @Override
@@ -168,8 +172,9 @@ public class ControlFragment extends Fragment implements IDisplayDevice, CastFra
 
     private long mDurationMillSeconds = 0;
 
-    private final Runnable mRefreshUIRunnable = () -> {
+    private final Runnable mPositionRunnable = () -> {
         if (mDevice == null) return;
+        // update position text and progress
         DLNACastManager.getInstance().getPositionInfo(mDevice, (positionInfo, errMsg) -> {
             if (positionInfo != null) {
                 mPositionInfo.setText(String.format("%s:%s", positionInfo.getRelTime(), positionInfo.getTrackDuration()));
@@ -183,10 +188,25 @@ public class ControlFragment extends Fragment implements IDisplayDevice, CastFra
                 mPositionInfo.setText(errMsg);
             }
         });
-
     };
 
-    private final CircleMessageHandler mCircleMsgHandler = new CircleMessageHandler(1000, mRefreshUIRunnable);
+    private final Runnable mVolumeRunnable = () -> {
+        if (mDevice == null) return;
+        // update volume
+        DLNACastManager.getInstance().getVolumeInfo(mDevice, (integer, errMsg) -> {
+            if (integer != null) {
+                AudioManager audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
+                int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+                mVolumeSeekBar.setProgress(integer);
+                mVolumeInfo.setText(String.format("%s/%s", (int) (integer / 100f * maxVolume), maxVolume));
+            } else {
+                mVolumeInfo.setText(errMsg);
+            }
+        });
+    };
+
+    private final CircleMessageHandler mPositionMsgHandler = new CircleMessageHandler(1000, mPositionRunnable);
+    private final CircleMessageHandler mVolumeMsgHandler = new CircleMessageHandler(3000, mVolumeRunnable);
 
     private static class CircleMessageHandler extends Handler {
         private static final int MSG = 101;
