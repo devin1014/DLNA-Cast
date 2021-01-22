@@ -25,7 +25,6 @@ import org.fourthline.cling.binding.annotations.UpnpStateVariable;
 
 import java.beans.PropertyChangeSupport;
 
-// DOC:CLASS
 @UpnpService(
         serviceId = @UpnpServiceId("SwitchPower"),
         serviceType = @UpnpServiceType(value = "SwitchPower", version = 1)
@@ -71,4 +70,3 @@ public class SwitchPower {
         return status;
     }
 }
-// DOC:CLASS

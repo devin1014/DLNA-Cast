@@ -84,6 +84,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
+                <fragment
+                    android:id="@+id/fragment_local_provider"
+                    class="com.android.cast.dlna.demo.LocalProviderFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
             </FrameLayout>
 
         </LinearLayout>

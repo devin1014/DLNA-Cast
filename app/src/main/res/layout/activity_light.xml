@@ -7,11 +7,11 @@
     android:orientation="vertical">
 
     <ImageView
-        android:id="@+id/light_imageview"
+        android:id="@+id/light_image"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:background="#33000000"
         android:contentDescription="@null"
-        android:scaleType="center" />
+        android:scaleType="centerCrop"
+        android:src="@drawable/light_off" />
 
 </LinearLayout>

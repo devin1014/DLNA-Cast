@@ -59,17 +59,15 @@ import java.util.logging.Logger;
 /**
  *
  */
-// DOC:CLASS
 public class LightActivity extends Activity implements PropertyChangeListener {
-    // DOC:CLASS
+
     private static final Logger log = Logger.getLogger(LightActivity.class.getName());
 
-    // DOC:SERVICE_BINDING
     private AndroidUpnpService upnpService;
 
-    private UDN udn = new UDN(UUID.randomUUID()); // TODO: Not stable!
+    private final UDN udn = new UDN(UUID.randomUUID()); // TODO: Not stable!
 
-    private ServiceConnection serviceConnection = new ServiceConnection() {
+    private final ServiceConnection serviceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             Toast.makeText(LightActivity.this, LightActivity.this.getClass().getSimpleName() + " bind service!", Toast.LENGTH_SHORT).show();
 
@@ -113,21 +111,11 @@ public class LightActivity extends Activity implements PropertyChangeListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // DOC:LOGGING
-        // Fix the logging integration between java.util.logging and Android internal logging
-        // org.seamless.util.logging.LoggingUtil.resetRootHandler(
-        //    new FixedAndroidLogHandler()
-        // );
-        // Logger.getLogger("org.fourthline.cling").setLevel(Level.FINEST);
-        // DOC:LOGGING
 
-        setContentView(R.layout.light);
+        setContentView(R.layout.activity_light);
 
-        getApplicationContext().bindService(
-                new Intent(this, AndroidUpnpServiceImpl.class),
-                serviceConnection,
-                Context.BIND_AUTO_CREATE
-        );
+        getApplicationContext()
+                .bindService(new Intent(this, AndroidUpnpServiceImpl.class), serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
@@ -212,7 +200,7 @@ public class LightActivity extends Activity implements PropertyChangeListener {
     protected void setLightbulb(final boolean on) {
         runOnUiThread(new Runnable() {
             public void run() {
-                ImageView imageView = findViewById(R.id.light_imageview);
+                ImageView imageView = findViewById(R.id.light_image);
                 imageView.setImageResource(on ? R.drawable.light_on : R.drawable.light_off);
                 // You can NOT externalize this color into /res/values/colors.xml. Go on, try it!
                 imageView.setBackgroundColor(on ? Color.parseColor("#9EC942") : Color.WHITE);
@@ -232,9 +220,10 @@ public class LightActivity extends Activity implements PropertyChangeListener {
                         new ModelDetails("AndroidLight", "A light with on/off switch.", "v1")
                 );
 
-        LocalService service = new AnnotationLocalServiceBinder().read(SwitchPower.class);
+        LocalService<?> service = new AnnotationLocalServiceBinder().read(SwitchPower.class);
 
-        service.setManager(new DefaultServiceManager<>(service, SwitchPower.class));
+        //noinspection unchecked,rawtypes
+        service.setManager(new DefaultServiceManager(service, SwitchPower.class));
 
         return new LocalDevice(
                 new DeviceIdentity(udn),
@@ -301,7 +290,4 @@ public class LightActivity extends Activity implements PropertyChangeListener {
                         "04408001003EE42959E2CD74A60000000049454E44AE426082"
         );
     }
-    // DOC:CLASS_END
-    // ...
 }
-// DOC:CLASS_END

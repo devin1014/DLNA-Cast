@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.cast.dlna.DLNACastManager;
 import com.android.cast.dlna.demo.detail.DetailActivity;
+import com.android.cast.dlna.demo.light.LightActivity;
 import com.permissionx.guolindev.PermissionX;
 
 import java.util.logging.Level;
@@ -108,6 +109,8 @@ public class MainActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.menu_search_start) {
             Toast.makeText(this, "开始搜索", Toast.LENGTH_SHORT).show();
             DLNACastManager.getInstance().search(DLNACastManager.DEVICE_TYPE_DMR, 60);
+        } else if (item.getItemId() == R.id.menu_light) {
+            startActivity(new Intent(this, LightActivity.class));
         } else if (item.getItemId() == R.id.menu_link_detail) {
             startActivity(new Intent(this, DetailActivity.class));
         }
