@@ -4,7 +4,8 @@
 
     <string name="mode_info">设备</string>
     <string name="mode_query">查询</string>
-    <string name="mode_ctrl">控制</string>
+    <string name="mode_ctrl">投射</string>
+    <string name="mode_ctrl_local">投射(本地)</string>
 
     <string name="device_info">设备信息</string>
     <string name="device_control">控制器</string>

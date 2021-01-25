@@ -12,6 +12,7 @@ import android.os.IBinder;
 import android.os.Looper;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.android.cast.dlna.ILogger.DefaultLoggerImpl;
 import com.android.cast.dlna.control.ControlImpl;
@@ -124,6 +125,11 @@ public final class DLNACastManager implements ICastInterface.IControl, OnDeviceR
             mDLNACastService = null;
         }
     };
+
+    @Nullable
+    public AndroidUpnpService getService() {
+        return mDLNACastService;
+    }
 
     // -----------------------------------------------------------------------------------------
     // ---- register or unregister device listener

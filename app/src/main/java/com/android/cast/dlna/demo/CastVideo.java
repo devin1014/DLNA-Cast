@@ -7,9 +7,9 @@ import com.android.cast.dlna.ICast;
 /**
  *
  */
-public class CastObject implements ICast.ICastVideo {
-    public static CastObject newInstance(String url, String id, String name) {
-        return new CastObject(url, id, name);
+public class CastVideo implements ICast.ICastVideo {
+    public static CastVideo newInstance(String url, String id, String name) {
+        return new CastVideo(url, id, name);
     }
 
     public final String url;
@@ -20,7 +20,7 @@ public class CastObject implements ICast.ICastVideo {
 
     private long duration;
 
-    public CastObject(String url, String id, String name) {
+    public CastVideo(String url, String id, String name) {
         this.url = url;
         this.id = id;
         this.name = name;
@@ -29,7 +29,7 @@ public class CastObject implements ICast.ICastVideo {
     /**
      * @param duration the total time of video (ms)
      */
-    public CastObject setDuration(long duration) {
+    public CastVideo setDuration(long duration) {
         this.duration = duration;
         return this;
     }

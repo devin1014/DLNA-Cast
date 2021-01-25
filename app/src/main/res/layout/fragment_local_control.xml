@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="6dp">
+
+    <Button
+        android:id="@+id/local_ctrl_pick_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="请选择投射内容..."
+        tools:ignore="HardcodedText" />
+
+    <TextView
+        android:id="@+id/local_ctrl_pick_content_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp" />
+
+    <Button
+        android:id="@+id/local_ctrl_cast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="投屏"
+        tools:ignore="HardcodedText" />
+
+</LinearLayout>

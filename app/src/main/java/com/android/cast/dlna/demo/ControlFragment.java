@@ -166,7 +166,7 @@ public class ControlFragment extends Fragment implements IDisplayDevice, CastFra
     @Override
     public void onCastUrl(String url) {
         if (mDevice != null) {
-            DLNACastManager.getInstance().cast(mDevice, CastObject.newInstance(url, Constants.CAST_ID, Constants.CAST_NAME));
+            DLNACastManager.getInstance().cast(mDevice, CastVideo.newInstance(url, Constants.CAST_ID, Constants.CAST_NAME));
         }
     }
 

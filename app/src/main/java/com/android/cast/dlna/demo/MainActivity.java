@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private Fragment mInformationFragment;
     private Fragment mQueryFragment;
     private Fragment mControlFragment;
+    private Fragment mLocalControlFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
         mInformationFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_information);
         mQueryFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_query);
         mControlFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_control);
+        mLocalControlFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_local_provider);
 
         RadioGroup typeGroup = findViewById(R.id.cast_type_group);
         typeGroup.setOnCheckedChangeListener(mOnCheckedChangeListener);
@@ -66,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
             mDeviceListAdapter.setSelectedDevice(selected ? castDevice : null);
             ((IDisplayDevice) mInformationFragment).setCastDevice(selected ? castDevice : null);
             ((IDisplayDevice) mControlFragment).setCastDevice(selected ? castDevice : null);
+            ((IDisplayDevice) mLocalControlFragment).setCastDevice(selected ? castDevice : null);
             ((IDisplayDevice) mQueryFragment).setCastDevice(selected ? castDevice : null);
         }));
         DLNACastManager.getInstance().registerDeviceListener(mDeviceListAdapter);
@@ -124,6 +127,7 @@ public class MainActivity extends AppCompatActivity {
                 getSupportFragmentManager().beginTransaction()
                         .show(mInformationFragment)
                         .hide(mControlFragment)
+                        .hide(mLocalControlFragment)
                         .hide(mQueryFragment)
                         .commit();
             } else if (checkedId == R.id.cast_type_query) {
@@ -131,10 +135,19 @@ public class MainActivity extends AppCompatActivity {
                         .show(mQueryFragment)
                         .hide(mInformationFragment)
                         .hide(mControlFragment)
+                        .hide(mLocalControlFragment)
                         .commit();
             } else if (checkedId == R.id.cast_type_ctrl) {
                 getSupportFragmentManager().beginTransaction()
                         .show(mControlFragment)
+                        .hide(mLocalControlFragment)
+                        .hide(mInformationFragment)
+                        .hide(mQueryFragment)
+                        .commit();
+            } else if (checkedId == R.id.cast_type_ctrl_local) {
+                getSupportFragmentManager().beginTransaction()
+                        .show(mLocalControlFragment)
+                        .hide(mControlFragment)
                         .hide(mInformationFragment)
                         .hide(mQueryFragment)
                         .commit();
