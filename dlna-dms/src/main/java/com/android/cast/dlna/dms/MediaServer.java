@@ -4,6 +4,8 @@ package com.android.cast.dlna.dms;
 import android.content.Context;
 import android.util.Log;
 
+import com.orhanobut.logger.Logger;
+
 import org.fourthline.cling.binding.annotations.AnnotationLocalServiceBinder;
 import org.fourthline.cling.model.DefaultServiceManager;
 import org.fourthline.cling.model.ValidationException;
@@ -16,60 +18,48 @@ import org.fourthline.cling.model.meta.ManufacturerDetails;
 import org.fourthline.cling.model.meta.ModelDetails;
 import org.fourthline.cling.model.types.DeviceType;
 import org.fourthline.cling.model.types.UDADeviceType;
-import org.fourthline.cling.model.types.UDN;
 
 import java.io.IOException;
 
 public class MediaServer {
 
-    private UDN udn = UpnpUtil.uniqueSystemIdentifier("GNaP-MediaServer");
-    private LocalDevice localDevice;
-    private final static String deviceType = "MediaServer";
-    private final static int version = 1;
-    private final static String TAG = "MediaServer";
-    public final static int PORT = 8192;
-    private Context mContext;
     public static final String DMS_DESC = "MSI MediaServer";
-    public static final String DMR_DESC = "MSI MediaRenderer";
+    private final static String MEDIA_SERVER = "MediaServer";
+    private final static String TAG = "MediaServer";
+    private final static int VERSION = 1;
+    public final static int PORT = 8192;
 
-    public MediaServer(Context context) throws ValidationException {
-        mContext = context;
-        DeviceType type = new UDADeviceType(deviceType, version);
-        DeviceDetails details = new DeviceDetails("DMS  (" + android.os.Build.MODEL + ")", new ManufacturerDetails(
-                android.os.Build.MANUFACTURER), new ModelDetails(android.os.Build.MODEL, DMS_DESC, "v1"));
+    private final LocalDevice mLocalDevice;
 
-        LocalService service = new AnnotationLocalServiceBinder().read(ContentDirectoryService.class);
-
+    public MediaServer(Context context, String ipAddress) throws ValidationException {
+        Logger.i("MediaServer start");
+        DeviceType type = new UDADeviceType(MEDIA_SERVER, VERSION);
+        DeviceDetails details = new DeviceDetails("DMS  (" + android.os.Build.MODEL + ")",
+                new ManufacturerDetails(android.os.Build.MANUFACTURER),
+                new ModelDetails(android.os.Build.MODEL, DMS_DESC, "v1", String.format("http://%s:%s", ipAddress, PORT)));
+        final LocalService<?> service = new AnnotationLocalServiceBinder().read(ContentDirectoryService.class);
+        //noinspection unchecked,rawtypes
         service.setManager(new DefaultServiceManager(service, ContentDirectoryService.class));
-
-        localDevice = new LocalDevice(new DeviceIdentity(udn), type, details, createDefaultDeviceIcon(), service);
-
-        Log.v(TAG, "MediaServer device created: ");
-        Log.v(TAG, "friendly name: " + details.getFriendlyName());
-        Log.v(TAG, "manufacturer: " + details.getManufacturerDetails().getManufacturer());
-        Log.v(TAG, "model: " + details.getModelDetails().getModelName());
+        mLocalDevice = new LocalDevice(new DeviceIdentity(UpnpUtil.uniqueSystemIdentifier("GNaP-MediaServer")), type, details, createDefaultDeviceIcon(context), service);
+        Logger.i("LocalDevice: " + mLocalDevice.toString());
 
         // start http server
         try {
-            new HttpServer(PORT);
+            new HttpServer(PORT).start();
+            Logger.e("Http Server started on port %s", PORT);
         } catch (IOException ioe) {
-            Log.e(TAG, "Couldn't start server:\n" + ioe);
+            Logger.e(ioe, "Couldn't start server.");
             System.exit(-1);
         }
-        Log.e(TAG, "Started Http Server on port " + PORT);
     }
 
-    public LocalDevice getDevice() {
-        return localDevice;
+    public final LocalDevice getDevice() {
+        return mLocalDevice;
     }
 
-    public static String getAddress() {
-        return "Application.getHostAddress():TODO" + ":" + PORT;
-    }
-
-    protected Icon createDefaultDeviceIcon() {
+    protected Icon createDefaultDeviceIcon(Context context) {
         try {
-            return new Icon("image/png", 48, 48, 32, "msi.png", mContext.getResources().getAssets().open(FileUtil.LOGO));
+            return new Icon("image/png", 48, 48, 32, "msi.png", context.getResources().getAssets().open("ic_launcher.png"));
         } catch (IOException e) {
             Log.w(TAG, "createDefaultDeviceIcon IOException");
             return null;

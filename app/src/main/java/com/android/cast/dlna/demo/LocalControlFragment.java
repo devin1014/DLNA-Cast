@@ -32,12 +32,10 @@ import org.seamless.util.MimeType;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class LocalControlFragment extends Fragment implements IDisplayDevice {
 
-    private final ExecutorService mThreadPool = Executors.newCachedThreadPool();
+    private JettyResourceServer mJettyResourceServer;
     private TextView mPickupContent;
 
     @Nullable
@@ -50,13 +48,13 @@ public class LocalControlFragment extends Fragment implements IDisplayDevice {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        JettyResourceServer mJettyResourceServer = new JettyResourceServer();
-        mThreadPool.execute(mJettyResourceServer);
+        mJettyResourceServer = new JettyResourceServer();
+        mJettyResourceServer.start();
 
         AndroidUpnpService upnpService = DLNACastManager.getInstance().getService();
         if (upnpService != null) {
             try {
-                MediaServer mediaServer = new MediaServer(view.getContext().getApplicationContext());
+                MediaServer mediaServer = new MediaServer(view.getContext().getApplicationContext(), NetworkUtils.getWiFiIPAddress(getActivity()));
                 upnpService.getRegistry().addDevice(mediaServer.getDevice());
             } catch (ValidationException e) {
                 e.printStackTrace();
@@ -216,5 +214,11 @@ public class LocalControlFragment extends Fragment implements IDisplayDevice {
     @Override
     public void setCastDevice(Device<?, ?, ?> device) {
         mDevice = device;
+    }
+
+    @Override
+    public void onDestroyView() {
+        mJettyResourceServer.stop();
+        super.onDestroyView();
     }
 }

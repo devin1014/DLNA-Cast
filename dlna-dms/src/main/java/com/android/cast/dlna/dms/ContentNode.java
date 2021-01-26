@@ -4,23 +4,26 @@ import org.fourthline.cling.support.model.container.Container;
 import org.fourthline.cling.support.model.item.Item;
 
 public class ContentNode {
-    private Container container;
-    private Item item;
-    private String id;
-    private String fullPath;
-    private boolean isItem;
+    private final Container container;
+    private final Item item;
+    private final String id;
+    private final String fullPath;
+    private final boolean isItem;
 
     public ContentNode(String id, Container container) {
         this.id = id;
         this.container = container;
+        this.item = null;
         this.fullPath = null;
         this.isItem = false;
     }
 
+    @SuppressWarnings("unused")
     public ContentNode(String id, Item item, String fullPath) {
         this.id = id;
         this.item = item;
         this.fullPath = fullPath;
+        this.container = null;
         this.isItem = true;
     }
 
@@ -37,10 +40,7 @@ public class ContentNode {
     }
 
     public String getFullPath() {
-        if (isItem && fullPath != null) {
-            return fullPath;
-        }
-        return null;
+        return isItem && fullPath != null ? fullPath : null;
     }
 
     public boolean isItem() {

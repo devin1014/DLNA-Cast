@@ -188,12 +188,21 @@ public class HttpServer {
                 try {
                     while (true)
                         new HTTPSession(myServerSocket.accept());
-                } catch (IOException ioe) {
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         });
         myThread.setDaemon(true);
-        myThread.start();
+    }
+
+    /**
+     * Start the server.
+     */
+    public void start() {
+        if (myThread != null) {
+            myThread.start();
+        }
     }
 
     /**
@@ -203,8 +212,8 @@ public class HttpServer {
         try {
             myServerSocket.close();
             myThread.join();
-        } catch (IOException ioe) {
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

@@ -15,41 +15,57 @@
  */
 package com.android.cast.dlna.dms;
 
+import com.orhanobut.logger.Logger;
+
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 
-import java.util.logging.Logger;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class JettyResourceServer implements Runnable {
-    private final static Logger log = Logger.getLogger(JettyResourceServer.class.getName());
-    public static final int JETTY_SERVER_PORT = 9090;
+public class JettyResourceServer {
+    private static final int JETTY_SERVER_PORT = 9090;
+    private static final ExecutorService sThreadPool = Executors.newCachedThreadPool();
     private final Server mServer;
 
     public JettyResourceServer() {
-        mServer = new Server(JETTY_SERVER_PORT); // Has its own QueuedThreadPool
+        this(JETTY_SERVER_PORT);
+    }
+
+    public JettyResourceServer(int port) {
+        mServer = new Server(port); // Has its own QueuedThreadPool
         mServer.setGracefulShutdown(1000); // Let's wait a second for ongoing transfers to complete
     }
 
-    synchronized public void startIfNotRunning() {
+    synchronized public void start() {
         if (!mServer.isStarted() && !mServer.isStarting()) {
-            log.info("Starting JettyResourceServer");
-            try {
-                mServer.start();
-            } catch (Exception ex) {
-                log.severe("Couldn't start Jetty server: " + ex);
-                throw new RuntimeException(ex);
-            }
+            sThreadPool.execute(new Runnable() {
+                @Override
+                public void run() {
+                    ServletContextHandler context = new ServletContextHandler();
+                    context.setContextPath("/");
+                    context.setInitParameter("org.eclipse.jetty.servlet.Default.gzip", "false");
+                    context.addServlet(AudioResourceServlet.class, "/audio/*");
+                    context.addServlet(VideoResourceServlet.class, "/video/*");
+                    mServer.setHandler(context);
+                    Logger.i("Starting JettyResourceServer");
+                    try {
+                        mServer.start();
+                    } catch (Exception ex) {
+                        Logger.e(ex, "Couldn't start Jetty server!");
+                    }
+                }
+            });
         }
     }
 
-    synchronized public void stopIfRunning() {
+    synchronized public void stop() {
         if (!mServer.isStopped() && !mServer.isStopping()) {
-            log.info("Stopping JettyResourceServer");
+            Logger.i("Stopping JettyResourceServer");
             try {
                 mServer.stop();
             } catch (Exception ex) {
-                log.severe("Couldn't stop Jetty server: " + ex);
-                throw new RuntimeException(ex);
+                Logger.e(ex, "Couldn't stop Jetty server!");
             }
         }
     }
@@ -57,16 +73,4 @@ public class JettyResourceServer implements Runnable {
     public String getServerState() {
         return mServer.getState();
     }
-
-    @Override
-    public void run() {
-        ServletContextHandler context = new ServletContextHandler();
-        context.setContextPath("/");
-        context.setInitParameter("org.eclipse.jetty.servlet.Default.gzip", "false");
-        mServer.setHandler(context);
-        context.addServlet(AudioResourceServlet.class, "/audio/*");
-        context.addServlet(VideoResourceServlet.class, "/video/*");
-        startIfNotRunning();
-    }
-
 }

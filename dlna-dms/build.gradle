@@ -41,7 +41,8 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
-    implementation('com.orhanobut:logger:2.2.0')
+    // Logger
+    api('com.orhanobut:logger:2.2.0')
 
     // Cling library required
     api 'org.fourthline.cling:cling-core:2.1.1'
@@ -49,5 +50,4 @@ dependencies {
     api 'org.eclipse.jetty:jetty-server:8.1.18.v20150929'
     api 'org.eclipse.jetty:jetty-servlet:8.1.18.v20150929'
     api 'org.eclipse.jetty:jetty-client:8.1.18.v20150929'
-    api('org.slf4j:slf4j-jdk14:1.7.14')
 }

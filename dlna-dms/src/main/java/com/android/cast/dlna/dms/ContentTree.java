@@ -17,14 +17,11 @@ public class ContentTree {
     public final static String AUDIO_PREFIX = "audio-item-";
     public final static String IMAGE_PREFIX = "image-item-";
 
-    private static HashMap<String, ContentNode> contentMap = new HashMap<>();
-
-    private static ContentNode rootNode = createRootNode();
+    private final static HashMap<String, ContentNode> contentMap = new HashMap<>();
+    private final static ContentNode rootNode = createRootNode();
 
     public ContentTree() {
     }
-
-    ;
 
     protected static ContentNode createRootNode() {
         // create root container

@@ -49,11 +49,15 @@ public class NetworkUtils {
     }
 
     public static String getWiFiIPAddress(Context context) {
+        return getWiFiIPAddress(context, "");
+    }
+
+    public static String getWiFiIPAddress(Context context, String prefixString) {
         WifiManager wifiManager = getSystemService(context, Context.WIFI_SERVICE);
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
         int address = wifiInfo.getIpAddress();
         String ip = (address & 0xFF) + "." + ((address >> 8) & 0xFF) + "." + ((address >> 16) & 0xFF) + "." + (address >> 24 & 0xFF);
-        return String.format("IP: %s", ip);
+        return prefixString + ip;
     }
 
     @SuppressWarnings({"unchecked", "TypeParameterExplicitlyExtendsObject"})
