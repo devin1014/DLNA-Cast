@@ -18,6 +18,7 @@ import com.android.cast.dlna.ILogger.DefaultLoggerImpl;
 import com.android.cast.dlna.control.ControlImpl;
 import com.android.cast.dlna.control.ICastInterface;
 import com.android.cast.dlna.control.IServiceAction;
+import com.android.cast.dlna.dms.MediaServer;
 
 import org.fourthline.cling.UpnpService;
 import org.fourthline.cling.android.AndroidUpnpService;
@@ -104,6 +105,10 @@ public final class DLNACastManager implements ICastInterface.IControl, OnDeviceR
                 // Now add all devices to the list we already know about
                 mDeviceRegistryImpl.setDevices(upnpService.getRegistry().getDevices());
             }
+            if (_mediaServer != null && _mediaServer.getDevice() != null) {
+                mDLNACastService.getRegistry().addDevice(_mediaServer.getDevice());
+            }
+            _mediaServer = null;
         }
 
         @Override
@@ -216,6 +221,19 @@ public final class DLNACastManager implements ICastInterface.IControl, OnDeviceR
     }
 
     // -----------------------------------------------------------------------------------------
+    // ---- MediaServer
+    // -----------------------------------------------------------------------------------------
+    private MediaServer _mediaServer;
+
+    public void setMediaServer(MediaServer mediaServer) {
+        if (mDLNACastService != null) {
+            mDLNACastService.getRegistry().addDevice(mediaServer.getDevice());
+        } else {
+            _mediaServer = mediaServer;
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------
     // ---- search
     // -----------------------------------------------------------------------------------------
     public void search(DeviceType type, int maxSeconds) {
@@ -308,27 +326,6 @@ public final class DLNACastManager implements ICastInterface.IControl, OnDeviceR
             }
         }
     }
-
-    // final static class ServiceActionCallbackWrapper<T> implements IServiceAction.IServiceActionCallback<T> {
-    //
-    //     final String tag;
-    //     final IServiceAction.IServiceActionCallback<T> callback;
-    //
-    //     public ServiceActionCallbackWrapper(String tag, IServiceAction.IServiceActionCallback<T> callback) {
-    //         this.tag = tag;
-    //         this.callback = callback;
-    //     }
-    //
-    //     @Override
-    //     public void onSuccess(T result) {
-    //         if (callback != null) callback.onSuccess(result);
-    //     }
-    //
-    //     @Override
-    //     public void onFailed(String errMsg) {
-    //         if (callback != null) callback.onFailed(errMsg);
-    //     }
-    // }
 
     // -----------------------------------------------------------------------------------------
     // ---- query

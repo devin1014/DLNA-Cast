@@ -126,21 +126,16 @@ public class UpnpUtil {
         return ret;
     }
 
-    public static UDN uniqueSystemIdentifier(String salt) {
-        StringBuilder systemSalt = new StringBuilder();
-        //TODO:add hostName and address
-        //Log.d(TAG, "host:" + Application.getHostName() + " ip:" + Application.getHostAddress());
-        // if (null != Application.getHostName() && null != Application.getHostAddress()) {
-        //     systemSalt.append(Application.getHostName()).append(Application.getHostAddress());
-        // }
-        systemSalt.append(android.os.Build.MODEL);
-        systemSalt.append(android.os.Build.MANUFACTURER);
-
+    public static UDN uniqueSystemIdentifier(String salt, String ipAddress) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(ipAddress);
+        builder.append(android.os.Build.MODEL);
+        builder.append(android.os.Build.MANUFACTURER);
         try {
-            byte[] hash = MessageDigest.getInstance("MD5").digest(systemSalt.toString().getBytes());
+            byte[] hash = MessageDigest.getInstance("MD5").digest(builder.toString().getBytes());
             return new UDN(new UUID(new BigInteger(-1, hash).longValue(), salt.hashCode()));
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            return new UDN(ex.getMessage() != null ? ex.getMessage() : "UNKNOWN");
         }
     }
 

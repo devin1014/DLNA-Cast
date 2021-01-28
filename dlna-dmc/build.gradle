@@ -51,4 +51,6 @@ dependencies {
     api 'org.eclipse.jetty:jetty-server:8.1.18.v20150929'
     api 'org.eclipse.jetty:jetty-servlet:8.1.18.v20150929'
     api 'org.eclipse.jetty:jetty-client:8.1.18.v20150929'
+
+    implementation(project(':dlna-dms'))
 }

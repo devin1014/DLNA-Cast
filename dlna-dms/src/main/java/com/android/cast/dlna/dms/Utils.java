@@ -19,6 +19,8 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
@@ -72,6 +74,22 @@ public class Utils {
         } catch (Exception ex) {
         } // for now eat exceptions
         return "";
+    }
+
+    public static String getWiFiIPAddress(Context context) {
+        WifiManager wifiManager = getSystemService(context, Context.WIFI_SERVICE);
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        if (wifiInfo != null) {
+            int address = wifiInfo.getIpAddress();
+            return (address & 0xFF) + "." + ((address >> 8) & 0xFF) + "." + ((address >> 16) & 0xFF) + "." + (address >> 24 & 0xFF);
+        } else {
+            return "unknown";
+        }
+    }
+
+    @SuppressWarnings({"unchecked", "TypeParameterExplicitlyExtendsObject"})
+    private static <T extends Object> T getSystemService(Context context, String name) {
+        return (T) context.getApplicationContext().getSystemService(name);
     }
 
     /**
