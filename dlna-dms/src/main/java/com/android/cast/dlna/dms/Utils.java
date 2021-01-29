@@ -27,54 +27,7 @@ import android.provider.MediaStore;
 
 import androidx.annotation.RequiresApi;
 
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.util.Collections;
-import java.util.List;
-
 public class Utils {
-    public static final String WLAN0 = "wlan0";
-
-    public static boolean isNull(Object obj) {
-        return obj == null;
-    }
-
-    public static boolean isNotNull(Object obj) {
-        return !isNull(obj);
-    }
-
-    /**
-     * Get IP address from first non-localhost interface
-     *
-     * @param useIPv4 true=return ipv4, false=return ipv6
-     * @return address or empty string
-     */
-    public static String getIPAddress(boolean useIPv4) {
-        try {
-            List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
-            for (NetworkInterface intf : interfaces) {
-                List<InetAddress> addrs = Collections.list(intf.getInetAddresses());
-                for (InetAddress addr : addrs) {
-                    if (!addr.isLoopbackAddress()) {
-                        String sAddr = addr.getHostAddress().toUpperCase();
-                        boolean isIPv4 = addr instanceof Inet4Address;
-                        if (useIPv4) {
-                            if (isIPv4)
-                                return sAddr;
-                        } else {
-                            if (!isIPv4) {
-                                int delim = sAddr.indexOf('%'); // drop ip6 port suffix
-                                return delim < 0 ? sAddr : sAddr.substring(0, delim);
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (Exception ex) {
-        } // for now eat exceptions
-        return "";
-    }
 
     public static String getWiFiIPAddress(Context context) {
         WifiManager wifiManager = getSystemService(context, Context.WIFI_SERVICE);
@@ -92,72 +45,49 @@ public class Utils {
         return (T) context.getApplicationContext().getSystemService(name);
     }
 
-    /**
-     * Returns MAC address of the given interface name.
-     *
-     * @param interfaceName eth0, wlan0 or NULL=use first interface
-     * @return mac address or empty string
-     */
-    public static String getMACAddress(String interfaceName) {
-        try {
-            List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
-            for (NetworkInterface intf : interfaces) {
-                if (interfaceName != null) {
-                    if (!intf.getName().equalsIgnoreCase(interfaceName)) continue;
-                }
-                byte[] mac = intf.getHardwareAddress();
-                if (mac == null) return "";
-                StringBuilder buf = new StringBuilder();
-                for (int idx = 0; idx < mac.length; idx++)
-                    buf.append(String.format("%02X:", mac[idx]));
-                if (buf.length() > 0) buf.deleteCharAt(buf.length() - 1);
-                return buf.toString();
-            }
-        } catch (Exception ex) {
-        } // for now eat exceptions
-        return "";
-    }
-
-    /**
-     * Parse path url, obtain database id from file name.
-     *
-     * @param path
-     * @return
-     */
-    public static String parseResourceId(String path) {
-        String result = null;
-        if (path != null && path.length() > 0) {
-            int index = path.lastIndexOf("/");
-            //File name like "id".mp3
-            String fileName = path.substring(index + 1);
-            result = fileName.substring(0, fileName.lastIndexOf("."));
-        }
-
-        return result;
-    }
+    // /**
+    //  * Returns MAC address of the given interface name.
+    //  *
+    //  * @param interfaceName eth0, wlan0 or NULL=use first interface
+    //  * @return mac address or empty string
+    //  */
+    // public static String getMACAddress(String interfaceName) {
+    //     try {
+    //         List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+    //         for (NetworkInterface intf : interfaces) {
+    //             if (interfaceName != null) {
+    //                 if (!intf.getName().equalsIgnoreCase(interfaceName)) continue;
+    //             }
+    //             byte[] mac = intf.getHardwareAddress();
+    //             if (mac == null) return "";
+    //             StringBuilder buf = new StringBuilder();
+    //             for (int idx = 0; idx < mac.length; idx++)
+    //                 buf.append(String.format("%02X:", mac[idx]));
+    //             if (buf.length() > 0) buf.deleteCharAt(buf.length() - 1);
+    //             return buf.toString();
+    //         }
+    //     } catch (Exception ex) {
+    //     } // for now eat exceptions
+    //     return "";
+    // }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static String getRealPathFromUriAboveApi19(Context context, Uri uri) {
         String filePath = null;
-        if (DocumentsContract.isDocumentUri(context, uri)) {
-            // 如果是document类型的 uri, 则通过document id来进行处理
+        if (DocumentsContract.isDocumentUri(context, uri)) { // 如果是document类型的 uri, 则通过document id来进行处理
             String documentId = DocumentsContract.getDocumentId(uri);
-            if (isMediaDocument(uri)) { // MediaProvider
-                // 使用':'分割
+            if (isMediaDocument(uri)) { // MediaProvider, 使用':'分割
                 String id = documentId.split(":")[1];
-
                 String selection = MediaStore.Images.Media._ID + "=?";
                 String[] selectionArgs = {id};
                 filePath = getDataColumn(context, MediaStore.Images.Media.EXTERNAL_CONTENT_URI, selection, selectionArgs);
             } else if (isDownloadsDocument(uri)) { // DownloadsProvider
-                Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(documentId));
+                Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.parseLong(documentId));
                 filePath = getDataColumn(context, contentUri, null, null);
             }
-        } else if ("content".equalsIgnoreCase(uri.getScheme())) {
-            // 如果是 content 类型的 Uri
+        } else if ("content".equalsIgnoreCase(uri.getScheme())) { // 如果是 content 类型的 Uri
             filePath = getDataColumn(context, uri, null, null);
-        } else if ("file".equals(uri.getScheme())) {
-            // 如果是 file 类型的 Uri,直接获取图片对应的路径
+        } else if ("file".equals(uri.getScheme())) { // 如果是 file 类型的 Uri,直接获取图片对应的路径
             filePath = uri.getPath();
         }
         return filePath;
@@ -181,12 +111,9 @@ public class Utils {
 
     /**
      * 获取数据库表中的 _data 列，即返回Uri对应的文件路径
-     *
-     * @return
      */
     private static String getDataColumn(Context context, Uri uri, String selection, String[] selectionArgs) {
         String path = null;
-
         String[] projection = new String[]{MediaStore.Images.Media.DATA};
         Cursor cursor = null;
         try {
@@ -203,4 +130,79 @@ public class Utils {
         return path;
     }
 
+    // public static boolean isLocalIpAddress(String checkip) {
+    //     boolean ret = false;
+    //     if (checkip != null) {
+    //         try {
+    //             for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
+    //                 NetworkInterface intf = en.nextElement();
+    //                 for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
+    //                     InetAddress inetAddress = enumIpAddr.nextElement();
+    //                     if (!inetAddress.isLoopbackAddress()) {
+    //                         String ip = inetAddress.getHostAddress().toString();
+    //                         if (checkip.equals(ip)) {
+    //                             return true;
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         } catch (SocketException ex) {
+    //             ex.printStackTrace();
+    //         }
+    //     }
+    //
+    //     return ret;
+    // }
+    //
+    // public static String getIP() throws SocketException {
+    //     String ipaddress = "";
+    //     for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
+    //         NetworkInterface intf = en.nextElement();
+    //         if (intf.getName().toLowerCase().equals("eth0") || intf.getName().toLowerCase().equals("wlan0")) {
+    //             for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
+    //                 InetAddress inetAddress = enumIpAddr.nextElement();
+    //                 if (!inetAddress.isLoopbackAddress()) {
+    //                     ipaddress = inetAddress.getHostAddress().toString();
+    //                     if (!ipaddress.contains("::")) {// ipV6的地址
+    //                         Log.e(TAG, ipaddress);
+    //                         return ipaddress;
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     return ipaddress;
+    // }
+    //
+    // /**
+    //  * Get IP address from first non-localhost interface
+    //  *
+    //  * @param useIPv4 true=return ipv4, false=return ipv6
+    //  * @return address or empty string
+    //  */
+    // public static String getIPAddress(boolean useIPv4) {
+    //     try {
+    //         List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+    //         for (NetworkInterface intf : interfaces) {
+    //             List<InetAddress> addrs = Collections.list(intf.getInetAddresses());
+    //             for (InetAddress addr : addrs) {
+    //                 if (!addr.isLoopbackAddress()) {
+    //                     String sAddr = addr.getHostAddress().toUpperCase();
+    //                     boolean isIPv4 = addr instanceof Inet4Address;
+    //                     if (useIPv4) {
+    //                         if (isIPv4)
+    //                             return sAddr;
+    //                     } else {
+    //                         if (!isIPv4) {
+    //                             int delim = sAddr.indexOf('%'); // drop ip6 port suffix
+    //                             return delim < 0 ? sAddr : sAddr.substring(0, delim);
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     } catch (Exception ex) {
+    //     } // for now eat exceptions
+    //     return "";
+    // }
 }

@@ -14,9 +14,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.android.cast.dlna.DLNACastManager;
-import com.android.cast.dlna.dms.JettyResourceServer;
 import com.android.cast.dlna.dms.MediaServer;
 import com.android.cast.dlna.dms.Utils;
+import com.orhanobut.logger.Logger;
 
 import org.fourthline.cling.model.action.ActionInvocation;
 import org.fourthline.cling.model.message.UpnpResponse;
@@ -30,13 +30,11 @@ import org.seamless.util.MimeType;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class LocalControlFragment extends Fragment implements IDisplayDevice {
 
-    private static final ExecutorService sThreadPool = Executors.newCachedThreadPool();
-    private JettyResourceServer mJettyResourceServer;
+    // private static final ExecutorService sThreadPool = Executors.newCachedThreadPool();
+    // private JettyResourceServer mJettyResourceServer;
     private TextView mPickupContent;
     private MediaServer mMediaServer;
 
@@ -50,12 +48,12 @@ public class LocalControlFragment extends Fragment implements IDisplayDevice {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mMediaServer = new MediaServer(getActivity().getApplicationContext());
+        mMediaServer = new MediaServer(view.getContext());
         mMediaServer.start();
         DLNACastManager.getInstance().setMediaServer(mMediaServer);
-        mJettyResourceServer = new JettyResourceServer();
+        // mJettyResourceServer = new JettyResourceServer();
         //mJettyResourceServer.start();//TODO:
-        sThreadPool.execute(mJettyResourceServer.get());
+        // sThreadPool.execute(mJettyResourceServer.get());
 
         initComponent(view);
     }
@@ -200,6 +198,8 @@ public class LocalControlFragment extends Fragment implements IDisplayDevice {
         if (requestCode == 222 && resultCode == Activity.RESULT_OK && data != null) {
             Uri uri = data.getData();
             String path = Utils.getRealPathFromUriAboveApi19(getActivity(), uri);
+            Logger.i("onActivityResult: " + uri.toString());
+            Logger.i("onActivityResult: " + path);
             mCastPathUrl = mMediaServer.getBaseUrl() + path;
             mPickupContent.setText(mCastPathUrl);
         }
@@ -214,7 +214,7 @@ public class LocalControlFragment extends Fragment implements IDisplayDevice {
 
     @Override
     public void onDestroyView() {
-        mJettyResourceServer.stop();
+        // mJettyResourceServer.stop();
         mMediaServer.stop();
         super.onDestroyView();
     }

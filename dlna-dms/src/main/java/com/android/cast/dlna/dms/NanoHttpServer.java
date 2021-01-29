@@ -29,7 +29,7 @@ import java.util.Vector;
  * Modified from NanoHTTPD, you can find it here
  * http://elonen.iki.fi/code/nanohttpd/
  */
-public class HttpServer {
+public class NanoHttpServer implements LocalResourceServer {
     // ==================================================
     // API parts
     // ==================================================
@@ -179,7 +179,7 @@ public class HttpServer {
      * Starts a HTTP server to given port.<p>
      * Throws an IOException if the socket is already in use
      */
-    public HttpServer(int port) throws IOException {
+    public NanoHttpServer(int port) throws IOException {
         myTcpPort = port;
         this.myRootDir = new File("/");
         myServerSocket = new ServerSocket(myTcpPort);

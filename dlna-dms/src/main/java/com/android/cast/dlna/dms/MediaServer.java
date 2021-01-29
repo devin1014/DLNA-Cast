@@ -17,38 +17,48 @@ import org.fourthline.cling.model.meta.ManufacturerDetails;
 import org.fourthline.cling.model.meta.ModelDetails;
 import org.fourthline.cling.model.types.DeviceType;
 import org.fourthline.cling.model.types.UDADeviceType;
+import org.fourthline.cling.model.types.UDN;
 
 import java.io.IOException;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.util.UUID;
 
 public final class MediaServer {
 
     //TODO:remove local device field?
+    //TODO:remove local device field?
+    //TODO:remove local device field?
     private LocalDevice mDevice;
-    private HttpServer mHttpServer;
+    private LocalResourceServer mResourceServer;
     private final String mInetAddress;
     private final String mBaseUrl;
 
     public MediaServer(Context context) {
+        this(context, new ResourceServerFactory.DefaultResourceServerFactoryImpl(PORT));
+    }
+
+    public MediaServer(Context context, ResourceServerFactory factory) {
         String address = Utils.getWiFiIPAddress(context);
-        mInetAddress = String.format("%s:%s", address, PORT);
-        mBaseUrl = String.format("http://%s:%s", address, PORT);
+        mInetAddress = String.format("%s:%s", address, factory.getPort());
+        mBaseUrl = String.format("http://%s:%s", address, factory.getPort());
         try {
             mDevice = createLocalDevice(context, address);
-            mHttpServer = new HttpServer(PORT);
-        } catch (ValidationException | IOException e) {
+            mResourceServer = factory.getInstance();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public void start() {
-        if (mHttpServer != null) {
-            mHttpServer.start();
+        if (mResourceServer != null) {
+            mResourceServer.start();
         }
     }
 
     public void stop() {
-        if (mHttpServer != null) {
-            mHttpServer.stop();
+        if (mResourceServer != null) {
+            mResourceServer.stop();
         }
     }
 
@@ -73,7 +83,7 @@ public final class MediaServer {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected LocalDevice createLocalDevice(Context context, String ipAddress) throws ValidationException {
-        DeviceIdentity identity = new DeviceIdentity(UpnpUtil.uniqueSystemIdentifier(ID_SALT, ipAddress));
+        DeviceIdentity identity = new DeviceIdentity(createUniqueSystemIdentifier(ID_SALT, ipAddress));
         DeviceType type = new UDADeviceType(TYPE_MEDIA_SERVER, VERSION);
         DeviceDetails details = new DeviceDetails(String.format("DMS  (%s)", android.os.Build.MODEL),
                 new ManufacturerDetails(android.os.Build.MANUFACTURER),
@@ -87,5 +97,18 @@ public final class MediaServer {
         } catch (IOException ignored) {
         }
         return new LocalDevice(identity, type, details, icon, service);
+    }
+
+    private static UDN createUniqueSystemIdentifier(@SuppressWarnings("SameParameterValue") String salt, String ipAddress) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(ipAddress);
+        builder.append(android.os.Build.MODEL);
+        builder.append(android.os.Build.MANUFACTURER);
+        try {
+            byte[] hash = MessageDigest.getInstance("MD5").digest(builder.toString().getBytes());
+            return new UDN(new UUID(new BigInteger(-1, hash).longValue(), salt.hashCode()));
+        } catch (Exception ex) {
+            return new UDN(ex.getMessage() != null ? ex.getMessage() : "UNKNOWN");
+        }
     }
 }
