@@ -22,6 +22,7 @@ import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 
@@ -29,6 +30,7 @@ import androidx.annotation.RequiresApi;
 
 public class Utils {
 
+    //TODO:check auth or multiple ip
     public static String getWiFiIPAddress(Context context) {
         WifiManager wifiManager = getSystemService(context, Context.WIFI_SERVICE);
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
@@ -40,7 +42,7 @@ public class Utils {
         }
     }
 
-    @SuppressWarnings({"unchecked", "TypeParameterExplicitlyExtendsObject"})
+    @SuppressWarnings({"unchecked", "TypeParameterExplicitlyExtendsObject", "SameParameterValue"})
     private static <T extends Object> T getSystemService(Context context, String name) {
         return (T) context.getApplicationContext().getSystemService(name);
     }
@@ -71,26 +73,78 @@ public class Utils {
     //     return "";
     // }
 
+    // @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    // public static String getRealPathFromUriAboveApi19(Context context, Uri uri) {
+    //     String filePath = null;
+    //     if (DocumentsContract.isDocumentUri(context, uri)) { // 如果是document类型的 uri, 则通过document id来进行处理
+    //         String documentId = DocumentsContract.getDocumentId(uri);
+    //         if (isMediaDocument(uri)) { // MediaProvider, 使用':'分割
+    //             String id = documentId.split(":")[1];
+    //             String selection = MediaStore.Images.Media._ID + "=?";
+    //             String[] selectionArgs = {id};
+    //             filePath = getDataColumn(context, MediaStore.Images.Media.EXTERNAL_CONTENT_URI, selection, selectionArgs);
+    //         } else if (isDownloadsDocument(uri)) { // DownloadsProvider
+    //             Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.parseLong(documentId));
+    //             filePath = getDataColumn(context, contentUri, null, null);
+    //         }
+    //     } else if ("content".equalsIgnoreCase(uri.getScheme())) { // 如果是 content 类型的 Uri
+    //         filePath = getDataColumn(context, uri, null, null);
+    //     } else if ("file".equals(uri.getScheme())) { // 如果是 file 类型的 Uri,直接获取图片对应的路径
+    //         filePath = uri.getPath();
+    //     }
+    //     return filePath;
+    // }
+
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    public static String getRealPathFromUriAboveApi19(Context context, Uri uri) {
-        String filePath = null;
-        if (DocumentsContract.isDocumentUri(context, uri)) { // 如果是document类型的 uri, 则通过document id来进行处理
-            String documentId = DocumentsContract.getDocumentId(uri);
-            if (isMediaDocument(uri)) { // MediaProvider, 使用':'分割
-                String id = documentId.split(":")[1];
-                String selection = MediaStore.Images.Media._ID + "=?";
-                String[] selectionArgs = {id};
-                filePath = getDataColumn(context, MediaStore.Images.Media.EXTERNAL_CONTENT_URI, selection, selectionArgs);
-            } else if (isDownloadsDocument(uri)) { // DownloadsProvider
-                Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.parseLong(documentId));
-                filePath = getDataColumn(context, contentUri, null, null);
+    public static String parseUri2Path(final Context context, final Uri uri) {
+        // DocumentProvider
+        if (DocumentsContract.isDocumentUri(context, uri)) {
+            // ExternalStorageProvider
+            if (isExternalStorageDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+                if ("primary".equalsIgnoreCase(type)) {
+                    return Environment.getExternalStorageDirectory() + "/" + split[1];
+                }
             }
-        } else if ("content".equalsIgnoreCase(uri.getScheme())) { // 如果是 content 类型的 Uri
-            filePath = getDataColumn(context, uri, null, null);
-        } else if ("file".equals(uri.getScheme())) { // 如果是 file 类型的 Uri,直接获取图片对应的路径
-            filePath = uri.getPath();
+            // DownloadsProvider
+            else if (isDownloadsDocument(uri)) {
+                final String id = DocumentsContract.getDocumentId(uri);
+                final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.parseLong(id));
+                return getDataColumn(context, contentUri, null, null);
+            }
+            // MediaProvider
+            else if (isMediaDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+                Uri contentUri = null;
+                if ("image".equals(type)) {
+                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                } else if ("video".equals(type)) {
+                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                } else if ("audio".equals(type)) {
+                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                }
+                final String selection = "_id=?";
+                final String[] selectionArgs = new String[]{split[1]};
+                return getDataColumn(context, contentUri, selection, selectionArgs);
+            }
         }
-        return filePath;
+        // MediaStore (and general)
+        else if ("content".equalsIgnoreCase(uri.getScheme())) {
+            return getDataColumn(context, uri, null, null);
+        }
+        // File
+        else if ("file".equalsIgnoreCase(uri.getScheme())) {
+            return uri.getPath();
+        }
+        return null;
+    }
+
+    private static boolean isExternalStorageDocument(Uri uri) {
+        return "com.android.externalstorage.documents".equals(uri.getAuthority());
     }
 
     /**

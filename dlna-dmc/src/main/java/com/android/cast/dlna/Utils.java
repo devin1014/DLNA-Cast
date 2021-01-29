@@ -13,6 +13,8 @@ import org.fourthline.cling.model.meta.RemoteService;
 import org.fourthline.cling.support.model.DIDLObject;
 import org.fourthline.cling.support.model.ProtocolInfo;
 import org.fourthline.cling.support.model.Res;
+import org.fourthline.cling.support.model.item.AudioItem;
+import org.fourthline.cling.support.model.item.ImageItem;
 import org.fourthline.cling.support.model.item.VideoItem;
 import org.seamless.util.MimeType;
 
@@ -95,9 +97,25 @@ final public class Utils {
             castRes.setBitrate(castObj.getBitrate());
             castRes.setDuration(getStringTime(castObj.getDurationMillSeconds()));
             String resolution = "description";
-            VideoItem videoItem = new VideoItem(cast.getId(), CAST_PARENT_ID, cast.getName(), CAST_CREATOR, castRes);
-            videoItem.setDescription(resolution);
-            return createItemMetadata(videoItem);
+            VideoItem item = new VideoItem(cast.getId(), CAST_PARENT_ID, cast.getName(), CAST_CREATOR, castRes);
+            item.setDescription(resolution);
+            return createItemMetadata(item);
+        }
+        if (cast instanceof ICast.ICastAudio) {
+            ICast.ICastAudio castObj = (ICast.ICastAudio) cast;
+            Res castRes = new Res(new MimeType(ProtocolInfo.WILDCARD, ProtocolInfo.WILDCARD), castObj.getSize(), cast.getUri());
+            castRes.setDuration(getStringTime(castObj.getDurationMillSeconds()));
+            String resolution = "description";
+            AudioItem item = new AudioItem(cast.getId(), CAST_PARENT_ID, cast.getName(), CAST_CREATOR, castRes);
+            item.setDescription(resolution);
+            return createItemMetadata(item);
+        } else if (cast instanceof ICast.ICastImage) {
+            ICast.ICastImage castObj = (ICast.ICastImage) cast;
+            Res castRes = new Res(new MimeType(ProtocolInfo.WILDCARD, ProtocolInfo.WILDCARD), castObj.getSize(), cast.getUri());
+            String resolution = "description";
+            ImageItem item = new ImageItem(cast.getId(), CAST_PARENT_ID, cast.getName(), CAST_CREATOR, castRes);
+            item.setDescription(resolution);
+            return createItemMetadata(item);
         } else {
             return "";
         }

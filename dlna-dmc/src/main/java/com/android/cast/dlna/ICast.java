@@ -23,4 +23,18 @@ public interface ICast {
 
         long getBitrate();
     }
+
+    interface ICastAudio extends ICast {
+        /**
+         * @return audio duration, ms
+         */
+        long getDurationMillSeconds();
+
+        long getSize();
+    }
+
+    interface ICastImage extends ICast {
+        long getSize();
+    }
+
 }
