@@ -42,6 +42,7 @@ public final class MediaServer {
         String address = Utils.getWiFiIPAddress(context);
         mInetAddress = String.format("%s:%s", address, factory.getPort());
         mBaseUrl = String.format("http://%s:%s", address, factory.getPort());
+        ContentFactory.initInstance(context, mBaseUrl);
         try {
             mDevice = createLocalDevice(context, address);
             mResourceServer = factory.getInstance();

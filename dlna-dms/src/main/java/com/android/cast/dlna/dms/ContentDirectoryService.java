@@ -1,7 +1,5 @@
 package com.android.cast.dlna.dms;
 
-import com.orhanobut.logger.Logger;
-
 import org.fourthline.cling.support.contentdirectory.AbstractContentDirectoryService;
 import org.fourthline.cling.support.contentdirectory.ContentDirectoryErrorCode;
 import org.fourthline.cling.support.contentdirectory.ContentDirectoryException;
@@ -22,42 +20,22 @@ public class ContentDirectoryService extends AbstractContentDirectoryService {
                                long firstResult,
                                long maxResults,
                                SortCriterion[] orderBy) throws ContentDirectoryException {
-        Logger.i("ContentDirectoryService.browse: %s, %s, %s", objectID, browseFlag, filter);
-        try {
-            DIDLContent didl = new DIDLContent();
-            ContentNode contentNode = ContentTree.getNode(objectID);
-            if (contentNode == null) {
-                Logger.w("ContentDirectoryService.browse result: empty.");
-                return new BrowseResult("", 0, 0);
-            }
-            if (contentNode.isItem()) {
-                Logger.w("ContentDirectoryService.browse result: %s", contentNode.getItem().getTitle());
-                didl.addItem(contentNode.getItem());
-                return new BrowseResult(new DIDLParser().generate(didl), 1, 1);
-            } else {
-                if (browseFlag == BrowseFlag.METADATA) {
-                    didl.addContainer(contentNode.getContainer());
-                    return new BrowseResult(new DIDLParser().generate(didl), 1, 1);
-                } else {
-                    for (Container container : contentNode.getContainer().getContainers()) {
-                        didl.addContainer(container);
-                        Logger.d("ContentDirectoryService getting child container: " + container.getTitle());
-                    }
-                    for (Item item : contentNode.getContainer().getItems()) {
-                        didl.addItem(item);
-                        Logger.d("ContentDirectoryService getting child item: " + item.getTitle());
-                    }
-                    return new BrowseResult(new DIDLParser().generate(didl),
-                            contentNode.getContainer().getChildCount(),
-                            contentNode.getContainer().getChildCount());
-                }
-            }
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            Logger.e(ex, "ContentDirectoryService.browse: failed.");
-            throw new ContentDirectoryException(ContentDirectoryErrorCode.CANNOT_PROCESS, ex.toString());
+        Container resultBean = ContentFactory.getInstance().getContent(objectID);
+        DIDLContent content = new DIDLContent();
+        for (Container c : resultBean.getContainers()) {
+            content.addContainer(c);
         }
+        for (Item item : resultBean.getItems()) {
+            content.addItem(item);
+        }
+        int count = resultBean.getChildCount();
+        String contentModel;
+        try {
+            contentModel = new DIDLParser().generate(content);
+        } catch (Exception e) {
+            throw new ContentDirectoryException(ContentDirectoryErrorCode.CANNOT_PROCESS, e.toString());
+        }
+        return new BrowseResult(contentModel, count, count);
     }
 
     @Override

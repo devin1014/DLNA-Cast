@@ -15,10 +15,12 @@
  */
 package com.android.cast.dlna.dms;
 
+import com.orhanobut.logger.Logger;
+
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 
-public class JettyServer implements LocalResourceServer {
+final class JettyServer implements LocalResourceServer {
     private final Server mServer;
 
     public JettyServer(int port) {
@@ -38,9 +40,11 @@ public class JettyServer implements LocalResourceServer {
                     // context.addServlet(ContentResourceServlet.VideoResourceServlet.class, "/video/*");
                     context.addServlet(ContentResourceServlet.class, "/");
                     mServer.setHandler(context);
+                    Logger.i("JettyServer start.");
                     try {
                         mServer.start();
                         mServer.join();
+                        Logger.i("JettyServer complete.");
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
@@ -52,6 +56,7 @@ public class JettyServer implements LocalResourceServer {
     synchronized public void stop() {
         if (!mServer.isStopped() && !mServer.isStopping()) {
             try {
+                Logger.i("JettyServer stop.");
                 mServer.stop();
             } catch (Exception ex) {
                 ex.printStackTrace();

@@ -39,7 +39,8 @@ public class LocalControlFragment extends Fragment implements IDisplayDevice {
 
         mMediaServer = new MediaServer(view.getContext());
         mMediaServer.start();
-        DLNACastManager.getInstance().setMediaServer(mMediaServer);
+        DLNACastManager.getInstance().addMediaServer(mMediaServer);
+        //ContentFactory.getInstance().getContent(MediaItem.VIDEO_ID);
 
         initComponent(view);
     }

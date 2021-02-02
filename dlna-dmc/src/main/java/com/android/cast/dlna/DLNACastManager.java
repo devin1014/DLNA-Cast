@@ -225,9 +225,11 @@ public final class DLNACastManager implements ICastInterface.IControl, OnDeviceR
     // -----------------------------------------------------------------------------------------
     private MediaServer _mediaServer;
 
-    public void setMediaServer(MediaServer mediaServer) {
+    public void addMediaServer(@NonNull MediaServer mediaServer) {
         if (mDLNACastService != null) {
-            mDLNACastService.getRegistry().addDevice(mediaServer.getDevice());
+            if (mDLNACastService.getRegistry().getDevice(mediaServer.getDevice().getIdentity().getUdn(), true) == null) {
+                mDLNACastService.getRegistry().addDevice(mediaServer.getDevice());
+            }
         } else {
             _mediaServer = mediaServer;
         }

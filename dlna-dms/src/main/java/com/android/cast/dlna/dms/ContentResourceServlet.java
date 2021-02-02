@@ -27,11 +27,11 @@ public class ContentResourceServlet extends DefaultServlet {
 
     @Override
     public Resource getResource(String pathInContext) {
+        // String id = Utils.parseResourceId(pathInContext);
+        // content://media/external/video/media/1611127029319529
+        // Uri uri = ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, Long.parseLong(id));
         Logger.i("ContentResourceServlet, path: %s", pathInContext);
         try {
-            // String id = Utils.parseResourceId(pathInContext);
-            // content://media/external/video/media/1611127029319529
-            // Uri uri = ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, Long.parseLong(id));
             File file = new File(pathInContext);
             if (file.exists()) return FileResource.newResource(file);
         } catch (Exception e) {
@@ -40,31 +40,9 @@ public class ContentResourceServlet extends DefaultServlet {
         return null;
     }
 
-    public static class VideoResourceServlet extends DefaultServlet {
-        @Override
-        public Resource getResource(String pathInContext) {
-            Logger.i("VideoResourceServlet, path: %s", pathInContext);
-            try {
-                File file = new File(pathInContext);
-                if (file.exists()) return FileResource.newResource(file);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
+    public static class VideoResourceServlet extends ContentResourceServlet {
     }
 
-    public static class AudioResourceServlet extends DefaultServlet {
-        @Override
-        public Resource getResource(String pathInContext) {
-            Logger.i("AudioResourceServlet, path: %s", pathInContext);
-            try {
-                File file = new File(pathInContext);
-                if (file.exists()) return FileResource.newResource(file);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
+    public static class AudioResourceServlet extends ContentResourceServlet {
     }
 }

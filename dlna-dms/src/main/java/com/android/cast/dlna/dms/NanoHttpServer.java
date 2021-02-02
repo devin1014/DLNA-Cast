@@ -29,7 +29,7 @@ import java.util.Vector;
  * Modified from NanoHTTPD, you can find it here
  * http://elonen.iki.fi/code/nanohttpd/
  */
-public class NanoHttpServer implements LocalResourceServer {
+final class NanoHttpServer implements LocalResourceServer {
     // ==================================================
     // API parts
     // ==================================================

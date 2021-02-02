@@ -194,7 +194,7 @@ public class ControlFragment extends Fragment implements IDisplayDevice, CastFra
         if (mDevice == null) return;
         // update volume
         DLNACastManager.getInstance().getVolumeInfo(mDevice, (integer, errMsg) -> {
-            if (integer != null) {
+            if (integer != null && getActivity() != null) {
                 AudioManager audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
                 int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
                 mVolumeSeekBar.setProgress(integer);

@@ -1,6 +1,6 @@
 package com.android.cast.dlna.dms;
 
-public interface ResourceServerFactory {
+interface ResourceServerFactory {
     int getPort();
 
     LocalResourceServer getInstance();

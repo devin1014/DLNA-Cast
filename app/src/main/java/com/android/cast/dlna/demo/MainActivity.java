@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_search_start) {
             Toast.makeText(this, "开始搜索", Toast.LENGTH_SHORT).show();
-            DLNACastManager.getInstance().search(DLNACastManager.DEVICE_TYPE_DMR, 60);
+            DLNACastManager.getInstance().search(null, 60);
         } else if (item.getItemId() == R.id.menu_light) {
             startActivity(new Intent(this, LightActivity.class));
         } else if (item.getItemId() == R.id.menu_link_detail) {

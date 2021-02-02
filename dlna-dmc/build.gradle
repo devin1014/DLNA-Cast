@@ -48,9 +48,9 @@ dependencies {
     // Cling library required
     api 'org.fourthline.cling:cling-core:2.1.1'
     api 'org.fourthline.cling:cling-support:2.1.1'
-    api 'org.eclipse.jetty:jetty-server:8.1.18.v20150929'
-    api 'org.eclipse.jetty:jetty-servlet:8.1.18.v20150929'
-    api 'org.eclipse.jetty:jetty-client:8.1.18.v20150929'
+    api 'org.eclipse.jetty:jetty-server:8.1.21.v20160908'
+    api 'org.eclipse.jetty:jetty-servlet:8.1.21.v20160908'
+    api 'org.eclipse.jetty:jetty-client:8.1.21.v20160908'
 
     implementation(project(':dlna-dms'))
 }
