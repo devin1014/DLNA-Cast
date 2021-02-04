@@ -1,3 +1,4 @@
+include ':dlna-dmr'
 include ':dlna-dms'
 include ':app'
 include ':dlna-dmc'
