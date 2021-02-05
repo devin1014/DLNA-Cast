@@ -1,10 +1,10 @@
-package com.android.cast.dlna.control;
+package com.android.cast.dlna.dmc.control;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.android.cast.dlna.ICast;
-import com.android.cast.dlna.Utils;
+import com.android.cast.dlna.dmc.ICast;
+import com.android.cast.dlna.dmc.Utils;
 
 import org.fourthline.cling.controlpoint.ControlPoint;
 import org.fourthline.cling.model.meta.Device;

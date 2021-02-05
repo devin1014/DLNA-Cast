@@ -1,4 +1,4 @@
-package com.android.cast.dlna.control;
+package com.android.cast.dlna.dmc.control;
 
 import org.fourthline.cling.support.model.MediaInfo;
 import org.fourthline.cling.support.model.PositionInfo;

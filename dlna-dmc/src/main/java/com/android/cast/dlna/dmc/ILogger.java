@@ -1,7 +1,9 @@
-package com.android.cast.dlna;
+package com.android.cast.dlna.dmc;
 
 import android.text.TextUtils;
 import android.util.Log;
+
+import com.android.cast.dlna.BuildConfig;
 
 
 /**

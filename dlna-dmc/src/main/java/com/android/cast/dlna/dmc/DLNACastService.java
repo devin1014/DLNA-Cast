@@ -1,8 +1,8 @@
-package com.android.cast.dlna;
+package com.android.cast.dlna.dmc;
 
 import android.content.Intent;
 
-import com.android.cast.dlna.ILogger.DefaultLoggerImpl;
+import com.android.cast.dlna.dmc.ILogger.DefaultLoggerImpl;
 
 import org.fourthline.cling.UpnpServiceConfiguration;
 import org.fourthline.cling.android.AndroidUpnpServiceConfiguration;

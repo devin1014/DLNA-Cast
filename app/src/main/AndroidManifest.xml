@@ -40,7 +40,7 @@
             android:name="com.android.cast.dlna.demo.browser.BrowserActivity"
             android:configChanges="orientation" />
 
-        <service android:name="com.android.cast.dlna.DLNACastService" />
+        <service android:name="com.android.cast.dlna.dmc.DLNACastService" />
 
     </application>
 

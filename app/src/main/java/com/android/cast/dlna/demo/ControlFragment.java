@@ -18,9 +18,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.android.cast.dlna.DLNACastManager;
-import com.android.cast.dlna.Utils;
-import com.android.cast.dlna.control.ICastInterface;
+import com.android.cast.dlna.dmc.DLNACastManager;
+import com.android.cast.dlna.dmc.Utils;
+import com.android.cast.dlna.dmc.control.ICastInterface;
 
 import org.fourthline.cling.model.meta.Device;
 

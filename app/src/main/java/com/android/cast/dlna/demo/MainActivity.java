@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.cast.dlna.DLNACastManager;
+import com.android.cast.dlna.dmc.DLNACastManager;
 import com.android.cast.dlna.demo.detail.DetailActivity;
 import com.android.cast.dlna.demo.light.LightActivity;
 import com.permissionx.guolindev.PermissionX;

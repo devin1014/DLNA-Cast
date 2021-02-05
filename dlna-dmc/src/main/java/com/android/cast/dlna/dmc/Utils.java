@@ -1,4 +1,4 @@
-package com.android.cast.dlna;
+package com.android.cast.dlna.dmc;
 
 import android.content.ComponentName;
 import android.os.IBinder;

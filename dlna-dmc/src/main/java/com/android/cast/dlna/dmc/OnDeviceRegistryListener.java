@@ -1,4 +1,4 @@
-package com.android.cast.dlna;
+package com.android.cast.dlna.dmc;
 
 import org.fourthline.cling.model.meta.Device;
 

@@ -1,6 +1,6 @@
-package com.android.cast.dlna.control;
+package com.android.cast.dlna.dmc.control;
 
-import com.android.cast.dlna.DLNACastManager;
+import com.android.cast.dlna.dmc.DLNACastManager;
 
 import org.fourthline.cling.controlpoint.ControlPoint;
 import org.fourthline.cling.model.gena.GENASubscription;

@@ -5,7 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.android.cast.dlna.DLNACastManager;
+import com.android.cast.dlna.dmc.DLNACastManager;
 import com.android.cast.dlna.demo.R;
 
 public class DetailActivity extends AppCompatActivity {

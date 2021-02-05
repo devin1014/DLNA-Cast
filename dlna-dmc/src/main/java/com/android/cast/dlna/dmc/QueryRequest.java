@@ -1,4 +1,4 @@
-package com.android.cast.dlna;
+package com.android.cast.dlna.dmc;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -7,7 +7,7 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.android.cast.dlna.control.ICastInterface;
+import com.android.cast.dlna.dmc.control.ICastInterface;
 
 import org.fourthline.cling.controlpoint.ActionCallback;
 import org.fourthline.cling.controlpoint.ControlPoint;

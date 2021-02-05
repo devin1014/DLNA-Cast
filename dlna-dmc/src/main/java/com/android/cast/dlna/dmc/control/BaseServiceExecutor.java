@@ -1,4 +1,4 @@
-package com.android.cast.dlna.control;
+package com.android.cast.dlna.dmc.control;
 
 
 import android.os.Handler;
@@ -6,9 +6,9 @@ import android.os.Looper;
 
 import androidx.annotation.Nullable;
 
-import com.android.cast.dlna.Utils;
-import com.android.cast.dlna.action.GetBrightness;
-import com.android.cast.dlna.action.SetBrightness;
+import com.android.cast.dlna.dmc.Utils;
+import com.android.cast.dlna.dmc.action.GetBrightness;
+import com.android.cast.dlna.dmc.action.SetBrightness;
 
 import org.fourthline.cling.controlpoint.ActionCallback;
 import org.fourthline.cling.controlpoint.ControlPoint;

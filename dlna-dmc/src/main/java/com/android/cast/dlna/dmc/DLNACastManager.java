@@ -1,4 +1,4 @@
-package com.android.cast.dlna;
+package com.android.cast.dlna.dmc;
 
 import android.app.Activity;
 import android.app.Application;
@@ -14,10 +14,10 @@ import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.android.cast.dlna.ILogger.DefaultLoggerImpl;
-import com.android.cast.dlna.control.ControlImpl;
-import com.android.cast.dlna.control.ICastInterface;
-import com.android.cast.dlna.control.IServiceAction;
+import com.android.cast.dlna.dmc.ILogger.DefaultLoggerImpl;
+import com.android.cast.dlna.dmc.control.ControlImpl;
+import com.android.cast.dlna.dmc.control.ICastInterface;
+import com.android.cast.dlna.dmc.control.IServiceAction;
 import com.android.cast.dlna.dms.MediaServer;
 
 import org.fourthline.cling.UpnpService;

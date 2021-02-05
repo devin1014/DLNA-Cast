@@ -1,8 +1,8 @@
-package com.android.cast.dlna.control;
+package com.android.cast.dlna.dmc.control;
 
 import androidx.annotation.Nullable;
 
-import com.android.cast.dlna.ICast;
+import com.android.cast.dlna.dmc.ICast;
 
 import org.fourthline.cling.model.gena.GENASubscription;
 import org.fourthline.cling.model.message.UpnpResponse;

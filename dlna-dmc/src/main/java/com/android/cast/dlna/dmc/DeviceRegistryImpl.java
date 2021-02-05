@@ -1,11 +1,11 @@
-package com.android.cast.dlna;
+package com.android.cast.dlna.dmc;
 
 import android.os.Handler;
 import android.os.Looper;
 
 import androidx.annotation.NonNull;
 
-import com.android.cast.dlna.ILogger.DefaultLoggerImpl;
+import com.android.cast.dlna.dmc.ILogger.DefaultLoggerImpl;
 
 import org.fourthline.cling.model.meta.Device;
 import org.fourthline.cling.model.meta.LocalDevice;

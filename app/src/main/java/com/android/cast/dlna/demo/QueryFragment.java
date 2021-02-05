@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.android.cast.dlna.DLNACastManager;
+import com.android.cast.dlna.dmc.DLNACastManager;
 
 import org.fourthline.cling.model.meta.Device;
 

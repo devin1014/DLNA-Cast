@@ -2,7 +2,7 @@ package com.android.cast.dlna.demo;
 
 import androidx.annotation.NonNull;
 
-import com.android.cast.dlna.ICast;
+import com.android.cast.dlna.dmc.ICast;
 
 /**
  *

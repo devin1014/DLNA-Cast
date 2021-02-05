@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView.Adapter;
 
-import com.android.cast.dlna.OnDeviceRegistryListener;
+import com.android.cast.dlna.dmc.OnDeviceRegistryListener;
 
 import org.fourthline.cling.model.meta.Device;
 

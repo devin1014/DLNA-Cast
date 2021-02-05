@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.android.cast.dlna">
+    package="com.android.cast.dlna.dmc">
 
     <!--these permissions are required by cling-->
     <!--you can see here "http://4thline.org/projects/cling/core/manual/cling-core-manual.xhtml#chapter.Android"-->
