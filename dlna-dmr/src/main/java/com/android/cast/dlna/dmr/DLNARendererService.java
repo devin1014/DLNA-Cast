@@ -1,4 +1,4 @@
-package com.android.cast.dlna.dms;
+package com.android.cast.dlna.dmr;
 
 import android.app.Notification;
 import android.content.Context;
@@ -9,15 +9,15 @@ import android.os.IBinder;
 
 import androidx.core.content.ContextCompat;
 
-import com.android.cast.dlna.dms.localservice.AVTransportControlImp;
-import com.android.cast.dlna.dms.localservice.AudioControlImp;
-import com.android.cast.dlna.dms.localservice.IRendererInterface.IAVTransport;
-import com.android.cast.dlna.dms.localservice.IRendererInterface.IAudioControl;
-import com.android.cast.dlna.dms.localservice.RendererAVTransportService;
-import com.android.cast.dlna.dms.localservice.RendererAudioControlService;
-import com.android.cast.dlna.dms.localservice.RendererConnectionService;
-import com.android.cast.dlna.dms.player.ICastMediaControl;
-import com.android.cast.dlna.dms.player.ICastMediaControl.CastMediaControlListener;
+import com.android.cast.dlna.dmr.localservice.AVTransportControlImp;
+import com.android.cast.dlna.dmr.localservice.AudioControlImp;
+import com.android.cast.dlna.dmr.localservice.IRendererInterface.IAVTransport;
+import com.android.cast.dlna.dmr.localservice.IRendererInterface.IAudioControl;
+import com.android.cast.dlna.dmr.localservice.RendererAVTransportService;
+import com.android.cast.dlna.dmr.localservice.RendererAudioControlService;
+import com.android.cast.dlna.dmr.localservice.RendererConnectionService;
+import com.android.cast.dlna.dmr.player.ICastMediaControl;
+import com.android.cast.dlna.dmr.player.ICastMediaControl.CastMediaControlListener;
 
 import org.fourthline.cling.UpnpServiceConfiguration;
 import org.fourthline.cling.android.AndroidUpnpServiceConfiguration;

@@ -1,9 +1,9 @@
-package com.android.cast.dlna.dms.player;
+package com.android.cast.dlna.dmr.player;
 
-import com.android.cast.dlna.dms.DLNARendererService;
-import com.android.cast.dlna.dms.localservice.RendererAVTransportService;
-import com.android.cast.dlna.dms.localservice.RendererAudioControlService;
-import com.android.cast.dlna.dms.ILogger;
+import com.android.cast.dlna.dmr.DLNARendererService;
+import com.android.cast.dlna.dmr.localservice.RendererAVTransportService;
+import com.android.cast.dlna.dmr.localservice.RendererAudioControlService;
+import com.android.cast.dlna.dmr.ILogger;
 
 import org.fourthline.cling.model.meta.LocalDevice;
 import org.fourthline.cling.model.meta.LocalService;

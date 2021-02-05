@@ -1,4 +1,4 @@
-package com.android.cast.dlna.dms.localservice;
+package com.android.cast.dlna.dmr.localservice;
 
 import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
 import org.fourthline.cling.model.types.UnsignedIntegerTwoBytes;

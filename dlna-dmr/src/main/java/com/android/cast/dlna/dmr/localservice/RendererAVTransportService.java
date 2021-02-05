@@ -1,4 +1,4 @@
-package com.android.cast.dlna.dms.localservice;
+package com.android.cast.dlna.dmr.localservice;
 
 import org.fourthline.cling.binding.annotations.UpnpAction;
 import org.fourthline.cling.binding.annotations.UpnpInputArgument;

@@ -1,4 +1,4 @@
-package com.android.cast.dlna.dms.player;
+package com.android.cast.dlna.dmr.player;
 
 import android.app.Service;
 import android.content.ComponentName;
@@ -13,12 +13,12 @@ import android.view.KeyEvent;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.android.cast.dlna.dms.Constants.Key;
-import com.android.cast.dlna.dms.DLNARendererService;
-import com.android.cast.dlna.dms.DLNARendererService.RendererServiceBinder;
-import com.android.cast.dlna.dms.CastUtils;
-import com.android.cast.dlna.dms.ILogger;
-import com.android.cast.dlna.dms.ILogger.DefaultLoggerImpl;
+import com.android.cast.dlna.dmr.Constants.Key;
+import com.android.cast.dlna.dmr.DLNARendererService;
+import com.android.cast.dlna.dmr.DLNARendererService.RendererServiceBinder;
+import com.android.cast.dlna.dmr.CastUtils;
+import com.android.cast.dlna.dmr.ILogger;
+import com.android.cast.dlna.dmr.ILogger.DefaultLoggerImpl;
 
 import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
 import org.fourthline.cling.support.avtransport.lastchange.AVTransportVariable;

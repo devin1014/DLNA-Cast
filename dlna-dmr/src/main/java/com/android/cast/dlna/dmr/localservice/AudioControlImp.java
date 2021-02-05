@@ -1,10 +1,10 @@
-package com.android.cast.dlna.dms.localservice;
+package com.android.cast.dlna.dmr.localservice;
 
 import android.content.Context;
 import android.media.AudioManager;
 
-import com.android.cast.dlna.dms.player.ICastMediaControl;
-import com.android.cast.dlna.dms.ILogger;
+import com.android.cast.dlna.dmr.player.ICastMediaControl;
+import com.android.cast.dlna.dmr.ILogger;
 
 import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
 import org.fourthline.cling.model.types.UnsignedIntegerTwoBytes;

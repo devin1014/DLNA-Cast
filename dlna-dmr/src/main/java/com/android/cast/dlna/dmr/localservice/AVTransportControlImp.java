@@ -1,13 +1,13 @@
-package com.android.cast.dlna.dms.localservice;
+package com.android.cast.dlna.dmr.localservice;
 
 
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.android.cast.dlna.dms.player.ICastMediaControl;
-import com.android.cast.dlna.dms.player.NLPlayerCompat;
-import com.android.cast.dlna.dms.CastUtils;
-import com.android.cast.dlna.dms.ILogger;
+import com.android.cast.dlna.dmr.player.ICastMediaControl;
+import com.android.cast.dlna.dmr.player.NLPlayerCompat;
+import com.android.cast.dlna.dmr.CastUtils;
+import com.android.cast.dlna.dmr.ILogger;
 
 import org.fourthline.cling.model.types.ErrorCode;
 import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;

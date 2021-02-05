@@ -1,4 +1,4 @@
-package com.android.cast.dlna.dms.player;
+package com.android.cast.dlna.dmr.player;
 
 import android.content.Context;
 

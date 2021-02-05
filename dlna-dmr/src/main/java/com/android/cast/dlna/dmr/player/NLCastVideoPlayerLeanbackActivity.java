@@ -1,4 +1,4 @@
-package com.android.cast.dlna.dms.player;
+package com.android.cast.dlna.dmr.player;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,8 +7,8 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
-import com.android.cast.dlna.dms.R;
-import com.android.cast.dlna.dms.player.RendererThread.IActivityAliveCallback;
+import com.android.cast.dlna.dmr.R;
+import com.android.cast.dlna.dmr.player.RendererThread.IActivityAliveCallback;
 
 public class NLCastVideoPlayerLeanbackActivity extends FragmentActivity implements IActivityAliveCallback {
     public static final String EXTRA_KEY_VIDEO = "com.neulion.intent.extra.EXTRA_KEY_VIDEO";

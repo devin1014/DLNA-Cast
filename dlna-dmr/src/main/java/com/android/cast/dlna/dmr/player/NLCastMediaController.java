@@ -1,4 +1,4 @@
-package com.android.cast.dlna.dms.player;
+package com.android.cast.dlna.dmr.player;
 
 import android.app.Activity;
 import android.media.AudioManager;
@@ -8,7 +8,7 @@ import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.android.cast.dlna.dms.DLNARendererService;
+import com.android.cast.dlna.dmr.DLNARendererService;
 
 import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
 import org.fourthline.cling.support.lastchange.LastChange;

@@ -1,4 +1,4 @@
-package com.android.cast.dlna.dms.player;
+package com.android.cast.dlna.dmr.player;
 
 import android.app.Service;
 import android.content.ComponentName;
@@ -12,8 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.android.cast.dlna.dms.DLNARendererService;
-import com.android.cast.dlna.dms.ILogger;
+import com.android.cast.dlna.dmr.DLNARendererService;
+import com.android.cast.dlna.dmr.ILogger;
 
 public class NLCastVideoPlayerLeanbackFragment extends Fragment {
     private ILogger mLogger = new ILogger.DefaultLoggerImpl(this);

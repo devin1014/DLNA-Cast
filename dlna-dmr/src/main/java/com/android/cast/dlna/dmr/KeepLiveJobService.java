@@ -1,4 +1,4 @@
-package com.android.cast.dlna.dms;
+package com.android.cast.dlna.dmr;
 
 import android.annotation.TargetApi;
 import android.app.job.JobInfo;
