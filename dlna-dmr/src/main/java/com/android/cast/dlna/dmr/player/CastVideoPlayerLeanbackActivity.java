@@ -10,13 +10,13 @@ import androidx.fragment.app.FragmentActivity;
 import com.android.cast.dlna.dmr.R;
 import com.android.cast.dlna.dmr.player.RendererThread.IActivityAliveCallback;
 
-public class NLCastVideoPlayerLeanbackActivity extends FragmentActivity implements IActivityAliveCallback {
+public class CastVideoPlayerLeanbackActivity extends FragmentActivity implements IActivityAliveCallback {
     public static final String EXTRA_KEY_VIDEO = "com.neulion.intent.extra.EXTRA_KEY_VIDEO";
-    private NLCastVideoPlayerLeanbackFragment mFragment;
+    private CastVideoPlayerLeanbackFragment mFragment;
     private boolean mActivityDestroyed = false;
 
     public static void startVideoActivity(Context context, CastMediaRequest castMediaRequest) {
-        Intent intent = new Intent(context, NLCastVideoPlayerLeanbackActivity.class);
+        Intent intent = new Intent(context, CastVideoPlayerLeanbackActivity.class);
 
         intent.putExtra(EXTRA_KEY_VIDEO, castMediaRequest);
 
@@ -31,9 +31,9 @@ public class NLCastVideoPlayerLeanbackActivity extends FragmentActivity implemen
 
         setContentView(R.layout.activity_cast_videoplayer_leanback);
 
-        CastMediaRequest castMediaRequest = getIntent().getParcelableExtra(NLCastVideoPlayerLeanbackActivity.EXTRA_KEY_VIDEO);
+        CastMediaRequest castMediaRequest = getIntent().getParcelableExtra(CastVideoPlayerLeanbackActivity.EXTRA_KEY_VIDEO);
 
-        mFragment = NLCastVideoPlayerLeanbackFragment.newInstance(castMediaRequest);
+        mFragment = CastVideoPlayerLeanbackFragment.newInstance(castMediaRequest);
 
         getSupportFragmentManager().beginTransaction().replace(R.id.videoFragment, mFragment).commit();
     }
@@ -43,7 +43,7 @@ public class NLCastVideoPlayerLeanbackActivity extends FragmentActivity implemen
         super.onNewIntent(intent);
 
         if (intent != null) {
-            CastMediaRequest castMediaRequest = getIntent().getParcelableExtra(NLCastVideoPlayerLeanbackActivity.EXTRA_KEY_VIDEO);
+            CastMediaRequest castMediaRequest = getIntent().getParcelableExtra(CastVideoPlayerLeanbackActivity.EXTRA_KEY_VIDEO);
 
             if (mFragment != null) {
                 mFragment.playVideo(castMediaRequest);

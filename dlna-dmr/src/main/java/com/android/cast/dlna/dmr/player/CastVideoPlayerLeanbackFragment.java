@@ -15,9 +15,9 @@ import androidx.fragment.app.Fragment;
 import com.android.cast.dlna.dmr.DLNARendererService;
 import com.android.cast.dlna.dmr.ILogger;
 
-public class NLCastVideoPlayerLeanbackFragment extends Fragment {
+public class CastVideoPlayerLeanbackFragment extends Fragment {
     private ILogger mLogger = new ILogger.DefaultLoggerImpl(this);
-    private NLCastMediaController mCastControlImp;
+    private CastMediaController mCastControlImp;
     private DLNARendererService mRendererService;
     private ServiceConnection mRendererServiceConnection = new ServiceConnection() {
         @Override
@@ -26,7 +26,7 @@ public class NLCastVideoPlayerLeanbackFragment extends Fragment {
 
             mRendererService = ((DLNARendererService.RendererServiceBinder) service).getRendererService();
 
-            mRendererService.registerControlBridge(mCastControlImp = new NLCastMediaController(NLCastVideoPlayerLeanbackFragment.this, mRendererService));
+            mRendererService.registerControlBridge(mCastControlImp = new CastMediaController(CastVideoPlayerLeanbackFragment.this, mRendererService));
 
             //TODO: service maybe bind more than once!
             new RendererThread.AvControlThread((RendererThread.IActivityAliveCallback) getActivity(), mRendererService).start();
@@ -42,12 +42,12 @@ public class NLCastVideoPlayerLeanbackFragment extends Fragment {
         }
     };
 
-    public static NLCastVideoPlayerLeanbackFragment newInstance(CastMediaRequest castMediaRequest) {
-        NLCastVideoPlayerLeanbackFragment fragment = new NLCastVideoPlayerLeanbackFragment();
+    public static CastVideoPlayerLeanbackFragment newInstance(CastMediaRequest castMediaRequest) {
+        CastVideoPlayerLeanbackFragment fragment = new CastVideoPlayerLeanbackFragment();
 
         Bundle arguments = new Bundle();
 
-        arguments.putParcelable(NLCastVideoPlayerLeanbackActivity.EXTRA_KEY_VIDEO, castMediaRequest);
+        arguments.putParcelable(CastVideoPlayerLeanbackActivity.EXTRA_KEY_VIDEO, castMediaRequest);
 
         fragment.setArguments(arguments);
 
@@ -63,7 +63,7 @@ public class NLCastVideoPlayerLeanbackFragment extends Fragment {
         }
 
         if (getArguments() != null) {
-            playVideo((CastMediaRequest) getArguments().getParcelable(NLCastVideoPlayerLeanbackActivity.EXTRA_KEY_VIDEO));
+            playVideo((CastMediaRequest) getArguments().getParcelable(CastVideoPlayerLeanbackActivity.EXTRA_KEY_VIDEO));
         }
     }
 

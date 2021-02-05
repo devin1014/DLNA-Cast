@@ -9,6 +9,7 @@ import android.os.IBinder;
 
 import androidx.core.content.ContextCompat;
 
+import com.android.cast.dlna.core.Utils;
 import com.android.cast.dlna.dmr.localservice.AVTransportControlImp;
 import com.android.cast.dlna.dmr.localservice.AudioControlImp;
 import com.android.cast.dlna.dmr.localservice.IRendererInterface.IAVTransport;
@@ -56,17 +57,17 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DLNARendererService extends AndroidUpnpServiceImpl {
 
     public static void startService(Context context) {
-        context.getApplicationContext().startService(new Intent(context.getApplicationContext(), DLNARendererService.class));
+        context.getApplicationContext().startService(new Intent(context, DLNARendererService.class));
     }
 
     public static final int NOTIFICATION_ID = 0x11;
     private Map<UnsignedIntegerFourBytes, IAVTransport> mAVTransportControls;
     private Map<UnsignedIntegerFourBytes, IAudioControl> mAudioControls;
-    private final LastChange mAvTransportLastChange = new LastChange(new AVTransportLastChangeParser());
-    private final LastChange mAudioControlLastChange = new LastChange(new RenderingControlLastChangeParser());
+    private LastChange mAvTransportLastChange;
+    private LastChange mAudioControlLastChange;
     private final RendererServiceBinder mBinder = new RendererServiceBinder();
     private CastMediaControlListener mCastControlListener;
-    private LocalDevice mLocalDevice;
+    private LocalDevice mRendererDevice;
 
     @Override
     protected UpnpServiceConfiguration createConfiguration() {
@@ -82,7 +83,7 @@ public class DLNARendererService extends AndroidUpnpServiceImpl {
     public void onCreate() {
         org.seamless.util.logging.LoggingUtil.resetRootHandler(new FixedAndroidLogHandler());
         super.onCreate();
-        String ipAddress = CastUtils.getWiFiIPAddress(getApplicationContext());
+        String ipAddress = Utils.getWiFiIPAddress(getApplicationContext());
         mCastControlListener = new CastMediaControlListener(getApplication());
         mAVTransportControls = new ConcurrentHashMap<>(1);
         for (int i = 0; i < 1; i++) {
@@ -95,20 +96,16 @@ public class DLNARendererService extends AndroidUpnpServiceImpl {
             mAudioControls.put(controlImp.getInstanceId(), controlImp);
         }
         try {
-            mLocalDevice = createRendererDevice(getApplicationContext(), ipAddress);
-            upnpService.getRegistry().addDevice(mLocalDevice);
+            mRendererDevice = createRendererDevice(getApplicationContext(), ipAddress);
+            upnpService.getRegistry().addDevice(mRendererDevice);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        // if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2) {
-        //     startForeground(NOTIFICATION_ID, new Notification());
-        // } else {
-        //API 18以上，发送Notification并将其置为前台后，启动InnerService
+
         Notification.Builder builder = new Notification.Builder(this);
-        //builder.setSmallIcon(R.mipmap.ic_launcher);
+        builder.setSmallIcon(R.drawable.ic_launcher);
         startForeground(NOTIFICATION_ID, builder.build());
         startService(new Intent(this, KeepLiveInnerService.class));
-        // }
     }
 
     @Override
@@ -123,8 +120,8 @@ public class DLNARendererService extends AndroidUpnpServiceImpl {
 
     @Override
     public void onDestroy() {
-        if (mLocalDevice != null && upnpService != null && upnpService.getRegistry() != null) {
-            upnpService.getRegistry().removeDevice(mLocalDevice);
+        if (mRendererDevice != null && upnpService != null && upnpService.getRegistry() != null) {
+            upnpService.getRegistry().removeDevice(mRendererDevice);
         }
         super.onDestroy();
     }
@@ -138,7 +135,7 @@ public class DLNARendererService extends AndroidUpnpServiceImpl {
     }
 
     public LocalDevice getLocalDevice() {
-        return mLocalDevice;
+        return mRendererDevice;
     }
 
     public Map<UnsignedIntegerFourBytes, IAVTransport> getAVTransportControls() {
@@ -166,7 +163,7 @@ public class DLNARendererService extends AndroidUpnpServiceImpl {
         UDADeviceType deviceType = new UDADeviceType(TYPE_MEDIA_PLAYER, VERSION);
         DeviceDetails details = new DeviceDetails(String.format("DMR  (%s)", android.os.Build.MODEL),
                 new ManufacturerDetails(android.os.Build.MANUFACTURER),
-                new ModelDetails(android.os.Build.MODEL, DMS_DESC, "v1"));
+                new ModelDetails(android.os.Build.MODEL, DMS_DESC, "v1", String.format("http://%s:%s", ipAddress, "8191")));
         Icon[] icons = null;
         BitmapDrawable drawable = ((BitmapDrawable) ContextCompat.getDrawable(context, R.drawable.ic_launcher));
         if (drawable != null) {
@@ -181,6 +178,8 @@ public class DLNARendererService extends AndroidUpnpServiceImpl {
 
     @SuppressWarnings("unchecked")
     protected LocalService<?>[] generateLocalServices() {
+
+        // connection
         LocalService<RendererConnectionService> connectionManagerService = new AnnotationLocalServiceBinder().read(RendererConnectionService.class);
         connectionManagerService.setManager(new DefaultServiceManager<RendererConnectionService>(connectionManagerService, RendererConnectionService.class) {
             @Override
@@ -190,6 +189,7 @@ public class DLNARendererService extends AndroidUpnpServiceImpl {
         });
 
         // av transport service
+        mAvTransportLastChange = new LastChange(new AVTransportLastChangeParser());
         LocalService<RendererAVTransportService> avTransportService = new AnnotationLocalServiceBinder().read(RendererAVTransportService.class);
         avTransportService.setManager(new LastChangeAwareServiceManager<RendererAVTransportService>(avTransportService, new AVTransportLastChangeParser()) {
             @Override
@@ -199,6 +199,7 @@ public class DLNARendererService extends AndroidUpnpServiceImpl {
         });
 
         // render service
+        mAudioControlLastChange = new LastChange(new RenderingControlLastChangeParser());
         LocalService<RendererAudioControlService> renderingControlService = new AnnotationLocalServiceBinder().read(RendererAudioControlService.class);
         renderingControlService.setManager(new LastChangeAwareServiceManager<RendererAudioControlService>(renderingControlService, new RenderingControlLastChangeParser()) {
             @Override

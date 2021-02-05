@@ -19,7 +19,7 @@ import org.fourthline.cling.support.renderingcontrol.lastchange.RenderingControl
 /**
  *
  */
-class NLCastMediaController implements ICastMediaControl {
+class CastMediaController implements ICastMediaControl {
     private final UnsignedIntegerFourBytes INSTANCE_ID = new UnsignedIntegerFourBytes(0);
     // private MediaControl mMediaControl;
     private DLNARendererService mRendererService;
@@ -30,13 +30,13 @@ class NLCastMediaController implements ICastMediaControl {
     private AudioManager mAudioManager;
     private Object mMediaBinder;
 
-    NLCastMediaController(@NonNull Fragment fragment, DLNARendererService service) {
+    CastMediaController(@NonNull Fragment fragment, DLNARendererService service) {
         this(fragment.getActivity(), service);
 
         mMediaBinder = fragment;
     }
 
-    NLCastMediaController(Activity activity, DLNARendererService service) {
+    CastMediaController(Activity activity, DLNARendererService service) {
         // mActivity = activity;
         //
         // mRendererService = service;

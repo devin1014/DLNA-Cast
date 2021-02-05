@@ -4,10 +4,11 @@ package com.android.cast.dlna.dmr.localservice;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.android.cast.dlna.dmr.player.ICastMediaControl;
-import com.android.cast.dlna.dmr.player.NLPlayerCompat;
+import com.android.cast.dlna.core.Utils;
 import com.android.cast.dlna.dmr.CastUtils;
 import com.android.cast.dlna.dmr.ILogger;
+import com.android.cast.dlna.dmr.player.ICastMediaControl;
+import com.android.cast.dlna.dmr.player.PlayerCompat;
 
 import org.fourthline.cling.model.types.ErrorCode;
 import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
@@ -129,7 +130,7 @@ public class AVTransportControlImp implements IRendererInterface.IAVTransport {
         //        }
         mMediaInfo = new MediaInfo(currentURI, currentURIMetaData, getInstanceId(), "", StorageMedium.NETWORK);
         mPositionInfo = new PositionInfo(1, currentURIMetaData, currentURI);
-        NLPlayerCompat.startPlayer(mApplicationContext, currentURI, currentURIMetaData);
+        PlayerCompat.startPlayer(mApplicationContext, currentURI, currentURIMetaData);
     }
 
     @Override
@@ -156,7 +157,7 @@ public class AVTransportControlImp implements IRendererInterface.IAVTransport {
         if (!seekMode.equals(SeekMode.REL_TIME)) {
             throw new AVTransportException(AVTransportErrorCode.SEEKMODE_NOT_SUPPORTED, "Unsupported seek mode: " + unit);
         }
-        long position = CastUtils.getIntTime(target);
+        long position = Utils.getIntTime(target);
         mControlListener.seek(position);
     }
 
@@ -198,7 +199,7 @@ public class AVTransportControlImp implements IRendererInterface.IAVTransport {
     // ----------------------------------------------------------------------------------------------------------------
     @Override
     public void updateMediaCurrentPosition(long position) {
-        mPositionInfo.setRelTime(CastUtils.getStringTime(position));
+        mPositionInfo.setRelTime(Utils.getStringTime(position));
     }
 
     @Override
@@ -208,11 +209,11 @@ public class AVTransportControlImp implements IRendererInterface.IAVTransport {
                     mMediaInfo.getCurrentURI(),
                     mMediaInfo.getCurrentURIMetaData(),
                     getInstanceId(),
-                    CastUtils.getStringTime(duration),
+                    Utils.getStringTime(duration),
                     StorageMedium.NETWORK);
         }
 
-        mPositionInfo.setTrackDuration(CastUtils.getStringTime(duration));
+        mPositionInfo.setTrackDuration(Utils.getStringTime(duration));
     }
 
     @Override

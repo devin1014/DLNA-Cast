@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.cast.dlna.dms;
+package com.android.cast.dlna.core;
 
 import android.content.ContentUris;
 import android.content.Context;
@@ -25,8 +25,12 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 
 import androidx.annotation.RequiresApi;
+
+import java.util.Formatter;
+import java.util.Locale;
 
 public class Utils {
 
@@ -259,4 +263,45 @@ public class Utils {
     //     } // for now eat exceptions
     //     return "";
     // }
+
+    /**
+     * 把时间戳转换成 00:00:00 格式
+     *
+     * @param timeMs 时间戳
+     * @return 00:00:00 时间格式
+     */
+    public static String getStringTime(long timeMs) {
+        StringBuilder formatBuilder = new StringBuilder();
+        Formatter formatter = new Formatter(formatBuilder, Locale.US);
+
+        long totalSeconds = timeMs / 1000;
+        long seconds = totalSeconds % 60;
+        long minutes = (totalSeconds / 60) % 60;
+        long hours = totalSeconds / 3600;
+
+        return formatter.format("%02d:%02d:%02d", hours, minutes, seconds).toString();
+    }
+
+    /**
+     * 把 00:00:00 格式转成时间戳
+     *
+     * @param formatTime 00:00:00 时间格式
+     * @return 时间戳(毫秒)
+     */
+    public static long getIntTime(String formatTime) {
+        if (!TextUtils.isEmpty(formatTime)) {
+            String[] tmp = formatTime.split(":");
+
+            if (tmp.length < 3) {
+                return 0;
+            }
+
+            int second = Integer.parseInt(tmp[0]) * 3600 + Integer.parseInt(tmp[1]) * 60 + Integer.parseInt(tmp[2]);
+
+            return second * 1000L;
+        }
+
+        return 0;
+    }
+
 }

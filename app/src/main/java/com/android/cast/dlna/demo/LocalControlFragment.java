@@ -14,9 +14,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.android.cast.dlna.core.Utils;
 import com.android.cast.dlna.dmc.DLNACastManager;
 import com.android.cast.dlna.dms.MediaServer;
-import com.android.cast.dlna.dms.Utils;
 import com.orhanobut.logger.Logger;
 
 import org.fourthline.cling.model.meta.Device;

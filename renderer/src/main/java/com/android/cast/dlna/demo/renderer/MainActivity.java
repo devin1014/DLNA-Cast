@@ -6,6 +6,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.android.cast.dlna.dmr.DLNARendererService;
 import com.permissionx.guolindev.PermissionX;
 
 public class MainActivity extends AppCompatActivity {
@@ -17,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
         PermissionX.init(this)
                 .permissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
                 .request((allGranted, grantedList, deniedList) -> resetWifiInfo());
+        DLNARendererService.startService(this);
     }
 
     private void resetWifiInfo() {

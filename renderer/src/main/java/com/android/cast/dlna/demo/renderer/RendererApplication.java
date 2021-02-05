@@ -1,11 +1,11 @@
-package com.android.cast.dlna.demo;
+package com.android.cast.dlna.demo.renderer;
 
 import android.app.Application;
 
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.Logger;
 
-public class CastApplication extends Application {
+public class RendererApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
