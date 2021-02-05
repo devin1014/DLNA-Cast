@@ -6,8 +6,8 @@ import android.text.TextUtils;
 
 import com.android.cast.dlna.dms.player.ICastMediaControl;
 import com.android.cast.dlna.dms.player.NLPlayerCompat;
-import com.android.cast.dlna.dms.utils.CastUtils;
-import com.android.cast.dlna.dms.utils.ILogger;
+import com.android.cast.dlna.dms.CastUtils;
+import com.android.cast.dlna.dms.ILogger;
 
 import org.fourthline.cling.model.types.ErrorCode;
 import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;

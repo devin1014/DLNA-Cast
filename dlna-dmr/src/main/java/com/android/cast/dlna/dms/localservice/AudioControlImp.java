@@ -4,7 +4,7 @@ import android.content.Context;
 import android.media.AudioManager;
 
 import com.android.cast.dlna.dms.player.ICastMediaControl;
-import com.android.cast.dlna.dms.utils.ILogger;
+import com.android.cast.dlna.dms.ILogger;
 
 import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
 import org.fourthline.cling.model.types.UnsignedIntegerTwoBytes;

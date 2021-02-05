@@ -3,7 +3,7 @@ package com.android.cast.dlna.dms.player;
 import com.android.cast.dlna.dms.DLNARendererService;
 import com.android.cast.dlna.dms.localservice.RendererAVTransportService;
 import com.android.cast.dlna.dms.localservice.RendererAudioControlService;
-import com.android.cast.dlna.dms.utils.ILogger;
+import com.android.cast.dlna.dms.ILogger;
 
 import org.fourthline.cling.model.meta.LocalDevice;
 import org.fourthline.cling.model.meta.LocalService;

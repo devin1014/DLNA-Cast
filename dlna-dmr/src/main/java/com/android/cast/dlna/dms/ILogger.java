@@ -1,8 +1,6 @@
-package com.android.cast.dlna.dms.utils;
+package com.android.cast.dlna.dms;
 
 import android.util.Log;
-
-import com.android.cast.dlna.dms.Constants;
 
 /**
  *

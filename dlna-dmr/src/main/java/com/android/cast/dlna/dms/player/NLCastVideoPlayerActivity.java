@@ -16,9 +16,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.android.cast.dlna.dms.Constants.Key;
 import com.android.cast.dlna.dms.DLNARendererService;
 import com.android.cast.dlna.dms.DLNARendererService.RendererServiceBinder;
-import com.android.cast.dlna.dms.utils.CastUtils;
-import com.android.cast.dlna.dms.utils.ILogger;
-import com.android.cast.dlna.dms.utils.ILogger.DefaultLoggerImpl;
+import com.android.cast.dlna.dms.CastUtils;
+import com.android.cast.dlna.dms.ILogger;
+import com.android.cast.dlna.dms.ILogger.DefaultLoggerImpl;
 
 import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
 import org.fourthline.cling.support.avtransport.lastchange.AVTransportVariable;
