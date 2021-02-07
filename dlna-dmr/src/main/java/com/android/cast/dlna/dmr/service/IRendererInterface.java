@@ -1,6 +1,5 @@
-package com.android.cast.dlna.dmr.localservice;
+package com.android.cast.dlna.dmr.service;
 
-import org.fourthline.cling.binding.annotations.UpnpInputArgument;
 import org.fourthline.cling.model.types.UnsignedIntegerTwoBytes;
 import org.fourthline.cling.support.avtransport.AVTransportException;
 import org.fourthline.cling.support.model.DeviceCapabilities;
@@ -14,23 +13,21 @@ import org.fourthline.cling.support.model.TransportSettings;
  *
  */
 public interface IRendererInterface {
+
     interface IAVTransportControl {
-        void setAVTransportURI(@UpnpInputArgument(name = "CurrentURI", stateVariable = "AVTransportURI") String currentURI,
-                               @UpnpInputArgument(name = "CurrentURIMetaData", stateVariable = "AVTransportURIMetaData") String currentURIMetaData) throws AVTransportException;
+        void setAVTransportURI(String currentURI, String currentURIMetaData) throws AVTransportException;
 
-        void setNextAVTransportURI(@UpnpInputArgument(name = "NextURI", stateVariable = "AVTransportURI") String nextURI,
-                                   @UpnpInputArgument(name = "NextURIMetaData", stateVariable = "AVTransportURIMetaData") String nextURIMetaData);
+        void setNextAVTransportURI(String nextURI, String nextURIMetaData);
 
-        void setPlayMode(@UpnpInputArgument(name = "NewPlayMode", stateVariable = "CurrentPlayMode") String newPlayMode);
+        void setPlayMode(String newPlayMode);
 
-        void setRecordQualityMode(@UpnpInputArgument(name = "NewRecordQualityMode", stateVariable = "CurrentRecordQualityMode") String newRecordQualityMode);
+        void setRecordQualityMode(String newRecordQualityMode);
 
-        void play(@UpnpInputArgument(name = "Speed", stateVariable = "TransportPlaySpeed") String speed) throws AVTransportException;
+        void play(String speed) throws AVTransportException;
 
         void pause() throws AVTransportException;
 
-        void seek(@UpnpInputArgument(name = "Unit", stateVariable = "A_ARG_TYPE_SeekMode") String unit,
-                  @UpnpInputArgument(name = "Target", stateVariable = "A_ARG_TYPE_SeekTarget") String target) throws AVTransportException;
+        void seek(String unit, String target) throws AVTransportException;
 
         void previous();
 

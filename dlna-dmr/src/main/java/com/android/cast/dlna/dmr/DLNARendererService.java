@@ -10,13 +10,13 @@ import android.os.IBinder;
 import androidx.core.content.ContextCompat;
 
 import com.android.cast.dlna.core.Utils;
-import com.android.cast.dlna.dmr.localservice.AVTransportControlImp;
-import com.android.cast.dlna.dmr.localservice.AudioControlImp;
-import com.android.cast.dlna.dmr.localservice.IRendererInterface.IAVTransport;
-import com.android.cast.dlna.dmr.localservice.IRendererInterface.IAudioControl;
-import com.android.cast.dlna.dmr.localservice.RendererAVTransportService;
-import com.android.cast.dlna.dmr.localservice.RendererAudioControlService;
-import com.android.cast.dlna.dmr.localservice.RendererConnectionService;
+import com.android.cast.dlna.dmr.service.AVTransportController;
+import com.android.cast.dlna.dmr.service.AudioController;
+import com.android.cast.dlna.dmr.service.IRendererInterface.IAVTransport;
+import com.android.cast.dlna.dmr.service.IRendererInterface.IAudioControl;
+import com.android.cast.dlna.dmr.service.AVTransportServiceImpl;
+import com.android.cast.dlna.dmr.service.AudioControlServiceImpl;
+import com.android.cast.dlna.dmr.service.ConnectionManagerServiceImpl;
 import com.android.cast.dlna.dmr.player.ICastMediaControl;
 import com.android.cast.dlna.dmr.player.ICastMediaControl.CastMediaControlListener;
 
@@ -87,12 +87,12 @@ public class DLNARendererService extends AndroidUpnpServiceImpl {
         mCastControlListener = new CastMediaControlListener(getApplication());
         mAVTransportControls = new ConcurrentHashMap<>(1);
         for (int i = 0; i < 1; i++) {
-            AVTransportControlImp controlImp = new AVTransportControlImp(getApplicationContext(), new UnsignedIntegerFourBytes(i), mCastControlListener);
+            AVTransportController controlImp = new AVTransportController(getApplicationContext(), new UnsignedIntegerFourBytes(i), mCastControlListener);
             mAVTransportControls.put(controlImp.getInstanceId(), controlImp);
         }
         mAudioControls = new ConcurrentHashMap<>(1);
         for (int i = 0; i < 1; i++) {
-            AudioControlImp controlImp = new AudioControlImp(getApplicationContext(), new UnsignedIntegerFourBytes(i), mCastControlListener);
+            AudioController controlImp = new AudioController(getApplicationContext(), new UnsignedIntegerFourBytes(i), mCastControlListener);
             mAudioControls.put(controlImp.getInstanceId(), controlImp);
         }
         try {
@@ -180,31 +180,31 @@ public class DLNARendererService extends AndroidUpnpServiceImpl {
     protected LocalService<?>[] generateLocalServices() {
 
         // connection
-        LocalService<RendererConnectionService> connectionManagerService = new AnnotationLocalServiceBinder().read(RendererConnectionService.class);
-        connectionManagerService.setManager(new DefaultServiceManager<RendererConnectionService>(connectionManagerService, RendererConnectionService.class) {
+        LocalService<ConnectionManagerServiceImpl> connectionManagerService = new AnnotationLocalServiceBinder().read(ConnectionManagerServiceImpl.class);
+        connectionManagerService.setManager(new DefaultServiceManager<ConnectionManagerServiceImpl>(connectionManagerService, ConnectionManagerServiceImpl.class) {
             @Override
-            protected RendererConnectionService createServiceInstance() {
-                return new RendererConnectionService();
+            protected ConnectionManagerServiceImpl createServiceInstance() {
+                return new ConnectionManagerServiceImpl();
             }
         });
 
         // av transport service
         mAvTransportLastChange = new LastChange(new AVTransportLastChangeParser());
-        LocalService<RendererAVTransportService> avTransportService = new AnnotationLocalServiceBinder().read(RendererAVTransportService.class);
-        avTransportService.setManager(new LastChangeAwareServiceManager<RendererAVTransportService>(avTransportService, new AVTransportLastChangeParser()) {
+        LocalService<AVTransportServiceImpl> avTransportService = new AnnotationLocalServiceBinder().read(AVTransportServiceImpl.class);
+        avTransportService.setManager(new LastChangeAwareServiceManager<AVTransportServiceImpl>(avTransportService, new AVTransportLastChangeParser()) {
             @Override
-            protected RendererAVTransportService createServiceInstance() {
-                return new RendererAVTransportService(mAvTransportLastChange, mAVTransportControls);
+            protected AVTransportServiceImpl createServiceInstance() {
+                return new AVTransportServiceImpl(mAvTransportLastChange, mAVTransportControls);
             }
         });
 
         // render service
         mAudioControlLastChange = new LastChange(new RenderingControlLastChangeParser());
-        LocalService<RendererAudioControlService> renderingControlService = new AnnotationLocalServiceBinder().read(RendererAudioControlService.class);
-        renderingControlService.setManager(new LastChangeAwareServiceManager<RendererAudioControlService>(renderingControlService, new RenderingControlLastChangeParser()) {
+        LocalService<AudioControlServiceImpl> renderingControlService = new AnnotationLocalServiceBinder().read(AudioControlServiceImpl.class);
+        renderingControlService.setManager(new LastChangeAwareServiceManager<AudioControlServiceImpl>(renderingControlService, new RenderingControlLastChangeParser()) {
             @Override
-            protected RendererAudioControlService createServiceInstance() {
-                return new RendererAudioControlService(mAudioControlLastChange, mAudioControls);
+            protected AudioControlServiceImpl createServiceInstance() {
+                return new AudioControlServiceImpl(mAudioControlLastChange, mAudioControls);
             }
         });
 

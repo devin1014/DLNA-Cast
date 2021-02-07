@@ -1,4 +1,4 @@
-package com.android.cast.dlna.dmr.localservice;
+package com.android.cast.dlna.dmr.service;
 
 import android.content.Context;
 import android.media.AudioManager;
@@ -12,7 +12,7 @@ import org.fourthline.cling.model.types.UnsignedIntegerTwoBytes;
 /**
  *
  */
-public class AudioControlImp implements IRendererInterface.IAudioControl {
+public class AudioController implements IRendererInterface.IAudioControl {
     private final UnsignedIntegerFourBytes mInstanceId;
     private final UnsignedIntegerTwoBytes VOLUME_MUTE = new UnsignedIntegerTwoBytes(0);
     private final ILogger mLogger = new ILogger.DefaultLoggerImpl(this);
@@ -21,7 +21,7 @@ public class AudioControlImp implements IRendererInterface.IAudioControl {
     private UnsignedIntegerTwoBytes mCurrentVolume;
 
     @SuppressWarnings("ConstantConditions")
-    public AudioControlImp(Context context, UnsignedIntegerFourBytes instanceId, ICastMediaControl listener) {
+    public AudioController(Context context, UnsignedIntegerFourBytes instanceId, ICastMediaControl listener) {
         mInstanceId = instanceId;
         AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         int MAX_MUSIC = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);

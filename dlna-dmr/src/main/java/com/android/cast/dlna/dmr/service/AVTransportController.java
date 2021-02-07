@@ -1,4 +1,4 @@
-package com.android.cast.dlna.dmr.localservice;
+package com.android.cast.dlna.dmr.service;
 
 
 import android.content.Context;
@@ -26,7 +26,7 @@ import org.fourthline.cling.support.model.TransportSettings;
 
 import java.net.URI;
 
-public class AVTransportControlImp implements IRendererInterface.IAVTransport {
+public class AVTransportController implements IRendererInterface.IAVTransport {
     private final TransportAction[] TRANSPORT_ACTION_STOPPED = new TransportAction[]{TransportAction.Play};
     private final TransportAction[] TRANSPORT_ACTION_PLAYING = new TransportAction[]{TransportAction.Stop, TransportAction.Pause, TransportAction.Seek};
     private final TransportAction[] TRANSPORT_ACTION_PAUSE_PLAYBACK = new TransportAction[]{TransportAction.Stop, TransportAction.Pause, TransportAction.Seek, TransportAction.Play};
@@ -40,7 +40,7 @@ public class AVTransportControlImp implements IRendererInterface.IAVTransport {
     private final ICastMediaControl mControlListener;
     private int mCountIndex = 0;
 
-    public AVTransportControlImp(Context context, UnsignedIntegerFourBytes instanceId, ICastMediaControl listener) {
+    public AVTransportController(Context context, UnsignedIntegerFourBytes instanceId, ICastMediaControl listener) {
         mApplicationContext = context.getApplicationContext();
         mInstanceId = instanceId;
         mControlListener = listener;

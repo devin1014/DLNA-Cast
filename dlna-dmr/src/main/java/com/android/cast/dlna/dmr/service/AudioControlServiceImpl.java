@@ -1,4 +1,4 @@
-package com.android.cast.dlna.dmr.localservice;
+package com.android.cast.dlna.dmr.service;
 
 import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
 import org.fourthline.cling.model.types.UnsignedIntegerTwoBytes;
@@ -10,11 +10,11 @@ import org.fourthline.cling.support.renderingcontrol.RenderingControlException;
 
 import java.util.Map;
 
-public class RendererAudioControlService extends AbstractAudioRenderingControl {
+public class AudioControlServiceImpl extends AbstractAudioRenderingControl {
     private final Map<UnsignedIntegerFourBytes, IRendererInterface.IAudioControl> mRendererControls;
     private final UnsignedIntegerFourBytes[] mUnsignedIntegerFourBytes;
 
-    public RendererAudioControlService(LastChange lastChange, Map<UnsignedIntegerFourBytes, IRendererInterface.IAudioControl> audioControls) {
+    public AudioControlServiceImpl(LastChange lastChange, Map<UnsignedIntegerFourBytes, IRendererInterface.IAudioControl> audioControls) {
         super(lastChange);
         mRendererControls = audioControls;
         mUnsignedIntegerFourBytes = new UnsignedIntegerFourBytes[audioControls.size()];
