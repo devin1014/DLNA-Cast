@@ -2,10 +2,8 @@ package com.android.cast.dlna.dmr.service;
 
 
 import android.content.Context;
-import android.text.TextUtils;
 
 import com.android.cast.dlna.core.Utils;
-import com.android.cast.dlna.dmr.CastUtils;
 import com.android.cast.dlna.dmr.ILogger;
 import com.android.cast.dlna.dmr.player.ICastMediaControl;
 import com.android.cast.dlna.dmr.player.PlayerCompat;
@@ -26,7 +24,7 @@ import org.fourthline.cling.support.model.TransportSettings;
 
 import java.net.URI;
 
-public class AVTransportController implements IRendererInterface.IAVTransport {
+public class AVTransportController implements IRendererInterface.IAVTransportControl {
     private final TransportAction[] TRANSPORT_ACTION_STOPPED = new TransportAction[]{TransportAction.Play};
     private final TransportAction[] TRANSPORT_ACTION_PLAYING = new TransportAction[]{TransportAction.Stop, TransportAction.Pause, TransportAction.Seek};
     private final TransportAction[] TRANSPORT_ACTION_PAUSE_PLAYBACK = new TransportAction[]{TransportAction.Stop, TransportAction.Pause, TransportAction.Seek, TransportAction.Play};
@@ -40,10 +38,14 @@ public class AVTransportController implements IRendererInterface.IAVTransport {
     private final ICastMediaControl mControlListener;
     private int mCountIndex = 0;
 
-    public AVTransportController(Context context, UnsignedIntegerFourBytes instanceId, ICastMediaControl listener) {
+    public AVTransportController(Context context, ICastMediaControl control) {
+        this(context, new UnsignedIntegerFourBytes(0), control);
+    }
+
+    public AVTransportController(Context context, UnsignedIntegerFourBytes instanceId, ICastMediaControl control) {
         mApplicationContext = context.getApplicationContext();
         mInstanceId = instanceId;
-        mControlListener = listener;
+        mControlListener = control;
     }
 
     public UnsignedIntegerFourBytes getInstanceId() {
@@ -197,32 +199,32 @@ public class AVTransportController implements IRendererInterface.IAVTransport {
     // ----------------------------------------------------------------------------------------------------------------
     // - Update
     // ----------------------------------------------------------------------------------------------------------------
-    @Override
-    public void updateMediaCurrentPosition(long position) {
-        mPositionInfo.setRelTime(Utils.getStringTime(position));
-    }
-
-    @Override
-    public void updateMediaDuration(long duration) {
-        if (TextUtils.isEmpty(mMediaInfo.getMediaDuration())) {
-            mMediaInfo = new MediaInfo(
-                    mMediaInfo.getCurrentURI(),
-                    mMediaInfo.getCurrentURIMetaData(),
-                    getInstanceId(),
-                    Utils.getStringTime(duration),
-                    StorageMedium.NETWORK);
-        }
-
-        mPositionInfo.setTrackDuration(Utils.getStringTime(duration));
-    }
-
-    @Override
-    public void updateMediaState(int state) {
-        final TransportInfo oldInfo = mTransportInfo;
-
-        mTransportInfo = CastUtils.getTransportInfo(state);
-
-        mLogger.d(String.format("transportStateChanged:[%s]->[%s]", oldInfo.getCurrentTransportState(), mTransportInfo.getCurrentTransportState()));
-
-    }
+    // @Override
+    // public void updateMediaCurrentPosition(long position) {
+    //     mPositionInfo.setRelTime(Utils.getStringTime(position));
+    // }
+    //
+    // @Override
+    // public void updateMediaDuration(long duration) {
+    //     if (TextUtils.isEmpty(mMediaInfo.getMediaDuration())) {
+    //         mMediaInfo = new MediaInfo(
+    //                 mMediaInfo.getCurrentURI(),
+    //                 mMediaInfo.getCurrentURIMetaData(),
+    //                 getInstanceId(),
+    //                 Utils.getStringTime(duration),
+    //                 StorageMedium.NETWORK);
+    //     }
+    //
+    //     mPositionInfo.setTrackDuration(Utils.getStringTime(duration));
+    // }
+    //
+    // @Override
+    // public void updateMediaState(int state) {
+    //     final TransportInfo oldInfo = mTransportInfo;
+    //
+    //     mTransportInfo = CastUtils.getTransportInfo(state);
+    //
+    //     mLogger.d(String.format("transportStateChanged:[%s]->[%s]", oldInfo.getCurrentTransportState(), mTransportInfo.getCurrentTransportState()));
+    //
+    // }
 }

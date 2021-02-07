@@ -1,7 +1,6 @@
 package com.android.cast.dlna.dmr.service;
 
 import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
-import org.fourthline.cling.support.avtransport.AVTransportErrorCode;
 import org.fourthline.cling.support.avtransport.AVTransportException;
 import org.fourthline.cling.support.avtransport.AbstractAVTransportService;
 import org.fourthline.cling.support.lastchange.LastChange;
@@ -12,114 +11,98 @@ import org.fourthline.cling.support.model.TransportAction;
 import org.fourthline.cling.support.model.TransportInfo;
 import org.fourthline.cling.support.model.TransportSettings;
 
-import java.util.Map;
-
 public class AVTransportServiceImpl extends AbstractAVTransportService {
-    private final Map<UnsignedIntegerFourBytes, IRendererInterface.IAVTransport> mRendererMediaControl;
-    private final UnsignedIntegerFourBytes[] mUnsignedIntegerFourBytes;
 
-    public AVTransportServiceImpl(LastChange lastChange, Map<UnsignedIntegerFourBytes, IRendererInterface.IAVTransport> rendererMediaControl) {
+    private final RenderControlManager mRenderControlManager;
+
+    public AVTransportServiceImpl(LastChange lastChange, RenderControlManager renderControlManager) {
         super(lastChange);
-        mRendererMediaControl = rendererMediaControl;
-        mUnsignedIntegerFourBytes = new UnsignedIntegerFourBytes[rendererMediaControl.size()];
-        int i = 0;
-        for (UnsignedIntegerFourBytes id : mRendererMediaControl.keySet()) {
-            mUnsignedIntegerFourBytes[i] = id;
-            i++;
-        }
-    }
-
-    private IRendererInterface.IAVTransportControl getInstance(UnsignedIntegerFourBytes instanceId) throws AVTransportException {
-        IRendererInterface.IAVTransportControl player = mRendererMediaControl.get(instanceId);
-        if (player == null) {
-            throw new AVTransportException(AVTransportErrorCode.INVALID_INSTANCE_ID);
-        }
-        return player;
+        mRenderControlManager = renderControlManager;
     }
 
     @Override
     public UnsignedIntegerFourBytes[] getCurrentInstanceIds() {
-        return mUnsignedIntegerFourBytes;
+        return mRenderControlManager.getAvTransportCurrentInstanceIds();
     }
 
     @Override
     protected TransportAction[] getCurrentTransportActions(UnsignedIntegerFourBytes instanceId) throws Exception {
-        return getInstance(instanceId).getCurrentTransportActions();
+        return mRenderControlManager.getAvTransportControl(instanceId).getCurrentTransportActions();
     }
 
-    public DeviceCapabilities getDeviceCapabilities(UnsignedIntegerFourBytes instanceId) throws AVTransportException {
-        return getInstance(instanceId).getDeviceCapabilities();
+    public DeviceCapabilities getDeviceCapabilities(UnsignedIntegerFourBytes instanceId) {
+        return mRenderControlManager.getAvTransportControl(instanceId).getDeviceCapabilities();
     }
 
-    public MediaInfo getMediaInfo(UnsignedIntegerFourBytes instanceId) throws AVTransportException {
-        return getInstance(instanceId).getMediaInfo();
+    public MediaInfo getMediaInfo(UnsignedIntegerFourBytes instanceId) {
+        return mRenderControlManager.getAvTransportControl(instanceId).getMediaInfo();
     }
 
-    public PositionInfo getPositionInfo(UnsignedIntegerFourBytes instanceId) throws AVTransportException {
-        return getInstance(instanceId).getPositionInfo();
+    public PositionInfo getPositionInfo(UnsignedIntegerFourBytes instanceId) {
+        return mRenderControlManager.getAvTransportControl(instanceId).getPositionInfo();
     }
 
-    public TransportInfo getTransportInfo(UnsignedIntegerFourBytes instanceId) throws AVTransportException {
-        return getInstance(instanceId).getTransportInfo();
+    public TransportInfo getTransportInfo(UnsignedIntegerFourBytes instanceId) {
+        return mRenderControlManager.getAvTransportControl(instanceId).getTransportInfo();
     }
 
-    public TransportSettings getTransportSettings(UnsignedIntegerFourBytes instanceId) throws AVTransportException {
-        return getInstance(instanceId).getTransportSettings();
+    public TransportSettings getTransportSettings(UnsignedIntegerFourBytes instanceId) {
+        return mRenderControlManager.getAvTransportControl(instanceId).getTransportSettings();
     }
 
     @Override
-    public void next(UnsignedIntegerFourBytes instanceId) throws AVTransportException {
-        getInstance(instanceId).next();
+    public void next(UnsignedIntegerFourBytes instanceId) {
+        mRenderControlManager.getAvTransportControl(instanceId).next();
     }
 
     @Override
     public void pause(UnsignedIntegerFourBytes instanceId) throws AVTransportException {
-        getInstance(instanceId).pause();
+        mRenderControlManager.getAvTransportControl(instanceId).pause();
     }
 
     @Override
     public void play(UnsignedIntegerFourBytes instanceId, String arg1) throws AVTransportException {
-        getInstance(instanceId).play(arg1);
+        mRenderControlManager.getAvTransportControl(instanceId).play(arg1);
     }
 
     @Override
-    public void previous(UnsignedIntegerFourBytes instanceId) throws AVTransportException {
-        getInstance(instanceId).previous();
+    public void previous(UnsignedIntegerFourBytes instanceId) {
+        mRenderControlManager.getAvTransportControl(instanceId).previous();
     }
 
     @Override
-    public void record(UnsignedIntegerFourBytes instanceId) throws AVTransportException {
-        getInstance(instanceId).record();
+    public void record(UnsignedIntegerFourBytes instanceId) {
+        mRenderControlManager.getAvTransportControl(instanceId).record();
     }
 
     @Override
     public void seek(UnsignedIntegerFourBytes instanceId, String arg1, String arg2) throws AVTransportException {
-        getInstance(instanceId).seek(arg1, arg2);
+        mRenderControlManager.getAvTransportControl(instanceId).seek(arg1, arg2);
     }
 
     @Override
     public void setAVTransportURI(UnsignedIntegerFourBytes instanceId, String arg1, String arg2) throws AVTransportException {
-        getInstance(instanceId).setAVTransportURI(arg1, arg2);
+        mRenderControlManager.getAvTransportControl(instanceId).setAVTransportURI(arg1, arg2);
     }
 
     @Override
-    public void setNextAVTransportURI(UnsignedIntegerFourBytes instanceId, String arg1, String arg2) throws AVTransportException {
-        getInstance(instanceId).setNextAVTransportURI(arg1, arg2);
+    public void setNextAVTransportURI(UnsignedIntegerFourBytes instanceId, String arg1, String arg2) {
+        mRenderControlManager.getAvTransportControl(instanceId).setNextAVTransportURI(arg1, arg2);
     }
 
     @Override
-    public void setPlayMode(UnsignedIntegerFourBytes instanceId, String arg1) throws AVTransportException {
-        getInstance(instanceId).setPlayMode(arg1);
+    public void setPlayMode(UnsignedIntegerFourBytes instanceId, String arg1) {
+        mRenderControlManager.getAvTransportControl(instanceId).setPlayMode(arg1);
     }
 
     @Override
-    public void setRecordQualityMode(UnsignedIntegerFourBytes instanceId, String arg1) throws AVTransportException {
-        getInstance(instanceId).setRecordQualityMode(arg1);
+    public void setRecordQualityMode(UnsignedIntegerFourBytes instanceId, String arg1) {
+        mRenderControlManager.getAvTransportControl(instanceId).setRecordQualityMode(arg1);
     }
 
     @Override
     public void stop(UnsignedIntegerFourBytes instanceId) throws AVTransportException {
-        getInstance(instanceId).stop();
+        mRenderControlManager.getAvTransportControl(instanceId).stop();
     }
 
 }

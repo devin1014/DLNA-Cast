@@ -10,15 +10,14 @@ import android.os.IBinder;
 import androidx.core.content.ContextCompat;
 
 import com.android.cast.dlna.core.Utils;
-import com.android.cast.dlna.dmr.service.AVTransportController;
-import com.android.cast.dlna.dmr.service.AudioController;
-import com.android.cast.dlna.dmr.service.IRendererInterface.IAVTransport;
-import com.android.cast.dlna.dmr.service.IRendererInterface.IAudioControl;
-import com.android.cast.dlna.dmr.service.AVTransportServiceImpl;
-import com.android.cast.dlna.dmr.service.AudioControlServiceImpl;
-import com.android.cast.dlna.dmr.service.ConnectionManagerServiceImpl;
 import com.android.cast.dlna.dmr.player.ICastMediaControl;
 import com.android.cast.dlna.dmr.player.ICastMediaControl.CastMediaControlListener;
+import com.android.cast.dlna.dmr.service.AVTransportController;
+import com.android.cast.dlna.dmr.service.AVTransportServiceImpl;
+import com.android.cast.dlna.dmr.service.AudioRenderController;
+import com.android.cast.dlna.dmr.service.AudioRenderServiceImpl;
+import com.android.cast.dlna.dmr.service.ConnectionManagerServiceImpl;
+import com.android.cast.dlna.dmr.service.RenderControlManager;
 
 import org.fourthline.cling.UpnpServiceConfiguration;
 import org.fourthline.cling.android.AndroidUpnpServiceConfiguration;
@@ -36,7 +35,6 @@ import org.fourthline.cling.model.meta.ManufacturerDetails;
 import org.fourthline.cling.model.meta.ModelDetails;
 import org.fourthline.cling.model.types.UDADeviceType;
 import org.fourthline.cling.model.types.UDN;
-import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
 import org.fourthline.cling.support.avtransport.lastchange.AVTransportLastChangeParser;
 import org.fourthline.cling.support.lastchange.LastChange;
 import org.fourthline.cling.support.lastchange.LastChangeAwareServiceManager;
@@ -47,9 +45,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -61,8 +57,8 @@ public class DLNARendererService extends AndroidUpnpServiceImpl {
     }
 
     public static final int NOTIFICATION_ID = 0x11;
-    private Map<UnsignedIntegerFourBytes, IAVTransport> mAVTransportControls;
-    private Map<UnsignedIntegerFourBytes, IAudioControl> mAudioControls;
+    private final RenderControlManager mRenderControlManager = new RenderControlManager();
+
     private LastChange mAvTransportLastChange;
     private LastChange mAudioControlLastChange;
     private final RendererServiceBinder mBinder = new RendererServiceBinder();
@@ -85,21 +81,15 @@ public class DLNARendererService extends AndroidUpnpServiceImpl {
         super.onCreate();
         String ipAddress = Utils.getWiFiIPAddress(getApplicationContext());
         mCastControlListener = new CastMediaControlListener(getApplication());
-        mAVTransportControls = new ConcurrentHashMap<>(1);
-        for (int i = 0; i < 1; i++) {
-            AVTransportController controlImp = new AVTransportController(getApplicationContext(), new UnsignedIntegerFourBytes(i), mCastControlListener);
-            mAVTransportControls.put(controlImp.getInstanceId(), controlImp);
-        }
-        mAudioControls = new ConcurrentHashMap<>(1);
-        for (int i = 0; i < 1; i++) {
-            AudioController controlImp = new AudioController(getApplicationContext(), new UnsignedIntegerFourBytes(i), mCastControlListener);
-            mAudioControls.put(controlImp.getInstanceId(), controlImp);
-        }
+        mRenderControlManager.addControl(new AVTransportController(getApplicationContext(), mCastControlListener));
+        mRenderControlManager.addControl(new AudioRenderController(getApplicationContext(), mCastControlListener));
         try {
             mRendererDevice = createRendererDevice(getApplicationContext(), ipAddress);
             upnpService.getRegistry().addDevice(mRendererDevice);
         } catch (Exception e) {
             e.printStackTrace();
+            stopSelf();
+            return;
         }
 
         Notification.Builder builder = new Notification.Builder(this);
@@ -136,10 +126,6 @@ public class DLNARendererService extends AndroidUpnpServiceImpl {
 
     public LocalDevice getLocalDevice() {
         return mRendererDevice;
-    }
-
-    public Map<UnsignedIntegerFourBytes, IAVTransport> getAVTransportControls() {
-        return mAVTransportControls;
     }
 
     public void registerControlBridge(ICastMediaControl bridge) {
@@ -194,17 +180,17 @@ public class DLNARendererService extends AndroidUpnpServiceImpl {
         avTransportService.setManager(new LastChangeAwareServiceManager<AVTransportServiceImpl>(avTransportService, new AVTransportLastChangeParser()) {
             @Override
             protected AVTransportServiceImpl createServiceInstance() {
-                return new AVTransportServiceImpl(mAvTransportLastChange, mAVTransportControls);
+                return new AVTransportServiceImpl(mAvTransportLastChange, mRenderControlManager);
             }
         });
 
         // render service
         mAudioControlLastChange = new LastChange(new RenderingControlLastChangeParser());
-        LocalService<AudioControlServiceImpl> renderingControlService = new AnnotationLocalServiceBinder().read(AudioControlServiceImpl.class);
-        renderingControlService.setManager(new LastChangeAwareServiceManager<AudioControlServiceImpl>(renderingControlService, new RenderingControlLastChangeParser()) {
+        LocalService<AudioRenderServiceImpl> renderingControlService = new AnnotationLocalServiceBinder().read(AudioRenderServiceImpl.class);
+        renderingControlService.setManager(new LastChangeAwareServiceManager<AudioRenderServiceImpl>(renderingControlService, new RenderingControlLastChangeParser()) {
             @Override
-            protected AudioControlServiceImpl createServiceInstance() {
-                return new AudioControlServiceImpl(mAudioControlLastChange, mAudioControls);
+            protected AudioRenderServiceImpl createServiceInstance() {
+                return new AudioRenderServiceImpl(mAudioControlLastChange, mRenderControlManager);
             }
         });
 

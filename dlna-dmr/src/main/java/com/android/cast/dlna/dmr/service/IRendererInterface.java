@@ -1,5 +1,6 @@
 package com.android.cast.dlna.dmr.service;
 
+import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
 import org.fourthline.cling.model.types.UnsignedIntegerTwoBytes;
 import org.fourthline.cling.support.avtransport.AVTransportException;
 import org.fourthline.cling.support.model.DeviceCapabilities;
@@ -14,7 +15,14 @@ import org.fourthline.cling.support.model.TransportSettings;
  */
 public interface IRendererInterface {
 
-    interface IAVTransportControl {
+    interface IControl {
+        UnsignedIntegerFourBytes getInstanceId();
+    }
+
+    // -------------------------------------------------------------------------------------------
+    // - AvTransport
+    // -------------------------------------------------------------------------------------------
+    interface IAVTransportControl extends IControl {
         void setAVTransportURI(String currentURI, String currentURIMetaData) throws AVTransportException;
 
         void setNextAVTransportURI(String nextURI, String nextURIMetaData);
@@ -50,21 +58,10 @@ public interface IRendererInterface {
         TransportSettings getTransportSettings();
     }
 
-    interface IAVTransportUpdate {
-        void updateMediaCurrentPosition(long position);
-
-        void updateMediaDuration(long duration);
-
-        void updateMediaState(int state);
-    }
-
-    interface IAVTransport extends IAVTransportControl, IAVTransportUpdate {
-    }
-
     // -------------------------------------------------------------------------------------------
     // - Audio
     // -------------------------------------------------------------------------------------------
-    interface IAudioControl {
+    interface IAudioControl extends IControl {
         void setMute(String channelName, boolean desiredMute);
 
         boolean getMute(String channelName);

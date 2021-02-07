@@ -2,7 +2,7 @@ package com.android.cast.dlna.dmr.player;
 
 import com.android.cast.dlna.dmr.DLNARendererService;
 import com.android.cast.dlna.dmr.service.AVTransportServiceImpl;
-import com.android.cast.dlna.dmr.service.AudioControlServiceImpl;
+import com.android.cast.dlna.dmr.service.AudioRenderServiceImpl;
 import com.android.cast.dlna.dmr.ILogger;
 
 import org.fourthline.cling.model.meta.LocalDevice;
@@ -100,7 +100,7 @@ abstract class RendererThread extends Thread {
             LastChangeAwareServiceManager lastChangeAwareServiceManager = null;
 
             for (LocalService service : localDevice.getServices()) {
-                if (service != null && service.getManager().getImplementation() instanceof AudioControlServiceImpl) {
+                if (service != null && service.getManager().getImplementation() instanceof AudioRenderServiceImpl) {
                     lastChangeAwareServiceManager = (LastChangeAwareServiceManager) service.getManager();
 
                     break;

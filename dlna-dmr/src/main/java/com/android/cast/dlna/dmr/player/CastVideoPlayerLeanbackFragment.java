@@ -54,6 +54,7 @@ public class CastVideoPlayerLeanbackFragment extends Fragment {
         return fragment;
     }
 
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);

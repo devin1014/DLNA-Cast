@@ -9,12 +9,13 @@ public class PlayerCompat {
     public static void startPlayer(Context context, String currentURI, String currentURIMetaData) {
         if (context != null) {
             CastMediaRequest castMediaRequest = new CastMediaRequest(currentURI, currentURIMetaData, null, null);
-            if (false) //TODO: show player!!!
-            {
-                DLNARendererActivity.startActivity(context, castMediaRequest);
-            } else {
-                CastVideoPlayerLeanbackActivity.startVideoActivity(context, castMediaRequest);
-            }
+            DLNARendererActivity.startActivity(context, castMediaRequest);
+            // if (false) //TODO: show player!!!
+            // {
+            //     DLNARendererActivity.startActivity(context, castMediaRequest);
+            // } else {
+            //     CastVideoPlayerLeanbackActivity.startVideoActivity(context, castMediaRequest);
+            // }
         }
     }
 }

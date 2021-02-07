@@ -38,9 +38,9 @@ public class DLNARendererActivity extends AppCompatActivity implements RendererT
     public static void startActivity(Context context, CastMediaRequest mediaRequest) {
         Intent intent = new Intent(context, DLNARendererActivity.class);
         intent.putExtra(Key.EXTRA_CAST_REQUEST, mediaRequest);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
-
 
     private final UnsignedIntegerFourBytes INSTANCE_ID = new UnsignedIntegerFourBytes(0);
     private VideoView mVideoView;
