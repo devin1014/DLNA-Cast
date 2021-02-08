@@ -13,12 +13,12 @@ import android.os.IBinder;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.android.cast.dlna.dmr.Constants.Key;
 import com.android.cast.dlna.dmr.DLNARendererService;
 import com.android.cast.dlna.dmr.DLNARendererService.RendererServiceBinder;
 import com.android.cast.dlna.dmr.R;
@@ -33,12 +33,14 @@ import org.fourthline.cling.support.renderingcontrol.lastchange.RenderingControl
 /**
  *
  */
-public class DLNARendererActivity extends AppCompatActivity implements RendererThread.IActivityAliveCallback {
+public class DLNARendererActivity extends AppCompatActivity {
 
-    public static void startActivity(Context context, CastMediaRequest mediaRequest) {
+    private static final String KEY_EXTRA_CURRENT_URI = "Renderer.KeyExtra.CurrentUri";
+
+    public static void startActivity(Context context, String currentURI) {
         Intent intent = new Intent(context, DLNARendererActivity.class);
-        intent.putExtra(Key.EXTRA_CAST_REQUEST, mediaRequest);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(KEY_EXTRA_CURRENT_URI, currentURI);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // start from service content,should add 'FLAG_ACTIVITY_NEW_TASK' flag.
         context.startActivity(intent);
     }
 
@@ -46,18 +48,13 @@ public class DLNARendererActivity extends AppCompatActivity implements RendererT
     private VideoView mVideoView;
     private ProgressBar mProgressBar;
     private CastMediaController mCastControlImp;
-    private boolean mActivityDestroy = false;
     private DLNARendererService mRendererService;
-    private AudioManager mAudioManager;
 
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mRendererService = ((RendererServiceBinder) service).getRendererService();
             mRendererService.registerControlBridge(mCastControlImp = new CastMediaController(DLNARendererActivity.this, mRendererService));
-            //TODO: service maybe bind more than once!
-            new RendererThread.AvControlThread(DLNARendererActivity.this, mRendererService).start();
-            new RendererThread.AudioControlThread(DLNARendererActivity.this, mRendererService).start();
         }
 
         @Override
@@ -70,11 +67,9 @@ public class DLNARendererActivity extends AppCompatActivity implements RendererT
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dlna_renderer);
-        mAudioManager = (AudioManager) getApplication().getSystemService(Context.AUDIO_SERVICE);
         bindService(new Intent(this, DLNARendererService.class), mServiceConnection, Service.BIND_AUTO_CREATE);
         mVideoView = findViewById(R.id.video_view);
         mProgressBar = findViewById(R.id.video_progress);
-        mActivityDestroy = false;
         openMedia(getIntent());
     }
 
@@ -88,20 +83,35 @@ public class DLNARendererActivity extends AppCompatActivity implements RendererT
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
             mProgressBar.setVisibility(View.VISIBLE);
-            CastMediaRequest mediaRequest = bundle.getParcelable(Key.EXTRA_CAST_REQUEST);
-            mVideoView.setVideoURI(Uri.parse(mediaRequest.videoURL));
+            String currentUri = bundle.getString(KEY_EXTRA_CURRENT_URI);
+            mVideoView.setVideoURI(Uri.parse(currentUri));
             mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
-                    mProgressBar.setVisibility(View.INVISIBLE);
                     mp.start();
+                    mProgressBar.setVisibility(View.INVISIBLE);
+                    notifyTransportStateChanged(TransportState.PLAYING);
                 }
             });
-            if (mRendererService != null) {
-                mRendererService.getAvTransportLastChange()
-                        .setEventedValue(INSTANCE_ID, new AVTransportVariable.TransportState(TransportState.NO_MEDIA_PRESENT));
-            }
+            mVideoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                @Override
+                public boolean onError(MediaPlayer mp, int what, int extra) {
+                    mProgressBar.setVisibility(View.INVISIBLE);
+                    notifyTransportStateChanged(TransportState.STOPPED);
+                    if (DLNARendererActivity.this != null) finish();
+                    return true;
+                }
+            });
+            mVideoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    mProgressBar.setVisibility(View.INVISIBLE);
+                    notifyTransportStateChanged(TransportState.STOPPED);
+                    if (DLNARendererActivity.this != null) finish();
+                }
+            });
         } else {
+            Toast.makeText(this, "没有找到有效的视频地址，请检查...", Toast.LENGTH_SHORT).show();
             finish();
         }
     }
@@ -111,29 +121,45 @@ public class DLNARendererActivity extends AppCompatActivity implements RendererT
         if (mVideoView != null) {
             mVideoView.stopPlayback();
         }
+        notifyTransportStateChanged(TransportState.STOPPED);
         if (mRendererService != null) {
             mRendererService.unregisterControlBridge(mCastControlImp);
         }
         unbindService(mServiceConnection);
         super.onDestroy();
-        mActivityDestroy = true;
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         boolean handled = super.onKeyDown(keyCode, event);
-        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN
-                || keyCode == KeyEvent.KEYCODE_VOLUME_UP
-                || keyCode == KeyEvent.KEYCODE_VOLUME_MUTE) {
-            int volume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-            mRendererService.getAudioControlLastChange()
-                    .setEventedValue(INSTANCE_ID, new RenderingControlVariable.Volume(new ChannelVolume(Channel.Master, volume)));
+        if (mRendererService != null) {
+            if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_MUTE) {
+                int volume = ((AudioManager) getApplication().getSystemService(Context.AUDIO_SERVICE)).getStreamVolume(AudioManager.STREAM_MUSIC);
+                notifyRenderVolumeChanged(volume);
+            } else if (keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
+                if (mVideoView != null && mVideoView.isPlaying()) {
+                    mVideoView.pause();
+                    notifyTransportStateChanged(TransportState.PAUSED_PLAYBACK);
+                } else if (mVideoView != null) {
+                    mVideoView.resume();
+                    notifyTransportStateChanged(TransportState.PLAYING);
+                }
+            }
         }
         return handled;
     }
 
-    @Override
-    public boolean isActivityDestroyed() {
-        return mActivityDestroy;
+    private void notifyTransportStateChanged(TransportState transportState) {
+        if (mRendererService != null) {
+            mRendererService.getAvTransportLastChange()
+                    .setEventedValue(INSTANCE_ID, new AVTransportVariable.TransportState(transportState));
+        }
+    }
+
+    private void notifyRenderVolumeChanged(int volume) {
+        if (mRendererService != null) {
+            mRendererService.getAudioControlLastChange()
+                    .setEventedValue(INSTANCE_ID, new RenderingControlVariable.Volume(new ChannelVolume(Channel.Master, volume)));
+        }
     }
 }

@@ -23,6 +23,11 @@ public interface ICastMediaControl {
     // -------------------------------------------------------------------------------------------
     // -
     // -------------------------------------------------------------------------------------------
+    class MediaController{
+
+    }
+
+
     class CastMediaControlListener implements ICastMediaControl {
         private final List<ICastMediaControl> mListeners = new ArrayList<>();
 
