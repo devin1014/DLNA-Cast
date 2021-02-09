@@ -51,6 +51,7 @@ public class DLNARendererActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mRendererService = ((RendererServiceBinder) service).getRendererService();
+            mRendererService.setRenderControl(new IDLNARenderControl.VideoViewRenderControl(mVideoView));
         }
 
         @Override
@@ -63,9 +64,9 @@ public class DLNARendererActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dlna_renderer);
-        bindService(new Intent(this, DLNARendererService.class), mServiceConnection, Service.BIND_AUTO_CREATE);
         mVideoView = findViewById(R.id.video_view);
         mProgressBar = findViewById(R.id.video_progress);
+        bindService(new Intent(this, DLNARendererService.class), mServiceConnection, Service.BIND_AUTO_CREATE);
         openMedia(getIntent());
     }
 

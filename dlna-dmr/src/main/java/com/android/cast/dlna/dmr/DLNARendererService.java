@@ -122,6 +122,11 @@ public class DLNARendererService extends AndroidUpnpServiceImpl {
         return mAudioControlLastChange;
     }
 
+    public void setRenderControl(IDLNARenderControl control) {
+        mRenderControlManager.addControl(new AVTransportController(getApplicationContext(), control));
+        mRenderControlManager.addControl(new AudioRenderController(getApplicationContext(), control));
+    }
+
     // -------------------------------------------------------------------------------------------
     // - MediaPlayer Device
     // -------------------------------------------------------------------------------------------

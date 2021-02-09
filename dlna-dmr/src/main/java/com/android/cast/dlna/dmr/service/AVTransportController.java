@@ -31,7 +31,7 @@ public class AVTransportController implements IRendererInterface.IAVTransportCon
     private final Context mApplicationContext;
     private final TransportInfo mTransportInfo = new TransportInfo();
     private final TransportSettings mTransportSettings = new TransportSettings();
-    private PositionInfo mPositionInfo = new PositionInfo();
+    private PositionInfo mOriginPositionInfo = new PositionInfo();
     private MediaInfo mMediaInfo = new MediaInfo();
     private final IDLNARenderControl mMediaControl;
 
@@ -72,7 +72,7 @@ public class AVTransportController implements IRendererInterface.IAVTransportCon
 
     @Override
     public PositionInfo getPositionInfo() {
-        return mPositionInfo;
+        return new PositionInfo(mOriginPositionInfo, mMediaControl.getPosition() / 1000, mMediaControl.getDuration() / 1000);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class AVTransportController implements IRendererInterface.IAVTransportCon
             throw new AVTransportException(ErrorCode.INVALID_ARGS, "CurrentURI can not be null or malformed");
         }
         mMediaInfo = new MediaInfo(currentURI, currentURIMetaData, new UnsignedIntegerFourBytes(1), "", StorageMedium.NETWORK);
-        mPositionInfo = new PositionInfo(1, currentURIMetaData, currentURI);
+        mOriginPositionInfo = new PositionInfo(1, currentURIMetaData, currentURI);
         DLNARendererActivity.startActivity(mApplicationContext, currentURI);
     }
 
