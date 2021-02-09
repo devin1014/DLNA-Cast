@@ -10,7 +10,7 @@ import android.os.IBinder;
 import androidx.core.content.ContextCompat;
 
 import com.android.cast.dlna.core.Utils;
-import com.android.cast.dlna.dmr.IDLNARenderControl.CastMediaControlListener;
+import com.android.cast.dlna.dmr.IDLNARenderControl.DefaultRenderControl;
 import com.android.cast.dlna.dmr.service.AVTransportController;
 import com.android.cast.dlna.dmr.service.AVTransportServiceImpl;
 import com.android.cast.dlna.dmr.service.AudioRenderController;
@@ -78,9 +78,8 @@ public class DLNARendererService extends AndroidUpnpServiceImpl {
         org.seamless.util.logging.LoggingUtil.resetRootHandler(new FixedAndroidLogHandler());
         super.onCreate();
         String ipAddress = Utils.getWiFiIPAddress(getApplicationContext());
-        IDLNARenderControl mCastControlListener = new CastMediaControlListener(getApplication());
-        mRenderControlManager.addControl(new AVTransportController(getApplicationContext(), mCastControlListener));
-        mRenderControlManager.addControl(new AudioRenderController(getApplicationContext(), mCastControlListener));
+        mRenderControlManager.addControl(new AudioRenderController(getApplicationContext()));
+        mRenderControlManager.addControl(new AVTransportController(getApplicationContext(), new DefaultRenderControl()));
         try {
             mRendererDevice = createRendererDevice(getApplicationContext(), ipAddress);
             upnpService.getRegistry().addDevice(mRendererDevice);
@@ -124,7 +123,6 @@ public class DLNARendererService extends AndroidUpnpServiceImpl {
 
     public void setRenderControl(IDLNARenderControl control) {
         mRenderControlManager.addControl(new AVTransportController(getApplicationContext(), control));
-        mRenderControlManager.addControl(new AudioRenderController(getApplicationContext(), control));
     }
 
     // -------------------------------------------------------------------------------------------
