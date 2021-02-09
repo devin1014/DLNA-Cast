@@ -1,4 +1,4 @@
-package com.android.cast.dlna.dmr.player;
+package com.android.cast.dlna.dmr;
 
 import android.content.Context;
 import android.media.AudioManager;
@@ -9,7 +9,7 @@ import java.util.List;
 /**
  *
  */
-public interface ICastMediaControl {
+public interface IDLNARenderControl {
     void play();
 
     void pause();
@@ -23,15 +23,10 @@ public interface ICastMediaControl {
     // -------------------------------------------------------------------------------------------
     // -
     // -------------------------------------------------------------------------------------------
-    class MediaController{
+    class CastMediaControlListener implements IDLNARenderControl {
+        private final List<IDLNARenderControl> mListeners = new ArrayList<>();
 
-    }
-
-
-    class CastMediaControlListener implements ICastMediaControl {
-        private final List<ICastMediaControl> mListeners = new ArrayList<>();
-
-        private final ICastMediaControl mDefaultListener;
+        private final IDLNARenderControl mDefaultListener;
 
         public CastMediaControlListener(Context context) {
             mDefaultListener = new DefaultCastMediaControlImp(context);
@@ -39,7 +34,7 @@ public interface ICastMediaControl {
             register(mDefaultListener);
         }
 
-        public void register(ICastMediaControl listener) {
+        public void register(IDLNARenderControl listener) {
             if (!mListeners.contains(listener)) {
                 mListeners.add(listener);
             }
@@ -49,7 +44,7 @@ public interface ICastMediaControl {
             }
         }
 
-        public void unregister(ICastMediaControl listener) {
+        public void unregister(IDLNARenderControl listener) {
             if (mListeners.contains(listener)) {
                 mListeners.remove(listener);
             }
@@ -61,40 +56,40 @@ public interface ICastMediaControl {
 
         @Override
         public void play() {
-            for (ICastMediaControl bridge : mListeners) {
+            for (IDLNARenderControl bridge : mListeners) {
                 bridge.play();
             }
         }
 
         @Override
         public void pause() {
-            for (ICastMediaControl bridge : mListeners) {
+            for (IDLNARenderControl bridge : mListeners) {
                 bridge.pause();
             }
         }
 
         @Override
         public void seek(long position) {
-            for (ICastMediaControl bridge : mListeners) {
+            for (IDLNARenderControl bridge : mListeners) {
                 bridge.seek(position);
             }
         }
 
         @Override
         public void stop() {
-            for (ICastMediaControl bridge : mListeners) {
+            for (IDLNARenderControl bridge : mListeners) {
                 bridge.stop();
             }
         }
 
         @Override
         public void setVolume(int volume) {
-            for (ICastMediaControl bridge : mListeners) {
+            for (IDLNARenderControl bridge : mListeners) {
                 bridge.setVolume(volume);
             }
         }
 
-        private static class DefaultCastMediaControlImp implements ICastMediaControl {
+        private static class DefaultCastMediaControlImp implements IDLNARenderControl {
             private final AudioManager mAudioManager;
 
             DefaultCastMediaControlImp(Context context) {

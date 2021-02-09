@@ -4,8 +4,8 @@ package com.android.cast.dlna.dmr.service;
 import android.content.Context;
 
 import com.android.cast.dlna.core.Utils;
-import com.android.cast.dlna.dmr.player.DLNARendererActivity;
-import com.android.cast.dlna.dmr.player.ICastMediaControl;
+import com.android.cast.dlna.dmr.DLNARendererActivity;
+import com.android.cast.dlna.dmr.IDLNARenderControl;
 
 import org.fourthline.cling.model.types.ErrorCode;
 import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
@@ -33,13 +33,13 @@ public class AVTransportController implements IRendererInterface.IAVTransportCon
     private final TransportSettings mTransportSettings = new TransportSettings();
     private PositionInfo mPositionInfo = new PositionInfo();
     private MediaInfo mMediaInfo = new MediaInfo();
-    private final ICastMediaControl mMediaControl;
+    private final IDLNARenderControl mMediaControl;
 
-    public AVTransportController(Context context, ICastMediaControl control) {
+    public AVTransportController(Context context, IDLNARenderControl control) {
         this(context, new UnsignedIntegerFourBytes(0), control);
     }
 
-    public AVTransportController(Context context, UnsignedIntegerFourBytes instanceId, ICastMediaControl control) {
+    public AVTransportController(Context context, UnsignedIntegerFourBytes instanceId, IDLNARenderControl control) {
         mApplicationContext = context.getApplicationContext();
         mInstanceId = instanceId;
         mMediaControl = control;

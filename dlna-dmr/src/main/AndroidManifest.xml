@@ -5,11 +5,7 @@
     <application>
 
         <activity
-            android:name=".player.DLNARendererActivity"
-            android:configChanges="keyboard|screenSize"
-            android:launchMode="singleTop" />
-        <activity
-            android:name=".player.CastVideoPlayerLeanbackActivity"
+            android:name=".DLNARendererActivity"
             android:configChanges="keyboard|screenSize"
             android:launchMode="singleTop" />
 

@@ -1,4 +1,4 @@
-package com.android.cast.dlna.dmr.player;
+package com.android.cast.dlna.dmr;
 
 import android.app.Service;
 import android.content.ComponentName;
@@ -19,9 +19,7 @@ import android.widget.VideoView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.android.cast.dlna.dmr.DLNARendererService;
 import com.android.cast.dlna.dmr.DLNARendererService.RendererServiceBinder;
-import com.android.cast.dlna.dmr.R;
 
 import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
 import org.fourthline.cling.support.avtransport.lastchange.AVTransportVariable;
@@ -47,14 +45,12 @@ public class DLNARendererActivity extends AppCompatActivity {
     private final UnsignedIntegerFourBytes INSTANCE_ID = new UnsignedIntegerFourBytes(0);
     private VideoView mVideoView;
     private ProgressBar mProgressBar;
-    private CastMediaController mCastControlImp;
     private DLNARendererService mRendererService;
 
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mRendererService = ((RendererServiceBinder) service).getRendererService();
-            mRendererService.registerControlBridge(mCastControlImp = new CastMediaController(DLNARendererActivity.this, mRendererService));
         }
 
         @Override
@@ -118,13 +114,8 @@ public class DLNARendererActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        if (mVideoView != null) {
-            mVideoView.stopPlayback();
-        }
+        if (mVideoView != null) mVideoView.stopPlayback();
         notifyTransportStateChanged(TransportState.STOPPED);
-        if (mRendererService != null) {
-            mRendererService.unregisterControlBridge(mCastControlImp);
-        }
         unbindService(mServiceConnection);
         super.onDestroy();
     }

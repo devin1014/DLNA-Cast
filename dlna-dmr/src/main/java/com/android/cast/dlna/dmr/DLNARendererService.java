@@ -10,8 +10,7 @@ import android.os.IBinder;
 import androidx.core.content.ContextCompat;
 
 import com.android.cast.dlna.core.Utils;
-import com.android.cast.dlna.dmr.player.ICastMediaControl;
-import com.android.cast.dlna.dmr.player.ICastMediaControl.CastMediaControlListener;
+import com.android.cast.dlna.dmr.IDLNARenderControl.CastMediaControlListener;
 import com.android.cast.dlna.dmr.service.AVTransportController;
 import com.android.cast.dlna.dmr.service.AVTransportServiceImpl;
 import com.android.cast.dlna.dmr.service.AudioRenderController;
@@ -62,7 +61,6 @@ public class DLNARendererService extends AndroidUpnpServiceImpl {
     private LastChange mAvTransportLastChange;
     private LastChange mAudioControlLastChange;
     private final RendererServiceBinder mBinder = new RendererServiceBinder();
-    private CastMediaControlListener mCastControlListener;
     private LocalDevice mRendererDevice;
 
     @Override
@@ -80,7 +78,7 @@ public class DLNARendererService extends AndroidUpnpServiceImpl {
         org.seamless.util.logging.LoggingUtil.resetRootHandler(new FixedAndroidLogHandler());
         super.onCreate();
         String ipAddress = Utils.getWiFiIPAddress(getApplicationContext());
-        mCastControlListener = new CastMediaControlListener(getApplication());
+        IDLNARenderControl mCastControlListener = new CastMediaControlListener(getApplication());
         mRenderControlManager.addControl(new AVTransportController(getApplicationContext(), mCastControlListener));
         mRenderControlManager.addControl(new AudioRenderController(getApplicationContext(), mCastControlListener));
         try {
@@ -122,18 +120,6 @@ public class DLNARendererService extends AndroidUpnpServiceImpl {
 
     public LastChange getAudioControlLastChange() {
         return mAudioControlLastChange;
-    }
-
-    public LocalDevice getLocalDevice() {
-        return mRendererDevice;
-    }
-
-    public void registerControlBridge(ICastMediaControl bridge) {
-        mCastControlListener.register(bridge);
-    }
-
-    public void unregisterControlBridge(ICastMediaControl bridge) {
-        mCastControlListener.unregister(bridge);
     }
 
     // -------------------------------------------------------------------------------------------

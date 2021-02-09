@@ -46,60 +46,60 @@ public class ControlFragment extends Fragment implements IDisplayDevice, CastFra
                 new ICastInterface.CastEventListener() {
                     @Override
                     public void onSuccess(String result) {
-                        Toast.makeText(getActivity(), "Cast: " + result, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Cast: " + result, Toast.LENGTH_LONG).show();
                         mPositionMsgHandler.start(0);
                         mVolumeMsgHandler.start(0);
                     }
 
                     @Override
                     public void onFailed(String errMsg) {
-                        Toast.makeText(getActivity(), errMsg, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), errMsg, Toast.LENGTH_LONG).show();
                     }
                 },
                 new ICastInterface.PlayEventListener() {
                     @Override
                     public void onSuccess(Void result) {
-                        Toast.makeText(getActivity(), "Play", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Play", Toast.LENGTH_LONG).show();
                     }
 
                     @Override
                     public void onFailed(String errMsg) {
-                        Toast.makeText(getActivity(), errMsg, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), errMsg, Toast.LENGTH_LONG).show();
                     }
                 },
                 new ICastInterface.PauseEventListener() {
                     @Override
                     public void onSuccess(Void result) {
-                        Toast.makeText(getActivity(), "Pause", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Pause", Toast.LENGTH_LONG).show();
                     }
 
                     @Override
                     public void onFailed(String errMsg) {
-                        Toast.makeText(getActivity(), errMsg, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), errMsg, Toast.LENGTH_LONG).show();
                     }
                 },
                 new ICastInterface.StopEventListener() {
                     @Override
                     public void onSuccess(Void result) {
-                        Toast.makeText(getActivity(), "Stop", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Stop", Toast.LENGTH_LONG).show();
                         mPositionMsgHandler.stop();
                         mVolumeMsgHandler.stop();
                     }
 
                     @Override
                     public void onFailed(String errMsg) {
-                        Toast.makeText(getActivity(), errMsg, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), errMsg, Toast.LENGTH_LONG).show();
                     }
                 },
                 new ICastInterface.SeekToEventListener() {
                     @Override
                     public void onSuccess(Long result) {
-                        Toast.makeText(getActivity(), "SeekTo: " + Utils.getStringTime(result), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "SeekTo: " + Utils.getStringTime(result), Toast.LENGTH_LONG).show();
                     }
 
                     @Override
                     public void onFailed(String errMsg) {
-                        Toast.makeText(getActivity(), errMsg, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), errMsg, Toast.LENGTH_LONG).show();
                     }
                 }
         );
