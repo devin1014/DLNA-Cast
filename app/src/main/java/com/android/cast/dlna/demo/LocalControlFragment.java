@@ -39,8 +39,7 @@ public class LocalControlFragment extends Fragment implements IDisplayDevice {
 
         mMediaServer = new MediaServer(view.getContext());
         mMediaServer.start();
-        DLNACastManager.getInstance().addMediaServer(mMediaServer);
-        //ContentFactory.getInstance().getContent(MediaItem.VIDEO_ID);
+        DLNACastManager.getInstance().addMediaServer(mMediaServer.getDevice());
 
         initComponent(view);
     }
@@ -54,6 +53,7 @@ public class LocalControlFragment extends Fragment implements IDisplayDevice {
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
             // intent.setType("text/plain");
             intent.setType("video/*;audio/*;image/*");
+            // intent.setType("image/*");
             startActivityForResult(intent, REQUEST_CODE_SELECT);
         });
         view.findViewById(R.id.local_ctrl_cast).setOnClickListener(v -> {
@@ -90,6 +90,7 @@ public class LocalControlFragment extends Fragment implements IDisplayDevice {
 
     @Override
     public void onDestroyView() {
+        DLNACastManager.getInstance().removeMediaServer(mMediaServer.getDevice());
         mMediaServer.stop();
         super.onDestroyView();
     }

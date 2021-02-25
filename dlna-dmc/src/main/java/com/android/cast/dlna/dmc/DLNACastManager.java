@@ -18,13 +18,13 @@ import com.android.cast.dlna.dmc.ILogger.DefaultLoggerImpl;
 import com.android.cast.dlna.dmc.control.ControlImpl;
 import com.android.cast.dlna.dmc.control.ICastInterface;
 import com.android.cast.dlna.dmc.control.IServiceAction;
-import com.android.cast.dlna.dms.MediaServer;
 
 import org.fourthline.cling.UpnpService;
 import org.fourthline.cling.android.AndroidUpnpService;
 import org.fourthline.cling.model.message.header.STAllHeader;
 import org.fourthline.cling.model.message.header.UDADeviceTypeHeader;
 import org.fourthline.cling.model.meta.Device;
+import org.fourthline.cling.model.meta.LocalDevice;
 import org.fourthline.cling.model.types.DeviceType;
 import org.fourthline.cling.model.types.ServiceType;
 import org.fourthline.cling.model.types.UDADeviceType;
@@ -105,8 +105,8 @@ public final class DLNACastManager implements ICastInterface.IControl, OnDeviceR
                 // Now add all devices to the list we already know about
                 mDeviceRegistryImpl.setDevices(upnpService.getRegistry().getDevices());
             }
-            if (_mediaServer != null && _mediaServer.getDevice() != null) {
-                mDLNACastService.getRegistry().addDevice(_mediaServer.getDevice());
+            if (_mediaServer != null) {
+                mDLNACastService.getRegistry().addDevice(_mediaServer);
             }
             _mediaServer = null;
         }
@@ -223,15 +223,23 @@ public final class DLNACastManager implements ICastInterface.IControl, OnDeviceR
     // -----------------------------------------------------------------------------------------
     // ---- MediaServer
     // -----------------------------------------------------------------------------------------
-    private MediaServer _mediaServer;
+    private LocalDevice _mediaServer;
 
-    public void addMediaServer(@NonNull MediaServer mediaServer) {
-        if (mDLNACastService != null) {
-            if (mDLNACastService.getRegistry().getDevice(mediaServer.getDevice().getIdentity().getUdn(), true) == null) {
-                mDLNACastService.getRegistry().addDevice(mediaServer.getDevice());
+    public void addMediaServer(LocalDevice mediaServer) {
+        if (mDLNACastService != null && mediaServer != null) {
+            if (mDLNACastService.getRegistry().getDevice(mediaServer.getIdentity().getUdn(), true) == null) {
+                mDLNACastService.getRegistry().addDevice(mediaServer);
             }
         } else {
             _mediaServer = mediaServer;
+        }
+    }
+
+    public void removeMediaServer(LocalDevice mediaServer) {
+        if (mDLNACastService != null && mediaServer != null) {
+            mDLNACastService.getRegistry().removeDevice(mediaServer);
+        } else {
+            _mediaServer = null;
         }
     }
 

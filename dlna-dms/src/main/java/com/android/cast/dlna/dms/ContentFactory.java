@@ -69,7 +69,7 @@ public class ContentFactory {
             result.addContainer(videoContainer);
             result.setChildCount(result.getChildCount() + 1);
         } else if (MediaItem.IMAGE_ID.equals(containerId)) {
-            MediaContentDao contentDao = new MediaContentDao(baseUrl);
+            IMediaContentDao contentDao = new IMediaContentDao.MediaContentDao(baseUrl);
             //Get image items
             List<Item> items = contentDao.getImageItems(context);
             for (Item item : items) {
@@ -77,7 +77,7 @@ public class ContentFactory {
                 result.setChildCount(result.getChildCount() + 1);
             }
         } else if (MediaItem.AUDIO_ID.equals(containerId)) {
-            MediaContentDao contentDao = new MediaContentDao(baseUrl);
+            IMediaContentDao contentDao = new IMediaContentDao.MediaContentDao(baseUrl);
             //Get audio items
             List<Item> items = contentDao.getAudioItems(context);
             for (Item item : items) {
@@ -85,7 +85,7 @@ public class ContentFactory {
                 result.setChildCount(result.getChildCount() + 1);
             }
         } else if (MediaItem.VIDEO_ID.equals(containerId)) {
-            MediaContentDao contentDao = new MediaContentDao(baseUrl);
+            IMediaContentDao contentDao = new IMediaContentDao.MediaContentDao(baseUrl);
             //Get video items
             List<Item> items = contentDao.getVideoItems(context);
             for (Item item : items) {
