@@ -24,7 +24,7 @@ interface IResourceServerFactory {
         public IResourceServer getInstance() {
             // TODO:
             // return new JettyHttpServer(port);
-            return new NanoHttpServer2(port);
+            return new NanoHttpServer(port);
         }
     }
 }

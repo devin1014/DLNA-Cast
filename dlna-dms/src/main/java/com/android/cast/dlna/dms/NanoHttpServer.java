@@ -12,7 +12,7 @@ import java.util.Map;
 
 import fi.iki.elonen.NanoHTTPD;
 
-class NanoHttpServer2 extends NanoHTTPD implements IResourceServer {
+class NanoHttpServer extends NanoHTTPD implements IResourceServer {
 
     private static final Map<String, String> MIME_TYPE = new HashMap<>();
     private static final String MIME_PLAINTEXT = "text/plain";
@@ -26,7 +26,7 @@ class NanoHttpServer2 extends NanoHTTPD implements IResourceServer {
         MIME_TYPE.put("wav", "video/*");
     }
 
-    public NanoHttpServer2(int port) {
+    public NanoHttpServer(int port) {
         super(port);
     }
 
