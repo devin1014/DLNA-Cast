@@ -32,15 +32,15 @@ public final class MediaServer {
     //TODO:remove local device field?
     //TODO:remove local device field?
     private LocalDevice mDevice;
-    private LocalResourceServer mResourceServer;
+    private IResourceServer mResourceServer;
     private final String mInetAddress;
     private final String mBaseUrl;
 
     public MediaServer(Context context) {
-        this(context, new ResourceServerFactory.DefaultResourceServerFactoryImpl(PORT));
+        this(context, new IResourceServerFactory.DefaultResourceServerFactoryImpl(PORT));
     }
 
-    public MediaServer(Context context, ResourceServerFactory factory) {
+    public MediaServer(Context context, IResourceServerFactory factory) {
         String address = Utils.getWiFiIPAddress(context);
         mInetAddress = String.format("%s:%s", address, factory.getPort());
         mBaseUrl = String.format("http://%s:%s", address, factory.getPort());
@@ -55,13 +55,13 @@ public final class MediaServer {
 
     public void start() {
         if (mResourceServer != null) {
-            mResourceServer.start();
+            mResourceServer.startServer();
         }
     }
 
     public void stop() {
         if (mResourceServer != null) {
-            mResourceServer.stop();
+            mResourceServer.stopServer();
         }
     }
 

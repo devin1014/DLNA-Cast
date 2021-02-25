@@ -1,14 +1,14 @@
 package com.android.cast.dlna.dms;
 
-interface ResourceServerFactory {
+interface IResourceServerFactory {
     int getPort();
 
-    LocalResourceServer getInstance();
+    IResourceServer getInstance();
 
     // ----------------------------------------------------------------------------
     // ---- implement
     // ----------------------------------------------------------------------------
-    final class DefaultResourceServerFactoryImpl implements ResourceServerFactory {
+    final class DefaultResourceServerFactoryImpl implements IResourceServerFactory {
         private final int port;
 
         public DefaultResourceServerFactoryImpl(int port) {
@@ -21,8 +21,10 @@ interface ResourceServerFactory {
         }
 
         @Override
-        public LocalResourceServer getInstance() {
-            return new JettyServer(port);
+        public IResourceServer getInstance() {
+            // TODO:
+            // return new JettyHttpServer(port);
+            return new NanoHttpServer2(port);
         }
     }
 }

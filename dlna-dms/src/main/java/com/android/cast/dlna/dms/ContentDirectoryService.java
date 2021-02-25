@@ -20,22 +20,22 @@ public class ContentDirectoryService extends AbstractContentDirectoryService {
                                long firstResult,
                                long maxResults,
                                SortCriterion[] orderBy) throws ContentDirectoryException {
-        Container resultBean = ContentFactory.getInstance().getContent(objectID);
-        DIDLContent content = new DIDLContent();
-        for (Container c : resultBean.getContainers()) {
-            content.addContainer(c);
+        Container container = ContentFactory.getInstance().getContent(objectID);
+        DIDLContent didlContent = new DIDLContent();
+        for (Container c : container.getContainers()) {
+            didlContent.addContainer(c);
         }
-        for (Item item : resultBean.getItems()) {
-            content.addItem(item);
+        for (Item item : container.getItems()) {
+            didlContent.addItem(item);
         }
-        int count = resultBean.getChildCount();
-        String contentModel;
+        int count = container.getChildCount();
+        String result;
         try {
-            contentModel = new DIDLParser().generate(content);
+            result = new DIDLParser().generate(didlContent);
         } catch (Exception e) {
             throw new ContentDirectoryException(ContentDirectoryErrorCode.CANNOT_PROCESS, e.toString());
         }
-        return new BrowseResult(contentModel, count, count);
+        return new BrowseResult(result, count, count);
     }
 
     @Override

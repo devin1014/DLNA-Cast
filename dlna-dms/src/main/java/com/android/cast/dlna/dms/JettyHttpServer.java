@@ -20,15 +20,15 @@ import com.orhanobut.logger.Logger;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 
-final class JettyServer implements LocalResourceServer {
+final class JettyHttpServer implements IResourceServer {
     private final Server mServer;
 
-    public JettyServer(int port) {
+    public JettyHttpServer(int port) {
         mServer = new Server(port); // Has its own QueuedThreadPool
         mServer.setGracefulShutdown(1000); // Let's wait a second for ongoing transfers to complete
     }
 
-    synchronized public void start() {
+    synchronized public void startServer() {
         if (!mServer.isStarted() && !mServer.isStarting()) {
             new Thread(new Runnable() {
                 @Override
@@ -53,7 +53,7 @@ final class JettyServer implements LocalResourceServer {
         }
     }
 
-    synchronized public void stop() {
+    synchronized public void stopServer() {
         if (!mServer.isStopped() && !mServer.isStopping()) {
             try {
                 Logger.i("JettyServer stop.");
