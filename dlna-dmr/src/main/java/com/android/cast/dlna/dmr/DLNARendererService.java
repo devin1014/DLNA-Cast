@@ -1,6 +1,5 @@
 package com.android.cast.dlna.dmr;
 
-import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -55,7 +54,6 @@ public class DLNARendererService extends AndroidUpnpServiceImpl {
         context.getApplicationContext().startService(new Intent(context, DLNARendererService.class));
     }
 
-    public static final int NOTIFICATION_ID = 0x11;
     private final RenderControlManager mRenderControlManager = new RenderControlManager();
 
     private LastChange mAvTransportLastChange;
@@ -86,13 +84,7 @@ public class DLNARendererService extends AndroidUpnpServiceImpl {
         } catch (Exception e) {
             e.printStackTrace();
             stopSelf();
-            return;
         }
-
-        Notification.Builder builder = new Notification.Builder(this);
-        builder.setSmallIcon(R.drawable.ic_launcher);
-        startForeground(NOTIFICATION_ID, builder.build());
-        startService(new Intent(this, KeepLiveInnerService.class));
     }
 
     @Override
