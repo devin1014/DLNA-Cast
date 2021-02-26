@@ -28,22 +28,18 @@ import java.util.UUID;
 
 public final class MediaServer {
 
-    //TODO:remove local device field?
-    //TODO:remove local device field?
-    //TODO:remove local device field?
     private LocalDevice mDevice;
     private IResourceServer mResourceServer;
     private final String mBaseUrl;
 
     public MediaServer(Context context) {
-        this(context, new IResourceServerFactory.DefaultResourceServerFactoryImpl(PORT));
+        this(context, new IResourceServer.IResourceServerFactory.DefaultResourceServerFactoryImpl(PORT));
     }
 
-    public MediaServer(Context context, IResourceServerFactory factory) {
+    public MediaServer(Context context, IResourceServer.IResourceServerFactory factory) {
         String address = Utils.getWiFiIPAddress(context);
-        //mInetAddress = String.format("%s:%s", address, factory.getPort());
         mBaseUrl = String.format("http://%s:%s", address, factory.getPort());
-        ContentFactory.initInstance(context, mBaseUrl);
+        ContentFactory.getInstance().setServerUrl(context, mBaseUrl);
         try {
             mDevice = createLocalDevice(context, address);
             mResourceServer = factory.getInstance();

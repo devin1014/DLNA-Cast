@@ -17,6 +17,9 @@ import org.fourthline.cling.model.meta.Service;
 import org.fourthline.cling.support.avtransport.callback.GetMediaInfo;
 import org.fourthline.cling.support.avtransport.callback.GetPositionInfo;
 import org.fourthline.cling.support.avtransport.callback.GetTransportInfo;
+import org.fourthline.cling.support.contentdirectory.callback.Browse;
+import org.fourthline.cling.support.model.BrowseFlag;
+import org.fourthline.cling.support.model.DIDLContent;
 import org.fourthline.cling.support.model.MediaInfo;
 import org.fourthline.cling.support.model.PositionInfo;
 import org.fourthline.cling.support.model.TransportInfo;
@@ -213,6 +216,44 @@ abstract class QueryRequest<T> {
                     } :
                     null;
         }
+    }
 
+    // ---------------------------------------------------------------------------------------------
+    // ---- Browse
+    // ---------------------------------------------------------------------------------------------
+    static final class BrowseContentRequest extends QueryRequest<DIDLContent> {
+
+        private final String containId;
+
+        public BrowseContentRequest(@NonNull Service<?, ?> service, String containId) {
+            super(service);
+            this.containId = containId;
+        }
+
+        @Override
+        protected String getActionName() {
+            return "Browse";
+        }
+
+        @Override
+        protected ActionCallback getAction() {
+            return getService() != null ?
+                    new Browse(getService(), containId, BrowseFlag.METADATA) {
+                        @Override
+                        public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
+                            setError(defaultMsg);
+                        }
+
+                        @Override
+                        public void received(ActionInvocation actionInvocation, DIDLContent didl) {
+                            setResult(didl);
+                        }
+
+                        @Override
+                        public void updateStatus(Status status) {
+                        }
+                    } :
+                    null;
+        }
     }
 }

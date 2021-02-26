@@ -15,22 +15,19 @@
  */
 package com.android.cast.dlna.dms;
 
-import com.orhanobut.logger.Logger;
-
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.util.resource.FileResource;
 import org.eclipse.jetty.util.resource.Resource;
 
 import java.io.File;
 
-public class ContentResourceServlet extends DefaultServlet {
+class ContentResourceServlet extends DefaultServlet {
 
     @Override
     public Resource getResource(String pathInContext) {
         // String id = Utils.parseResourceId(pathInContext);
         // content://media/external/video/media/1611127029319529
         // Uri uri = ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, Long.parseLong(id));
-        Logger.i("ContentResourceServlet, path: %s", pathInContext);
         try {
             File file = new File(pathInContext);
             if (file.exists()) return FileResource.newResource(file);

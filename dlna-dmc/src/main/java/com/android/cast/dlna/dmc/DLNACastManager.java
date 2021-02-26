@@ -14,6 +14,7 @@ import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.android.cast.dlna.core.ContentType;
 import com.android.cast.dlna.dmc.ILogger.DefaultLoggerImpl;
 import com.android.cast.dlna.dmc.control.ControlImpl;
 import com.android.cast.dlna.dmc.control.ICastInterface;
@@ -31,6 +32,7 @@ import org.fourthline.cling.model.types.UDADeviceType;
 import org.fourthline.cling.model.types.UDAServiceType;
 import org.fourthline.cling.registry.Registry;
 import org.fourthline.cling.registry.RegistryListener;
+import org.fourthline.cling.support.model.DIDLContent;
 import org.fourthline.cling.support.model.MediaInfo;
 import org.fourthline.cling.support.model.PositionInfo;
 import org.fourthline.cling.support.model.TransportInfo;
@@ -51,6 +53,7 @@ public final class DLNACastManager implements ICastInterface.IControl, OnDeviceR
     public static final ServiceType SERVICE_AV_TRANSPORT = new UDAServiceType("AVTransport");
     public static final ServiceType SERVICE_RENDERING_CONTROL = new UDAServiceType("RenderingControl");
     public static final ServiceType SERVICE_CONNECTION_MANAGER = new UDAServiceType("ConnectionManager");
+    public static final ServiceType SERVICE_CONTENT_DIRECTORY = new UDAServiceType("ContentDirectory");
 
     private static class Holder {
         private static final DLNACastManager INSTANCE = new DLNACastManager();
@@ -354,5 +357,9 @@ public final class DLNACastManager implements ICastInterface.IControl, OnDeviceR
 
     public void getVolumeInfo(Device<?, ?, ?> device, ICastInterface.GetInfoListener<Integer> listener) {
         new QueryRequest.VolumeInfoRequest(device.findService(SERVICE_RENDERING_CONTROL)).execute(mDLNACastService.getControlPoint(), listener);
+    }
+
+    public void getContent(Device<?, ?, ?> device, ContentType contentType, ICastInterface.GetInfoListener<DIDLContent> listener) {
+        new QueryRequest.BrowseContentRequest(device.findService(SERVICE_CONTENT_DIRECTORY), contentType.id).execute(mDLNACastService.getControlPoint(), listener);
     }
 }
