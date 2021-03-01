@@ -37,7 +37,7 @@ public final class MediaServer {
     }
 
     public MediaServer(Context context, IResourceServer.IResourceServerFactory factory) {
-        String address = Utils.getWiFiIPAddress(context);
+        String address = Utils.getWiFiInfoIPAddress(context);
         mBaseUrl = String.format("http://%s:%s", address, factory.getPort());
         ContentFactory.getInstance().setServerUrl(context, mBaseUrl);
         try {

@@ -75,7 +75,7 @@ public class DLNARendererService extends AndroidUpnpServiceImpl {
     public void onCreate() {
         org.seamless.util.logging.LoggingUtil.resetRootHandler(new FixedAndroidLogHandler());
         super.onCreate();
-        String ipAddress = Utils.getWiFiIPAddress(getApplicationContext());
+        String ipAddress = Utils.getWiFiInfoIPAddress(getApplicationContext());
         mRenderControlManager.addControl(new AudioRenderController(getApplicationContext()));
         mRenderControlManager.addControl(new AVTransportController(getApplicationContext(), new DefaultRenderControl()));
         try {

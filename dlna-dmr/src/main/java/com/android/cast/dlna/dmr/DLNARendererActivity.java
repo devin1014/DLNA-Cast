@@ -95,7 +95,7 @@ public class DLNARendererActivity extends AppCompatActivity {
                 public boolean onError(MediaPlayer mp, int what, int extra) {
                     mProgressBar.setVisibility(View.INVISIBLE);
                     notifyTransportStateChanged(TransportState.STOPPED);
-                    if (DLNARendererActivity.this != null) finish();
+                    finish();
                     return true;
                 }
             });
@@ -104,7 +104,7 @@ public class DLNARendererActivity extends AppCompatActivity {
                 public void onCompletion(MediaPlayer mp) {
                     mProgressBar.setVisibility(View.INVISIBLE);
                     notifyTransportStateChanged(TransportState.STOPPED);
-                    if (DLNARendererActivity.this != null) finish();
+                    finish();
                 }
             });
         } else {

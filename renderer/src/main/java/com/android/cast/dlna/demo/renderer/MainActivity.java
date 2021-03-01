@@ -6,6 +6,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.android.cast.dlna.core.Utils;
 import com.android.cast.dlna.dmr.DLNARendererService;
 import com.permissionx.guolindev.PermissionX;
 
@@ -22,6 +23,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void resetWifiInfo() {
-        ((TextView) findViewById(R.id.network_info)).setText(Utils.getWiFiSSID(this));
+        ((TextView) findViewById(R.id.network_info)).setText(Utils.getWiFiInfoSSID(this));
     }
 }

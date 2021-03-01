@@ -31,6 +31,4 @@
     <string name="searchingLAN">Searching LAN for UPnP devices…</string>
     <string name="deviceDetailsNotYetAvailable">Device details are being discovered, please wait.</string>
 
-    <string name="not_connect_wifi">当前没有连接到WiFi网络，请检查</string>
-
 </resources>

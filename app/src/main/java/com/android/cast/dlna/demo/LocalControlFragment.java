@@ -17,7 +17,6 @@ import androidx.fragment.app.Fragment;
 import com.android.cast.dlna.core.Utils;
 import com.android.cast.dlna.dmc.DLNACastManager;
 import com.android.cast.dlna.dms.MediaServer;
-import com.orhanobut.logger.Logger;
 
 import org.fourthline.cling.model.meta.Device;
 
@@ -71,8 +70,6 @@ public class LocalControlFragment extends Fragment implements IDisplayDevice {
         if (requestCode == REQUEST_CODE_SELECT && resultCode == Activity.RESULT_OK && data != null) {
             Uri uri = data.getData();
             String path = Utils.parseUri2Path(getActivity(), uri);
-            Logger.i("onActivityResult: " + uri.toString());
-            Logger.i("onActivityResult: " + path);
             mCastPathUrl = mMediaServer.getBaseUrl() + path;
             mPickupContent.setText(mCastPathUrl);
             PreferenceManager.getDefaultSharedPreferences(getActivity())

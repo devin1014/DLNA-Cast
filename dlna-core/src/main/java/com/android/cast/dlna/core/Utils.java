@@ -15,10 +15,16 @@
  */
 package com.android.cast.dlna.core;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -28,21 +34,78 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 
 import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 
 import java.util.Formatter;
 import java.util.Locale;
 
 public class Utils {
 
-    //TODO:check auth or multiple ip
-    public static String getWiFiIPAddress(Context context) {
+    // ------------------------------------------------------------------------------------------------------------------------
+    // ---- Device Wifi Information
+    // ------------------------------------------------------------------------------------------------------------------------
+    private static final String NETWORK_TYPE_WIFI = "WiFi";
+    private static final String NETWORK_TYPE_MOBILE = "Mobile EDGE>";
+    private static final String NETWORK_TYPE_OTHERS = "Others>";
+
+    private static final String WIFI_DISABLED = "<disabled>";
+    private static final String WIFI_NO_CONNECT = "<not connect>";
+    private static final String WIFI_NO_PERMISSION = "<permission deny>";
+
+    private static final String UNKNOWN = "<unknown>";
+
+    /**
+     * need permission 'Manifest.permission.ACCESS_FINE_LOCATION' and 'Manifest.permission.ACCESS_WIFI_STATE' if system sdk >= Android O.
+     */
+    @SuppressLint("MissingPermission")
+    public static String getWiFiInfoSSID(Context context) {
         WifiManager wifiManager = getSystemService(context, Context.WIFI_SERVICE);
+        if (!wifiManager.isWifiEnabled()) return WIFI_DISABLED;
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-        if (wifiInfo != null) {
-            int address = wifiInfo.getIpAddress();
-            return (address & 0xFF) + "." + ((address >> 8) & 0xFF) + "." + ((address >> 16) & 0xFF) + "." + (address >> 24 & 0xFF);
+        if (wifiInfo == null) return WIFI_NO_CONNECT;
+        if (wifiInfo.getSSID().equals(WifiManager.UNKNOWN_SSID)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                        || ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_WIFI_STATE) != PackageManager.PERMISSION_GRANTED) {
+                    return WIFI_NO_PERMISSION;
+                }
+                if (wifiManager.getConfiguredNetworks() != null) {
+                    for (WifiConfiguration config : wifiManager.getConfiguredNetworks()) {
+                        if (config.networkId == wifiInfo.getNetworkId()) {
+                            return config.SSID.replaceAll("\"", "");
+                        }
+                    }
+                }
+            } else {
+                return WIFI_NO_CONNECT;
+            }
+            return UNKNOWN;
         } else {
-            return "unknown";
+            return wifiInfo.getSSID().replaceAll("\"", "");
+        }
+    }
+
+    public static String getWiFiInfoIPAddress(Context context) {
+        WifiManager wifiManager = getSystemService(context, Context.WIFI_SERVICE);
+        if (wifiManager == null || !wifiManager.isWifiEnabled()) return "";
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        if (wifiInfo == null) return UNKNOWN;
+        int address = wifiInfo.getIpAddress();
+        if (address == 0) return UNKNOWN;
+        return (address & 0xFF) + "." + ((address >> 8) & 0xFF) + "." + ((address >> 16) & 0xFF) + "." + (address >> 24 & 0xFF);
+    }
+
+    public static String getActiveNetworkInfo(Context context) {
+        ConnectivityManager connectivityManager = getSystemService(context, Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager == null) return UNKNOWN;
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if (networkInfo == null) return UNKNOWN;
+        if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+            return NETWORK_TYPE_WIFI;
+        } else if (networkInfo.getType() == ConnectivityManager.TYPE_MOBILE) {
+            return NETWORK_TYPE_MOBILE;
+        } else {
+            return NETWORK_TYPE_OTHERS;
         }
     }
 
@@ -51,54 +114,53 @@ public class Utils {
         return (T) context.getApplicationContext().getSystemService(name);
     }
 
-    // /**
-    //  * Returns MAC address of the given interface name.
-    //  *
-    //  * @param interfaceName eth0, wlan0 or NULL=use first interface
-    //  * @return mac address or empty string
-    //  */
-    // public static String getMACAddress(String interfaceName) {
-    //     try {
-    //         List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
-    //         for (NetworkInterface intf : interfaces) {
-    //             if (interfaceName != null) {
-    //                 if (!intf.getName().equalsIgnoreCase(interfaceName)) continue;
-    //             }
-    //             byte[] mac = intf.getHardwareAddress();
-    //             if (mac == null) return "";
-    //             StringBuilder buf = new StringBuilder();
-    //             for (int idx = 0; idx < mac.length; idx++)
-    //                 buf.append(String.format("%02X:", mac[idx]));
-    //             if (buf.length() > 0) buf.deleteCharAt(buf.length() - 1);
-    //             return buf.toString();
-    //         }
-    //     } catch (Exception ex) {
-    //     } // for now eat exceptions
-    //     return "";
-    // }
+    // ------------------------------------------------------------------------------------------------------------------------
+    // ---- Time&Date Format
+    // ------------------------------------------------------------------------------------------------------------------------
 
-    // @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    // public static String getRealPathFromUriAboveApi19(Context context, Uri uri) {
-    //     String filePath = null;
-    //     if (DocumentsContract.isDocumentUri(context, uri)) { // 如果是document类型的 uri, 则通过document id来进行处理
-    //         String documentId = DocumentsContract.getDocumentId(uri);
-    //         if (isMediaDocument(uri)) { // MediaProvider, 使用':'分割
-    //             String id = documentId.split(":")[1];
-    //             String selection = MediaStore.Images.Media._ID + "=?";
-    //             String[] selectionArgs = {id};
-    //             filePath = getDataColumn(context, MediaStore.Images.Media.EXTERNAL_CONTENT_URI, selection, selectionArgs);
-    //         } else if (isDownloadsDocument(uri)) { // DownloadsProvider
-    //             Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.parseLong(documentId));
-    //             filePath = getDataColumn(context, contentUri, null, null);
-    //         }
-    //     } else if ("content".equalsIgnoreCase(uri.getScheme())) { // 如果是 content 类型的 Uri
-    //         filePath = getDataColumn(context, uri, null, null);
-    //     } else if ("file".equals(uri.getScheme())) { // 如果是 file 类型的 Uri,直接获取图片对应的路径
-    //         filePath = uri.getPath();
-    //     }
-    //     return filePath;
-    // }
+    /**
+     * 把时间戳转换成 00:00:00 格式
+     *
+     * @param timeMs 时间戳
+     * @return 00:00:00 时间格式
+     */
+    public static String getStringTime(long timeMs) {
+        StringBuilder formatBuilder = new StringBuilder();
+        Formatter formatter = new Formatter(formatBuilder, Locale.US);
 
+        long totalSeconds = timeMs / 1000;
+        long seconds = totalSeconds % 60;
+        long minutes = (totalSeconds / 60) % 60;
+        long hours = totalSeconds / 3600;
+
+        return formatter.format("%02d:%02d:%02d", hours, minutes, seconds).toString();
+    }
+
+    /**
+     * 把 00:00:00 格式转成时间戳
+     *
+     * @param formatTime 00:00:00 时间格式
+     * @return 时间戳(毫秒)
+     */
+    public static long getIntTime(String formatTime) {
+        if (!TextUtils.isEmpty(formatTime)) {
+            String[] tmp = formatTime.split(":");
+
+            if (tmp.length < 3) {
+                return 0;
+            }
+
+            int second = Integer.parseInt(tmp[0]) * 3600 + Integer.parseInt(tmp[1]) * 60 + Integer.parseInt(tmp[2]);
+
+            return second * 1000L;
+        }
+
+        return 0;
+    }
+
+    // ------------------------------------------------------------------------------------------------------------------------
+    // ---- Others
+    // ------------------------------------------------------------------------------------------------------------------------
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static String parseUri2Path(final Context context, final Uri uri) {
         // DocumentProvider
@@ -187,121 +249,4 @@ public class Utils {
         }
         return path;
     }
-
-    // public static boolean isLocalIpAddress(String checkip) {
-    //     boolean ret = false;
-    //     if (checkip != null) {
-    //         try {
-    //             for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
-    //                 NetworkInterface intf = en.nextElement();
-    //                 for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
-    //                     InetAddress inetAddress = enumIpAddr.nextElement();
-    //                     if (!inetAddress.isLoopbackAddress()) {
-    //                         String ip = inetAddress.getHostAddress().toString();
-    //                         if (checkip.equals(ip)) {
-    //                             return true;
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //         } catch (SocketException ex) {
-    //             ex.printStackTrace();
-    //         }
-    //     }
-    //
-    //     return ret;
-    // }
-    //
-    // public static String getIP() throws SocketException {
-    //     String ipaddress = "";
-    //     for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
-    //         NetworkInterface intf = en.nextElement();
-    //         if (intf.getName().toLowerCase().equals("eth0") || intf.getName().toLowerCase().equals("wlan0")) {
-    //             for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
-    //                 InetAddress inetAddress = enumIpAddr.nextElement();
-    //                 if (!inetAddress.isLoopbackAddress()) {
-    //                     ipaddress = inetAddress.getHostAddress().toString();
-    //                     if (!ipaddress.contains("::")) {// ipV6的地址
-    //                         Log.e(TAG, ipaddress);
-    //                         return ipaddress;
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     return ipaddress;
-    // }
-    //
-    // /**
-    //  * Get IP address from first non-localhost interface
-    //  *
-    //  * @param useIPv4 true=return ipv4, false=return ipv6
-    //  * @return address or empty string
-    //  */
-    // public static String getIPAddress(boolean useIPv4) {
-    //     try {
-    //         List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
-    //         for (NetworkInterface intf : interfaces) {
-    //             List<InetAddress> addrs = Collections.list(intf.getInetAddresses());
-    //             for (InetAddress addr : addrs) {
-    //                 if (!addr.isLoopbackAddress()) {
-    //                     String sAddr = addr.getHostAddress().toUpperCase();
-    //                     boolean isIPv4 = addr instanceof Inet4Address;
-    //                     if (useIPv4) {
-    //                         if (isIPv4)
-    //                             return sAddr;
-    //                     } else {
-    //                         if (!isIPv4) {
-    //                             int delim = sAddr.indexOf('%'); // drop ip6 port suffix
-    //                             return delim < 0 ? sAddr : sAddr.substring(0, delim);
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     } catch (Exception ex) {
-    //     } // for now eat exceptions
-    //     return "";
-    // }
-
-    /**
-     * 把时间戳转换成 00:00:00 格式
-     *
-     * @param timeMs 时间戳
-     * @return 00:00:00 时间格式
-     */
-    public static String getStringTime(long timeMs) {
-        StringBuilder formatBuilder = new StringBuilder();
-        Formatter formatter = new Formatter(formatBuilder, Locale.US);
-
-        long totalSeconds = timeMs / 1000;
-        long seconds = totalSeconds % 60;
-        long minutes = (totalSeconds / 60) % 60;
-        long hours = totalSeconds / 3600;
-
-        return formatter.format("%02d:%02d:%02d", hours, minutes, seconds).toString();
-    }
-
-    /**
-     * 把 00:00:00 格式转成时间戳
-     *
-     * @param formatTime 00:00:00 时间格式
-     * @return 时间戳(毫秒)
-     */
-    public static long getIntTime(String formatTime) {
-        if (!TextUtils.isEmpty(formatTime)) {
-            String[] tmp = formatTime.split(":");
-
-            if (tmp.length < 3) {
-                return 0;
-            }
-
-            int second = Integer.parseInt(tmp[0]) * 3600 + Integer.parseInt(tmp[1]) * 60 + Integer.parseInt(tmp[2]);
-
-            return second * 1000L;
-        }
-
-        return 0;
-    }
-
 }

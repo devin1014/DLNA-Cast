@@ -53,7 +53,11 @@ public class InfoFragment extends Fragment implements IDisplayDevice {
         builder.append("DeviceType: ").append(device.getType().getType()).append("\n");
         builder.append("ModelName: ").append(device.getDetails().getModelDetails().getModelName()).append("\n");
         builder.append("ModelDescription: ").append(device.getDetails().getModelDetails().getModelDescription()).append("\n");
-        builder.append("ModelURL: ").append(device.getDetails().getModelDetails().getModelURI().toString()).append("\n");
+        try {
+            builder.append("ModelURL: ").append(device.getDetails().getModelDetails().getModelURI().toString()).append("\n");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         Service<?, ?>[] services = device.getServices();
         if (services != null) {
