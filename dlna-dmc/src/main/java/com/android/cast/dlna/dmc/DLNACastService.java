@@ -8,6 +8,7 @@ import org.fourthline.cling.UpnpServiceConfiguration;
 import org.fourthline.cling.android.AndroidUpnpServiceConfiguration;
 import org.fourthline.cling.android.AndroidUpnpServiceImpl;
 import org.fourthline.cling.android.FixedAndroidLogHandler;
+import org.fourthline.cling.model.types.ServiceType;
 
 /**
  *
@@ -49,12 +50,13 @@ public class DLNACastService extends AndroidUpnpServiceImpl {
             return 5000; //default is 3000!
         }
 
-        // @Override
-        // public ServiceType[] getExclusiveServiceTypes() {
-        //     return new ServiceType[]{
-        //             DLNACastManager.SERVICE_RENDERING_CONTROL,
-        //             DLNACastManager.SERVICE_AV_TRANSPORT,
-        //             DLNACastManager.SERVICE_CONNECTION_MANAGER};
-        // }
+        @Override
+        public ServiceType[] getExclusiveServiceTypes() {
+            return new ServiceType[]{
+                    DLNACastManager.SERVICE_RENDERING_CONTROL,
+                    DLNACastManager.SERVICE_AV_TRANSPORT,
+                    DLNACastManager.SERVICE_CONNECTION_MANAGER,
+                    DLNACastManager.SERVICE_CONTENT_DIRECTORY};
+        }
     }
 }
