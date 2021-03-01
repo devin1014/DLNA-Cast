@@ -15,10 +15,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.android.cast.dlna.core.ContentType;
-import com.android.cast.dlna.dmc.ILogger.DefaultLoggerImpl;
 import com.android.cast.dlna.dmc.control.ControlImpl;
 import com.android.cast.dlna.dmc.control.ICastInterface;
 import com.android.cast.dlna.dmc.control.IServiceAction;
+import com.orhanobut.logger.Logger;
 
 import org.fourthline.cling.UpnpService;
 import org.fourthline.cling.android.AndroidUpnpService;
@@ -39,7 +39,6 @@ import org.fourthline.cling.support.model.TransportInfo;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,10 +63,8 @@ public final class DLNACastManager implements ICastInterface.IControl, OnDeviceR
     }
 
     private AndroidUpnpService mDLNACastService;
-    private final ILogger mLogger = new DefaultLoggerImpl(this);
     private final DeviceRegistryImpl mDeviceRegistryImpl = new DeviceRegistryImpl(this);
     private final Handler mMainHandler = new Handler(Looper.getMainLooper());
-    private final Map<String, Map<String, IServiceAction.IServiceActionCallback<?>>> mTagMap = new HashMap<>();
     private final Map<String, IServiceAction.IServiceActionCallback<?>> mActionEventCallbackMap = new LinkedHashMap<>();
 
     private DeviceType mSearchDeviceType;
@@ -80,7 +77,7 @@ public final class DLNACastManager implements ICastInterface.IControl, OnDeviceR
         if (context instanceof Application || context instanceof Activity) {
             context.bindService(new Intent(context, DLNACastService.class), mServiceConnection, Service.BIND_AUTO_CREATE);
         } else {
-            mLogger.e("bindCastService only support Application or Activity implementation.");
+            Logger.e("bindCastService only support Application or Activity implementation.");
         }
     }
 
@@ -88,7 +85,7 @@ public final class DLNACastManager implements ICastInterface.IControl, OnDeviceR
         if (context instanceof Application || context instanceof Activity) {
             context.unbindService(mServiceConnection);
         } else {
-            mLogger.e("bindCastService only support Application or Activity implementation.");
+            Logger.e("bindCastService only support Application or Activity implementation.");
         }
     }
 
@@ -98,7 +95,7 @@ public final class DLNACastManager implements ICastInterface.IControl, OnDeviceR
             AndroidUpnpService upnpService = (AndroidUpnpService) iBinder;
             if (mDLNACastService != upnpService) {
                 mDLNACastService = upnpService;
-                Utils.logServiceConnected(mLogger, upnpService, componentName, iBinder);
+                Utils.logServiceConnected(upnpService, componentName, iBinder);
                 Registry registry = upnpService.getRegistry();
                 // add registry listener
                 Collection<RegistryListener> collection = registry.getListeners();
@@ -116,13 +113,13 @@ public final class DLNACastManager implements ICastInterface.IControl, OnDeviceR
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
-            mLogger.w(String.format("[%s] onServiceDisconnected", componentName != null ? componentName.getShortClassName() : "NULL"));
+            Logger.w(String.format("[%s] onServiceDisconnected", componentName != null ? componentName.getShortClassName() : "NULL"));
             removeRegistryListener();
         }
 
         @Override
         public void onBindingDied(ComponentName componentName) {
-            mLogger.e(String.format("[%s] onBindingDied", componentName.getClassName()));
+            Logger.e(String.format("[%s] onBindingDied", componentName.getClassName()));
             removeRegistryListener();
         }
 

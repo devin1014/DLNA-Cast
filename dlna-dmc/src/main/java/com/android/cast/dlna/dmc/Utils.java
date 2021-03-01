@@ -6,6 +6,8 @@ import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 
+import com.orhanobut.logger.Logger;
+
 import org.fourthline.cling.android.AndroidUpnpService;
 import org.fourthline.cling.model.meta.Action;
 import org.fourthline.cling.model.meta.RemoteDevice;
@@ -205,14 +207,12 @@ final public class Utils {
         return builder.toString();
     }
 
-    public static void logServiceConnected(ILogger mLogger, AndroidUpnpService upnpService, ComponentName componentName, IBinder iBinder) {
-        mLogger.i("---------------------------------------------------------------------------");
-        mLogger.i("---------------------------------------------------------------------------");
-        mLogger.i(String.format("[%s] connected %s", componentName.getShortClassName(), iBinder.getClass().getName()));
-        mLogger.i(String.format("[UpnpService]: %s@0x%s", upnpService.get().getClass().getName(), toHexString(upnpService.get().hashCode())));
-        mLogger.i(String.format("[Registry]: listener=%s, devices=%s", upnpService.getRegistry().getListeners().size(), upnpService.getRegistry().getDevices().size()));
-        mLogger.i("---------------------------------------------------------------------------");
-        mLogger.i("---------------------------------------------------------------------------");
+    public static void logServiceConnected(AndroidUpnpService upnpService, ComponentName componentName, IBinder iBinder) {
+        Logger.i("---------------------------------------------------------------------------");
+        Logger.i(String.format("[%s] connected %s", componentName.getShortClassName(), iBinder.getClass().getName()));
+        Logger.i(String.format("[UpnpService]: %s@0x%s", upnpService.get().getClass().getName(), toHexString(upnpService.get().hashCode())));
+        Logger.i(String.format("[Registry]: listener=%s, devices=%s", upnpService.getRegistry().getListeners().size(), upnpService.getRegistry().getDevices().size()));
+        Logger.i("---------------------------------------------------------------------------");
     }
 
     private static String toHexString(int hashCode) {

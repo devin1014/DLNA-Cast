@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.android.cast.dlna.dmc.control.ICastInterface;
+import com.orhanobut.logger.Logger;
 
 import org.fourthline.cling.controlpoint.ActionCallback;
 import org.fourthline.cling.controlpoint.ControlPoint;
@@ -30,7 +31,6 @@ abstract class QueryRequest<T> {
     @Nullable
     private final Service<?, ?> service;
     private ICastInterface.GetInfoListener<T> listener;
-    private final ILogger logger = new ILogger.DefaultLoggerImpl(this);
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     public QueryRequest(@Nullable Service<?, ?> service) {
@@ -57,7 +57,7 @@ abstract class QueryRequest<T> {
     }
 
     protected void setError(String errorMsg) {
-        logger.e(errorMsg != null ? errorMsg : "error");
+        Logger.e(errorMsg != null ? errorMsg : "error");
         if (listener != null) {
             if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
                 mainHandler.post(() -> listener.onGetInfoResult(null, errorMsg != null ? errorMsg : "error"));

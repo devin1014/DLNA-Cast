@@ -5,7 +5,7 @@ import android.os.Looper;
 
 import androidx.annotation.NonNull;
 
-import com.android.cast.dlna.dmc.ILogger.DefaultLoggerImpl;
+import com.orhanobut.logger.Logger;
 
 import org.fourthline.cling.model.meta.Device;
 import org.fourthline.cling.model.meta.LocalDevice;
@@ -21,7 +21,6 @@ import java.util.Collection;
 final class DeviceRegistryImpl extends DefaultRegistryListener {
 
     private final OnDeviceRegistryListener mOnDeviceRegistryListener;
-    private final ILogger mLogger = new DefaultLoggerImpl(this);
     private final Handler mHandler = new Handler(Looper.getMainLooper());
     private volatile boolean mIgnoreUpdate = true;
 
@@ -46,39 +45,37 @@ final class DeviceRegistryImpl extends DefaultRegistryListener {
     // This function will called early than 'remoteDeviceAdded',but the device services maybe not entirely.
     @Override
     public void remoteDeviceDiscoveryStarted(Registry registry, RemoteDevice device) {
-        mLogger.i(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-        mLogger.i(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-        mLogger.i(String.format("[%s] discovery started...", device.getDetails().getFriendlyName()));
+        Logger.i(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        Logger.i(String.format("[%s] discovery started...", device.getDetails().getFriendlyName()));
     }
 
     //End of optimization, you can remove the whole block if your Android handset is fast (>= 600 Mhz)
     @Override
     public void remoteDeviceDiscoveryFailed(Registry registry, final RemoteDevice device, final Exception ex) {
-        mLogger.e("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-        mLogger.e("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-        mLogger.e(String.format("[%s] discovery failed...", device.getDetails().getFriendlyName()));
-        mLogger.e(ex.toString());
+        Logger.e("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+        Logger.e(String.format("[%s] discovery failed...", device.getDetails().getFriendlyName()));
+        Logger.e(ex.toString());
     }
 
     // remote device
     @Override
     public void remoteDeviceAdded(Registry registry, RemoteDevice device) {
-        mLogger.i("remoteDeviceAdded: " + Utils.parseDeviceInfo(device));
-        mLogger.i(Utils.parseDeviceService(device));
+        Logger.i("remoteDeviceAdded: " + Utils.parseDeviceInfo(device));
+        Logger.i(Utils.parseDeviceService(device));
         notifyDeviceAdd(device);
     }
 
     @Override
     public void remoteDeviceUpdated(Registry registry, RemoteDevice device) {
         if (!mIgnoreUpdate) {
-            mLogger.d("remoteDeviceUpdated: " + Utils.parseDeviceInfo(device));
+            Logger.d("remoteDeviceUpdated: " + Utils.parseDeviceInfo(device));
             notifyDeviceUpdate(device);
         }
     }
 
     @Override
     public void remoteDeviceRemoved(Registry registry, RemoteDevice device) {
-        mLogger.w("remoteDeviceRemoved: " + Utils.parseDeviceInfo(device));
+        Logger.w("remoteDeviceRemoved: " + Utils.parseDeviceInfo(device));
         notifyDeviceRemove(device);
     }
 
