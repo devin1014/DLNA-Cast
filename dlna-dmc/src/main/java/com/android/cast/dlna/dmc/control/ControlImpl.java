@@ -1,5 +1,7 @@
 package com.android.cast.dlna.dmc.control;
 
+import android.text.TextUtils;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -16,15 +18,20 @@ public class ControlImpl implements ICastInterface.IControl {
     private final IServiceFactory mServiceFactory;
     private final Device<?, ?, ?> mDevice;
     private final Map<String, IServiceAction.IServiceActionCallback<?>> mCallbackMap;
+    private String mUri;
 
     public ControlImpl(@NonNull ControlPoint controlPoint, @NonNull Device<?, ?, ?> device, Map<String, IServiceAction.IServiceActionCallback<?>> map) {
         mDevice = device;
         mCallbackMap = map;
         mServiceFactory = new IServiceFactory.ServiceFactoryImpl(controlPoint, device);
+        ((BaseServiceExecutor) mServiceFactory.getAvService()).execute(event -> {
+
+        });
     }
 
     @Override
     public void cast(Device<?, ?, ?> device, ICast object) {
+        mUri = object.getUri();
         mServiceFactory.getAvService().cast(new ICastInterface.CastEventListener() {
             @Override
             public void onSuccess(String result) {
@@ -42,7 +49,13 @@ public class ControlImpl implements ICastInterface.IControl {
 
     @Override
     public boolean isCasting(Device<?, ?, ?> device) {
-        return mDevice != null && mDevice.equals(device);
+        return mDevice.equals(device);
+    }
+
+    @Override
+    public boolean isCasting(Device<?, ?, ?> device, @Nullable String uri) {
+        if (TextUtils.isEmpty(uri)) return isCasting(device);
+        return isCasting(device) && uri != null && uri.equals(mUri);
     }
 
     @Override

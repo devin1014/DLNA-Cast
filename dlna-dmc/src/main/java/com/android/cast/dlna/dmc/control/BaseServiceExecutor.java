@@ -56,6 +56,10 @@ abstract class BaseServiceExecutor {
         mControlPoint.execute(actionCallback);
     }
 
+    protected void execute(ICastInterface.ISubscriptionListener subscriptionCallback) {
+        mControlPoint.execute(new CastSubscriptionCallback(mService, 600, subscriptionCallback));
+    }
+
     protected final <T> void notifySuccess(@Nullable IServiceAction.IServiceActionCallback<T> listener, T t) {
         if (listener != null) notify(() -> listener.onSuccess(t));
     }

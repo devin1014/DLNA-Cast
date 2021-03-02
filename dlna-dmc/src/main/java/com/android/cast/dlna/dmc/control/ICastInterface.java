@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import com.android.cast.dlna.dmc.ICast;
 
 import org.fourthline.cling.model.meta.Device;
+import org.fourthline.cling.support.model.TransportState;
 
 public interface ICastInterface {
 
@@ -15,6 +16,8 @@ public interface ICastInterface {
         void cast(Device<?, ?, ?> device, ICast object);
 
         boolean isCasting(Device<?, ?, ?> device);
+
+        boolean isCasting(Device<?, ?, ?> device, @Nullable String uri);
 
         void stop();
 
@@ -57,5 +60,12 @@ public interface ICastInterface {
     }
 
     interface SeekToEventListener extends IServiceAction.IServiceActionCallback<Long> {
+    }
+
+    // ------------------------------------------------------------------
+    // ---- Subscriber Listener
+    // ------------------------------------------------------------------
+    interface ISubscriptionListener {
+        void onSubscriptionTransportStateChanged(TransportState event);
     }
 }

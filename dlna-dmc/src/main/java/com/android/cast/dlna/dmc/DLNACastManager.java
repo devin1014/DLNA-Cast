@@ -207,9 +207,9 @@ public final class DLNACastManager implements ICastInterface.IControl, OnDeviceR
         if (checkDeviceType(device)) {
             // if this device is casting, disconnect first!
             if (mControlImpl != null && mControlImpl.isCasting(device)) {
-                //TODO
-                // mControlImpl.release();
+                mControlImpl.stop();
             }
+            mControlImpl = null;
             synchronized (mLock) {
                 for (OnDeviceRegistryListener listener : mRegisterDeviceListeners) listener.onDeviceRemoved(device);
             }
@@ -251,7 +251,7 @@ public final class DLNACastManager implements ICastInterface.IControl, OnDeviceR
 
         if (mDLNACastService != null) {
             UpnpService upnpService = mDLNACastService.get();
-            //TODO: clear all devices first? check!!!
+            //when search device, clear all founded first.
             upnpService.getRegistry().removeAllRemoteDevices();
             upnpService.getControlPoint().search(type == null ? new STAllHeader() : new UDADeviceTypeHeader(type), maxSeconds);
         }
@@ -262,9 +262,18 @@ public final class DLNACastManager implements ICastInterface.IControl, OnDeviceR
     // -----------------------------------------------------------------------------------------
     @Override
     public void cast(Device<?, ?, ?> device, ICast object) {
+
         // check device has been connected.
-        if (mControlImpl != null) mControlImpl.stop();
-        //FIXME: cast same video should not stop and restart!
+        if (mControlImpl != null) {
+            // the device is casting! should not recast and syc control status.
+            // the device is casting! should not recast and syc control status.
+            // the device is casting! should not recast and syc control status.
+            // if (mControlImpl.isCasting(device, object.getUri())) {
+            //     syc status
+            //     return;
+            // }
+            mControlImpl.stop();
+        }
         mControlImpl = new ControlImpl(mDLNACastService.getControlPoint(), device, mActionEventCallbackMap);
         mControlImpl.cast(device, object);
     }
@@ -282,6 +291,11 @@ public final class DLNACastManager implements ICastInterface.IControl, OnDeviceR
     @Override
     public boolean isCasting(Device<?, ?, ?> device) {
         return mControlImpl != null && mControlImpl.isCasting(device);
+    }
+
+    @Override
+    public boolean isCasting(Device<?, ?, ?> device, @Nullable String uri) {
+        return mControlImpl != null && mControlImpl.isCasting(device, uri);
     }
 
     @Override
