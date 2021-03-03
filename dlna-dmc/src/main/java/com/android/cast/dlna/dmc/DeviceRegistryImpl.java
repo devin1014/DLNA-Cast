@@ -45,14 +45,12 @@ final class DeviceRegistryImpl extends DefaultRegistryListener {
     // This function will called early than 'remoteDeviceAdded',but the device services maybe not entirely.
     @Override
     public void remoteDeviceDiscoveryStarted(Registry registry, RemoteDevice device) {
-        Logger.i(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
         Logger.i(String.format("[%s] discovery started...", device.getDetails().getFriendlyName()));
     }
 
     //End of optimization, you can remove the whole block if your Android handset is fast (>= 600 Mhz)
     @Override
     public void remoteDeviceDiscoveryFailed(Registry registry, final RemoteDevice device, final Exception ex) {
-        Logger.e("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
         Logger.e(String.format("[%s] discovery failed...", device.getDetails().getFriendlyName()));
         Logger.e(ex.toString());
     }

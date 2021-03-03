@@ -20,12 +20,20 @@ public class ControlImpl implements ICastInterface.IControl {
     private final Map<String, IServiceAction.IServiceActionCallback<?>> mCallbackMap;
     private String mUri;
 
-    public ControlImpl(@NonNull ControlPoint controlPoint, @NonNull Device<?, ?, ?> device, Map<String, IServiceAction.IServiceActionCallback<?>> map) {
+    public ControlImpl(@NonNull ControlPoint controlPoint, @NonNull Device<?, ?, ?> device,
+                       Map<String, IServiceAction.IServiceActionCallback<?>> map, ICastInterface.ISubscriptionListener subscriptionListener) {
         mDevice = device;
         mCallbackMap = map;
         mServiceFactory = new IServiceFactory.ServiceFactoryImpl(controlPoint, device);
         ((BaseServiceExecutor) mServiceFactory.getAvService()).execute(event -> {
-
+            if (subscriptionListener != null) {
+                subscriptionListener.onSubscriptionTransportStateChanged(event);
+            }
+        });
+        ((BaseServiceExecutor) mServiceFactory.getRenderService()).execute(event -> {
+            if (subscriptionListener != null) {
+                subscriptionListener.onSubscriptionTransportStateChanged(event);
+            }
         });
     }
 

@@ -208,11 +208,9 @@ final public class Utils {
     }
 
     public static void logServiceConnected(AndroidUpnpService upnpService, ComponentName componentName, IBinder iBinder) {
-        Logger.i("---------------------------------------------------------------------------");
         Logger.i(String.format("[%s] connected %s", componentName.getShortClassName(), iBinder.getClass().getName()));
         Logger.i(String.format("[UpnpService]: %s@0x%s", upnpService.get().getClass().getName(), toHexString(upnpService.get().hashCode())));
         Logger.i(String.format("[Registry]: listener=%s, devices=%s", upnpService.getRegistry().getListeners().size(), upnpService.getRegistry().getDevices().size()));
-        Logger.i("---------------------------------------------------------------------------");
     }
 
     private static String toHexString(int hashCode) {

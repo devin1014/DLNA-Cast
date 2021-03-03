@@ -30,6 +30,7 @@ public class ControlFragment extends Fragment implements IDisplayDevice, CastFra
     private SeekBar mPositionSeekBar;
     private TextView mVolumeInfo;
     private SeekBar mVolumeSeekBar;
+    private TextView mStatusInfo;
 
     @Nullable
     @Override
@@ -103,11 +104,11 @@ public class ControlFragment extends Fragment implements IDisplayDevice, CastFra
                     }
                 }
         );
+
+        DLNACastManager.getInstance().registerSubscriptionListener(event -> mStatusInfo.setText(event.getValue()));
     }
 
     private void initComponent(View view) {
-        mPositionInfo = view.findViewById(R.id.ctrl_position_info);
-
         view.findViewById(R.id.btn_cast).setOnClickListener(v -> new CastFragment().setCallback(this).show(getChildFragmentManager(), "CastFragment"));
         view.findViewById(R.id.btn_cast_pause).setOnClickListener(v -> DLNACastManager.getInstance().pause());
         view.findViewById(R.id.btn_cast_resume).setOnClickListener(v -> DLNACastManager.getInstance().play());
@@ -120,6 +121,7 @@ public class ControlFragment extends Fragment implements IDisplayDevice, CastFra
         mVolumeInfo = view.findViewById(R.id.ctrl_volume_info);
         mVolumeSeekBar = view.findViewById(R.id.ctrl_seek_volume);
         mVolumeSeekBar.setOnSeekBarChangeListener(mOnSeekBarChangeListener);
+        mStatusInfo = view.findViewById(R.id.ctrl_status_info);
     }
 
     @Override
@@ -161,6 +163,15 @@ public class ControlFragment extends Fragment implements IDisplayDevice, CastFra
     @Override
     public void setCastDevice(Device<?, ?, ?> device) {
         mDevice = device;
+        if (device == null) {
+            mPositionInfo.setText("");
+            mPositionSeekBar.setProgress(0);
+            mVolumeInfo.setText("");
+            mVolumeSeekBar.setProgress(0);
+            mPositionMsgHandler.stop();
+            mVolumeMsgHandler.stop();
+        }
+        // reconnect device, should recover status?
     }
 
     @Override
@@ -177,7 +188,7 @@ public class ControlFragment extends Fragment implements IDisplayDevice, CastFra
         // update position text and progress
         DLNACastManager.getInstance().getPositionInfo(mDevice, (positionInfo, errMsg) -> {
             if (positionInfo != null) {
-                mPositionInfo.setText(String.format("%s:%s", positionInfo.getRelTime(), positionInfo.getTrackDuration()));
+                mPositionInfo.setText(String.format("%s/%s", positionInfo.getRelTime(), positionInfo.getTrackDuration()));
                 if (positionInfo.getTrackDurationSeconds() != 0) {
                     mDurationMillSeconds = positionInfo.getTrackDurationSeconds() * 1000;
                     mPositionSeekBar.setProgress((int) (positionInfo.getTrackElapsedSeconds() * 100 / positionInfo.getTrackDurationSeconds()));

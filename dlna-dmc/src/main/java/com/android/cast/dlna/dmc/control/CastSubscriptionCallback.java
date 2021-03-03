@@ -57,25 +57,24 @@ final class CastSubscriptionCallback extends SubscriptionCallback {
     @SuppressWarnings({"ConstantConditions", "unchecked"})
     @Override
     protected void eventReceived(GENASubscription subscription) {
-        Logger.i("[%s GENASubscription eventReceived]", subscription.getService().getServiceType().getType());
         if (subscription.getCurrentValues() != null) {
-            Logger.i("currentValues: %s", subscription.getCurrentValues());
+            Logger.i("[%s GENASubscription eventReceived]\ncurrentValues: %s", subscription.getService().getServiceType().getType(), subscription.getCurrentValues());
+        } else {
+            Logger.i("[%s GENASubscription eventReceived]", subscription.getService().getServiceType().getType());
         }
         Map<String, StateVariableValue<?>> map = subscription.getCurrentValues();
         if (map != null && map.size() > 0) {
-            for (String key : map.keySet()) {
-                if (key.equals("LastChange")) {
-                    LastChangeParser parser = getLastChangeParser();
-                    if (parser != null) {
-                        Object value = map.get(key).getValue();
-                        try {
-                            EventedValue<?> event = parser.parse((String) value).getInstanceIDs().get(0).getValues().get(0);
-                            if (event instanceof AVTransportVariable.TransportState) {
-                                mEventCallback.onSubscriptionTransportStateChanged(((AVTransportVariable.TransportState) event).getValue());
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
+            if (map.containsKey("LastChange")) {
+                LastChangeParser parser = getLastChangeParser();
+                if (parser != null) {
+                    Object value = map.get("LastChange").getValue();
+                    try {
+                        EventedValue<?> event = parser.parse((String) value).getInstanceIDs().get(0).getValues().get(0);
+                        if (event instanceof AVTransportVariable.TransportState) {
+                            mEventCallback.onSubscriptionTransportStateChanged(((AVTransportVariable.TransportState) event).getValue());
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
             }

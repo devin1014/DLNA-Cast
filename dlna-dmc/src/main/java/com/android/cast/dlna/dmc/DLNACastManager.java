@@ -274,7 +274,7 @@ public final class DLNACastManager implements ICastInterface.IControl, OnDeviceR
             // }
             mControlImpl.stop();
         }
-        mControlImpl = new ControlImpl(mDLNACastService.getControlPoint(), device, mActionEventCallbackMap);
+        mControlImpl = new ControlImpl(mDLNACastService.getControlPoint(), device, mActionEventCallbackMap, mSubscriptionListener);
         mControlImpl.cast(device, object);
     }
 
@@ -323,6 +323,9 @@ public final class DLNACastManager implements ICastInterface.IControl, OnDeviceR
         if (mControlImpl != null) mControlImpl.setBrightness(percent);
     }
 
+    // -----------------------------------------------------------------------------------------
+    // ---- Callback
+    // -----------------------------------------------------------------------------------------
     public void registerActionCallbacks(IServiceAction.IServiceActionCallback<?>... callbacks) {
         _innerRegisterActionCallback(callbacks);
     }
@@ -349,6 +352,12 @@ public final class DLNACastManager implements ICastInterface.IControl, OnDeviceR
                 }
             }
         }
+    }
+
+    private ICastInterface.ISubscriptionListener mSubscriptionListener;
+
+    public void registerSubscriptionListener(ICastInterface.ISubscriptionListener listener) {
+        mSubscriptionListener = listener;
     }
 
     // -----------------------------------------------------------------------------------------
