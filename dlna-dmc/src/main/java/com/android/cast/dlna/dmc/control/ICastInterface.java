@@ -2,7 +2,7 @@ package com.android.cast.dlna.dmc.control;
 
 import androidx.annotation.Nullable;
 
-import com.android.cast.dlna.dmc.ICast;
+import com.android.cast.dlna.core.ICast;
 
 import org.fourthline.cling.model.meta.Device;
 import org.fourthline.cling.support.model.TransportState;

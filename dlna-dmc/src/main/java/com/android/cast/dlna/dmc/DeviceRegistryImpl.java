@@ -7,13 +7,18 @@ import androidx.annotation.NonNull;
 
 import com.orhanobut.logger.Logger;
 
+import org.fourthline.cling.model.meta.Action;
 import org.fourthline.cling.model.meta.Device;
 import org.fourthline.cling.model.meta.LocalDevice;
 import org.fourthline.cling.model.meta.RemoteDevice;
+import org.fourthline.cling.model.meta.RemoteService;
 import org.fourthline.cling.registry.DefaultRegistryListener;
 import org.fourthline.cling.registry.Registry;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  *
@@ -58,22 +63,22 @@ final class DeviceRegistryImpl extends DefaultRegistryListener {
     // remote device
     @Override
     public void remoteDeviceAdded(Registry registry, RemoteDevice device) {
-        Logger.i("remoteDeviceAdded: " + Utils.parseDeviceInfo(device));
-        Logger.i(Utils.parseDeviceService(device));
+        Logger.i("remoteDeviceAdded: " + parseDeviceInfo(device));
+        Logger.i(parseDeviceService(device));
         notifyDeviceAdd(device);
     }
 
     @Override
     public void remoteDeviceUpdated(Registry registry, RemoteDevice device) {
         if (!mIgnoreUpdate) {
-            Logger.d("remoteDeviceUpdated: " + Utils.parseDeviceInfo(device));
+            Logger.d("remoteDeviceUpdated: " + parseDeviceInfo(device));
             notifyDeviceUpdate(device);
         }
     }
 
     @Override
     public void remoteDeviceRemoved(Registry registry, RemoteDevice device) {
-        Logger.w("remoteDeviceRemoved: " + Utils.parseDeviceInfo(device));
+        Logger.w("remoteDeviceRemoved: " + parseDeviceInfo(device));
         notifyDeviceRemove(device);
     }
 
@@ -98,5 +103,33 @@ final class DeviceRegistryImpl extends DefaultRegistryListener {
 
     private void notifyDeviceRemove(final Device<?, ?, ?> device) {
         mHandler.post(() -> mOnDeviceRegistryListener.onDeviceRemoved(device));
+    }
+
+    /**
+     * @return device information like: [deviceType][name][manufacturer][udn]
+     */
+    private static String parseDeviceInfo(@NonNull RemoteDevice device) {
+        return String.format("[%s][%s][%s][%s]",
+                device.getType().getType(),
+                device.getDetails().getFriendlyName(),
+                device.getDetails().getManufacturerDetails().getManufacturer(),
+                device.getIdentity().getUdn());
+    }
+
+    private static String parseDeviceService(@NonNull RemoteDevice device) {
+        StringBuilder builder = new StringBuilder(device.getDetails().getFriendlyName());
+        builder.append(":");
+        for (RemoteService service : device.getServices()) {
+            builder.append("\nservice:").append(service.getServiceType().getType());
+            if (service.hasActions()) {
+                builder.append("\nactions: ");
+                List<Action<?>> list = Arrays.asList(service.getActions());
+                Collections.sort(list, (o1, o2) -> o1.getName().compareTo(o2.getName()));
+                for (Action<?> action : list) {
+                    builder.append(action.getName()).append(", ");
+                }
+            }
+        }
+        return builder.toString();
     }
 }

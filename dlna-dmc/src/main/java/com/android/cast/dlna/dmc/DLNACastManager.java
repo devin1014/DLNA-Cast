@@ -15,6 +15,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.android.cast.dlna.core.ContentType;
+import com.android.cast.dlna.core.ICast;
+import com.android.cast.dlna.core.Utils;
 import com.android.cast.dlna.dmc.control.ControlImpl;
 import com.android.cast.dlna.dmc.control.ICastInterface;
 import com.android.cast.dlna.dmc.control.IServiceAction;
@@ -95,7 +97,9 @@ public final class DLNACastManager implements ICastInterface.IControl, OnDeviceR
             AndroidUpnpService upnpService = (AndroidUpnpService) iBinder;
             if (mDLNACastService != upnpService) {
                 mDLNACastService = upnpService;
-                Utils.logServiceConnected(upnpService, componentName, iBinder);
+                Logger.i(String.format("[%s] connected %s", componentName.getShortClassName(), iBinder.getClass().getName()));
+                Logger.i(String.format("[UpnpService]: %s@0x%s", upnpService.get().getClass().getName(), Utils.toHexString(upnpService.get().hashCode())));
+                Logger.i(String.format("[Registry]: listener=%s, devices=%s", upnpService.getRegistry().getListeners().size(), upnpService.getRegistry().getDevices().size()));
                 Registry registry = upnpService.getRegistry();
                 // add registry listener
                 Collection<RegistryListener> collection = registry.getListeners();

@@ -41,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
 
         if (BuildConfig.DEBUG) {
             Logger.getLogger("org.fourthline.cling").setLevel(Level.FINEST);
+        }else{
+            Logger.getLogger("org.fourthline.cling").setLevel(Level.WARNING);
         }
         setContentView(R.layout.activity_main);
         initComponent();

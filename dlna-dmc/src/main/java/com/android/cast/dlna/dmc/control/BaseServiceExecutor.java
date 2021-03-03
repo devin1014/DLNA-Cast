@@ -6,7 +6,7 @@ import android.os.Looper;
 
 import androidx.annotation.Nullable;
 
-import com.android.cast.dlna.dmc.Utils;
+import com.android.cast.dlna.core.Utils;
 import com.android.cast.dlna.dmc.action.GetBrightness;
 import com.android.cast.dlna.dmc.action.SetBrightness;
 

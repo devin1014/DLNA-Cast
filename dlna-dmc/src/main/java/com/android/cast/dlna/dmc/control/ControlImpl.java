@@ -5,8 +5,8 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.android.cast.dlna.dmc.ICast;
-import com.android.cast.dlna.dmc.Utils;
+import com.android.cast.dlna.core.ICast;
+import com.android.cast.dlna.core.Utils;
 
 import org.fourthline.cling.controlpoint.ControlPoint;
 import org.fourthline.cling.model.meta.Device;

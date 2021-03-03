@@ -1,4 +1,4 @@
-package com.android.cast.dlna.dmc;
+package com.android.cast.dlna.core;
 
 import androidx.annotation.NonNull;
 
