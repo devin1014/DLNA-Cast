@@ -2,9 +2,14 @@ package com.android.cast.dlna.dmc.control;
 
 import androidx.annotation.Nullable;
 
+import com.android.cast.dlna.core.ContentType;
 import com.android.cast.dlna.core.ICast;
 
 import org.fourthline.cling.model.meta.Device;
+import org.fourthline.cling.support.model.DIDLContent;
+import org.fourthline.cling.support.model.MediaInfo;
+import org.fourthline.cling.support.model.PositionInfo;
+import org.fourthline.cling.support.model.TransportInfo;
 import org.fourthline.cling.support.model.TransportState;
 
 public interface ICastInterface {
@@ -40,6 +45,18 @@ public interface ICastInterface {
     // ------------------------------------------------------------------
     // ---- GetInfo Listener
     // ------------------------------------------------------------------
+    interface IGetInfo {
+        void getMediaInfo(Device<?, ?, ?> device, ICastInterface.GetInfoListener<MediaInfo> listener);
+
+        void getPositionInfo(Device<?, ?, ?> device, ICastInterface.GetInfoListener<PositionInfo> listener);
+
+        void getTransportInfo(Device<?, ?, ?> device, ICastInterface.GetInfoListener<TransportInfo> listener);
+
+        void getVolumeInfo(Device<?, ?, ?> device, ICastInterface.GetInfoListener<Integer> listener);
+
+        void getContent(Device<?, ?, ?> device, ContentType contentType, ICastInterface.GetInfoListener<DIDLContent> listener);
+    }
+
     interface GetInfoListener<T> {
         void onGetInfoResult(@Nullable T t, @Nullable String errMsg);
     }

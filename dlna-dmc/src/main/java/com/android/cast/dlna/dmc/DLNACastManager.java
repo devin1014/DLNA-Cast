@@ -30,7 +30,6 @@ import org.fourthline.cling.model.meta.Device;
 import org.fourthline.cling.model.meta.LocalDevice;
 import org.fourthline.cling.model.types.DeviceType;
 import org.fourthline.cling.model.types.ServiceType;
-import org.fourthline.cling.model.types.UDADeviceType;
 import org.fourthline.cling.model.types.UDAServiceType;
 import org.fourthline.cling.registry.Registry;
 import org.fourthline.cling.registry.RegistryListener;
@@ -48,9 +47,9 @@ import java.util.Map;
 /**
  *
  */
-public final class DLNACastManager implements ICastInterface.IControl, OnDeviceRegistryListener {
+public final class DLNACastManager implements ICastInterface.IControl, ICastInterface.IGetInfo, OnDeviceRegistryListener {
 
-    public static final DeviceType DEVICE_TYPE_DMR = new UDADeviceType("MediaRenderer");
+    //public static final DeviceType DEVICE_TYPE_DMR = new UDADeviceType("MediaRenderer");
     public static final ServiceType SERVICE_AV_TRANSPORT = new UDAServiceType("AVTransport");
     public static final ServiceType SERVICE_RENDERING_CONTROL = new UDAServiceType("RenderingControl");
     public static final ServiceType SERVICE_CONNECTION_MANAGER = new UDAServiceType("ConnectionManager");
