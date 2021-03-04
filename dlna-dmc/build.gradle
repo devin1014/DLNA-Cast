@@ -42,9 +42,14 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
+    //noinspection GradleDependency
     api 'org.eclipse.jetty:jetty-server:8.1.21.v20160908'
+    //noinspection GradleDependency
     api 'org.eclipse.jetty:jetty-servlet:8.1.21.v20160908'
+    //noinspection GradleDependency
     api 'org.eclipse.jetty:jetty-client:8.1.21.v20160908'
 
     api(project(':dlna-core'))
 }
+
+apply from: "../jcenter.gradle"

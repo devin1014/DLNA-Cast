@@ -21,9 +21,6 @@ import com.android.cast.dlna.demo.light.LightActivity;
 import com.android.cast.dlna.dmc.DLNACastManager;
 import com.permissionx.guolindev.PermissionX;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  *
  */
@@ -39,11 +36,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (BuildConfig.DEBUG) {
-            Logger.getLogger("org.fourthline.cling").setLevel(Level.FINEST);
-        }else{
-            Logger.getLogger("org.fourthline.cling").setLevel(Level.WARNING);
-        }
         setContentView(R.layout.activity_main);
         initComponent();
         PermissionX.init(this)

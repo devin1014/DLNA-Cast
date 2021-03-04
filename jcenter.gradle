@@ -1,0 +1,81 @@
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+version = "1.0.0"
+
+def siteUrl = 'https://github.com/devin1014/DLNA-Cast'
+def gitUrl = 'https://github.com/devin1014/DLNA-Cast.git'
+def issueUrl = 'https://github.com/devin1014/DLNA-Cast/issues'
+
+group = "devin1014.android"
+
+install {
+    repositories.mavenInstaller {
+        pom.project {   // POM.xml文件内容
+            packaging 'aar'
+            name 'android dlna service'  // 添加描述，不重要
+            url siteUrl
+            // 协议
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                }
+            }
+            developers {
+                developer {
+                    id 'devin1014' //your user ID
+                    name 'liuwei' //your name
+                    email 'liuwei10074180@163.com' //your email
+                }
+            }
+            scm {
+                connection gitUrl
+                developerConnection gitUrl
+                url siteUrl
+            }
+        }
+    }
+}
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+//task javadoc(type: Javadoc) {
+//    //增加编码，这行很重要，如果是windows系统，同时如果在代码中有中文的话，不加这行，上传会报错
+//    options.encoding = "utf-8"
+//    source = android.sourceSets.main.java.srcDirs
+//    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+//}
+//
+//task javadocJar(type: Jar, dependsOn: javadoc) {
+//    classifier = 'javadoc'
+//    from javadoc.destinationDir
+//}
+
+artifacts {
+    //archives javadocJar
+    archives sourcesJar
+}
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+    configurations = ['archives']
+    pkg {
+        repo = "android"  //发布到Bintray的哪个仓库
+        name = "dlna"   //发布到Bintray上的名字
+        desc = "android dlna service, support dmc dms dmr"  //项目描述
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        issueTrackerUrl = issueUrl
+        licenses = ["Apache-2.0"]
+        //标签
+        labels = ['android,dlna']
+        publish = true
+        publicDownloadNumbers = true
+    }
+}

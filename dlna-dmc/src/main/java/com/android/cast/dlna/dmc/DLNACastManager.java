@@ -20,6 +20,7 @@ import com.android.cast.dlna.core.Utils;
 import com.android.cast.dlna.dmc.control.ControlImpl;
 import com.android.cast.dlna.dmc.control.ICastInterface;
 import com.android.cast.dlna.dmc.control.IServiceAction;
+import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.Logger;
 
 import org.fourthline.cling.UpnpService;
@@ -43,6 +44,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 /**
  *
@@ -72,6 +74,11 @@ public final class DLNACastManager implements ICastInterface.IControl, ICastInte
     private ControlImpl mControlImpl;
 
     private DLNACastManager() {
+    }
+
+    public void enableLog() {
+        java.util.logging.Logger.getLogger("org.fourthline.cling").setLevel(Level.FINEST);
+        Logger.addLogAdapter(new AndroidLogAdapter());
     }
 
     public void bindCastService(@NonNull Context context) {
