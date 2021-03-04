@@ -4,7 +4,6 @@
 |-------------------------------|
 | Email: liuwei10074180@163.com |
 
-<!-- [![dlna-cast]()](https://github.com/devin1014/DLNA-Cast) -->
 [ ![Download](https://api.bintray.com/packages/devin1014/android/dlna/images/download.svg?version=1.0.0) ](https://bintray.com/devin1014/android/dlna/1.0.0/link)
 
 功能
@@ -16,8 +15,10 @@
 * 支持电视端设备播放器功能（DMR）
 
 Cling库(v2.1.1) 
+
 [Cling Core](http://4thline.org/projects/cling/core/manual/cling-core-manual.xhtml)
 [Cling Support](http://4thline.org/projects/cling/support/manual/cling-support-manual.xhtml)
+
 
 ##使用说明
 ### 引用地址
