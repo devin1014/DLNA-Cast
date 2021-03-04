@@ -5,7 +5,7 @@
 | Email: liuwei10074180@163.com |
 
 <!-- [![dlna-cast]()](https://github.com/devin1014/DLNA-Cast) -->
-[![version](a)]()
+[ ![Download](https://api.bintray.com/packages/devin1014/android/dlna/images/download.svg?version=1.0.0) ](https://bintray.com/devin1014/android/dlna/1.0.0/link)
 
 功能
 ----
@@ -19,14 +19,27 @@ Cling库(v2.1.1)
 [Cling Core](http://4thline.org/projects/cling/core/manual/cling-core-manual.xhtml)
 [Cling Support](http://4thline.org/projects/cling/support/manual/cling-support-manual.xhtml)
 
-##使用
+##使用说明
+### 引用地址
+在项目根gradle中引入
+```
+maven { url "https://dl.bintray.com/devin1014/android" }
+maven { url 'http://4thline.org/m2' }
+```
+在项目模块gradle中引入
+
+```
+api 'devin1014.android:dlna-dmc:1.0.0'
+```
+
 ###权限申明
 在AndroidManifest.xml中需要添加如下
-```<uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+```
+<uses-permission android:name="android.permission.INTERNET"/>
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+<uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"/>
+<uses-permission android:name="android.permission.WAKE_LOCK"/>
 ```
 
 ### 服务申明
@@ -66,22 +79,23 @@ DLNACastManager.getInstance().unregisterListener(listener);
 * OnDeviceRegistryListener 该接口回调始终在**主线程**线程被调用
 
 ### 投屏
-`DLNACastManager.getInstance().cast(device, castObject)`
+
+```
+DLNACastManager.getInstance().cast(device, castObject)
+```
 
 * device：已发现的设备（这个设备需要是Renderer类型，支持播放器才能投屏）
 * castObject：实现了ICast接口的实现类（主要参数是投屏的url）
 
 ### 事件监听
 控制器事件监听
-`DLNACastManager.getInstance().registerActionCallbacks(callbacks);`
-* callbacks: 操作事件回调接口，主要有如下事件接口(*投屏、播放、暂停、停止、快进*)
 
-> interface **CastEventListener**
-> interface **PlayEventListener** 
-> interface **PauseEventListener** 
-> interface **StopEventListener** 
-> interface **SeekToEventListener**
-> 以上接口都继承自*IServiceAction.IServiceActionCallback<Long>* 
+```
+DLNACastManager.getInstance().registerActionCallbacks(callbacks);
+```
+* callbacks: 操作事件回调接口，主要有如下事件接口(*投屏、播放、暂停、停止、快进*)
+ **CastEventListener**、**PlayEventListener**、**PauseEventListener**、**StopEventListener**、**SeekToEventListener**
+以上接口都继承自*IServiceAction.IServiceActionCallback<Long>* 
 
 ```
 interface IServiceActionCallback<T> {
