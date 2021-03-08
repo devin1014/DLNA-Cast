@@ -15,3 +15,5 @@ cling-core/
 cling-support/
 
 backup/
+
+*.sh

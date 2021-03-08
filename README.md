@@ -18,7 +18,7 @@ Cling库(v2.1.1)
 
 [Cling Core](http://4thline.org/projects/cling/core/manual/cling-core-manual.xhtml)
 [Cling Support](http://4thline.org/projects/cling/support/manual/cling-support-manual.xhtml)
-
+----
 
 ##使用说明
 ### 引用地址
@@ -35,6 +35,7 @@ api 'devin1014.android:dlna-dmc:1.0.0'
 
 ###权限申明
 在AndroidManifest.xml中需要添加如下
+
 ```
 <uses-permission android:name="android.permission.INTERNET"/>
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
