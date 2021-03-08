@@ -6,8 +6,7 @@
 
 [ ![Download](https://api.bintray.com/packages/devin1014/android/dlna/images/download.svg?version=1.0.0) ](https://bintray.com/devin1014/android/dlna/1.0.0/link)
 
-功能
-----
+# 功能
 
 基于Cling库封装的DLNA投屏库
 * 支持移动端设备控制（DMC）功能
@@ -18,9 +17,9 @@ Cling库(v2.1.1)
 
 [Cling Core](http://4thline.org/projects/cling/core/manual/cling-core-manual.xhtml)
 [Cling Support](http://4thline.org/projects/cling/support/manual/cling-support-manual.xhtml)
-----
 
-##使用说明
+
+## 使用说明
 ### 引用地址
 在项目根gradle中引入
 ```
@@ -33,7 +32,7 @@ maven { url 'http://4thline.org/m2' }
 api 'devin1014.android:dlna-dmc:1.0.0'
 ```
 
-###权限申明
+### 权限申明
 在AndroidManifest.xml中需要添加如下
 
 ```
