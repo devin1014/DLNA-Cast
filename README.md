@@ -18,22 +18,24 @@ Cling库(v2.1.1)
 [Cling Core](http://4thline.org/projects/cling/core/manual/cling-core-manual.xhtml)
 [Cling Support](http://4thline.org/projects/cling/support/manual/cling-support-manual.xhtml)
 
+#App示例
+![](https://raw.githubusercontent.com/devin1014/DLNA-Cast/master/screen/device-2021-05-13-155608.png)
 
 ## 使用说明
 ### 引用地址
 在项目根gradle中引入
 ```
 allprojects {
-		repositories {
-			...
-			maven { url 'https://jitpack.io' }
-		}
+	repositories {
+		...
+		maven { url 'https://jitpack.io' }
 	}
+}
 ```
 在项目模块gradle中引入
 
 ```
-api 'com.github.devin1014:DLNA-Cast:v1.0.0'
+api 'com.github.devin1014.DLNA-Cast:dlna-dmc:V1.0.0'
 ```
 
 ### 权限申明
