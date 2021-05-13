@@ -4,7 +4,7 @@
 |-------------------------------|
 | Email: liuwei10074180@163.com |
 
-[ ![Download](https://api.bintray.com/packages/devin1014/android/dlna/images/download.svg?version=1.0.0) ](https://bintray.com/devin1014/android/dlna/1.0.0/link)
+[![Download](https://jitpack.io/v/devin1014/DLNA-Cast.svg)](https://jitpack.io/#devin1014/DLNA-Cast)
 
 # 功能
 
@@ -23,13 +23,17 @@ Cling库(v2.1.1)
 ### 引用地址
 在项目根gradle中引入
 ```
-maven { url "https://dl.bintray.com/devin1014/android" }
-maven { url 'http://4thline.org/m2' }
+allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
 ```
 在项目模块gradle中引入
 
 ```
-api 'devin1014.android:dlna-dmc:1.0.0'
+api 'com.github.devin1014:DLNA-Cast:v1.0.0'
 ```
 
 ### 权限申明
