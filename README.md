@@ -19,7 +19,8 @@ Cling库(v2.1.1)
 [Cling Support](http://4thline.org/projects/cling/support/manual/cling-support-manual.xhtml)
 
 #App示例
-![](https://raw.githubusercontent.com/devin1014/DLNA-Cast/master/screen/device-2021-05-13-155608.png)
+
+![AppScreenshot](https://raw.githubusercontent.com/devin1014/DLNA-Cast/master/screen/device-2021-05-13-155608.png)
 
 ## 使用说明
 ### 引用地址
