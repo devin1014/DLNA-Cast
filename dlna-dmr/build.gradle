@@ -43,5 +43,3 @@ dependencies {
 
     api(project(':dlna-core'))
 }
-
-apply from: "../jcenter.gradle"
