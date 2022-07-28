@@ -1,5 +1,5 @@
 include ':app'
-include ':renderer'
+include ':tv'
 include ':dlna-core'
 include ':dlna-dmc'
 include ':dlna-dms'

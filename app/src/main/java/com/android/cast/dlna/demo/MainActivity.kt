@@ -1,153 +1,137 @@
-package com.android.cast.dlna.demo;
+package com.android.cast.dlna.demo
 
-import android.Manifest;
-import android.annotation.SuppressLint;
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.RadioGroup;
-import android.widget.Toast;
+import android.Manifest.permission
+import android.annotation.SuppressLint
+import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.RadioGroup
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.android.cast.dlna.demo.DeviceAdapter.OnItemSelectedListener
+import com.android.cast.dlna.demo.Utils.Companion.getWiFiInfoSSID
+import com.android.cast.dlna.dmc.DLNACastManager
+import com.permissionx.guolindev.PermissionX
+import org.fourthline.cling.model.meta.Device
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+class MainActivity : AppCompatActivity() {
 
-import com.android.cast.dlna.core.Utils;
-import com.android.cast.dlna.demo.detail.DetailActivity;
-import com.android.cast.dlna.demo.light.LightActivity;
-import com.android.cast.dlna.dmc.DLNACastManager;
-import com.permissionx.guolindev.PermissionX;
+    private lateinit var deviceListAdapter: DeviceAdapter
+    private lateinit var informationFragment: Fragment
+    private lateinit var queryFragment: Fragment
+    private lateinit var controlFragment: Fragment
+    private lateinit var localControlFragment: Fragment
 
-/**
- *
- */
-public class MainActivity extends AppCompatActivity {
-
-    private DeviceAdapter mDeviceListAdapter;
-    private Fragment mInformationFragment;
-    private Fragment mQueryFragment;
-    private Fragment mControlFragment;
-    private Fragment mLocalControlFragment;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.activity_main);
-        initComponent();
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        initComponent()
         PermissionX.init(this)
-                .permissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
-                .request((allGranted, grantedList, deniedList) -> resetToolbar());
+            .permissions(permission.READ_EXTERNAL_STORAGE, permission.ACCESS_COARSE_LOCATION, permission.ACCESS_FINE_LOCATION)
+            .request { _: Boolean, _: List<String?>?, _: List<String?>? -> resetToolbar() }
     }
 
-    private void initComponent() {
-        setSupportActionBar(findViewById(R.id.toolbar));
+    private fun initComponent() {
+        setSupportActionBar(findViewById(R.id.toolbar))
+        informationFragment = supportFragmentManager.findFragmentById(R.id.fragment_information)!!
+        queryFragment = supportFragmentManager.findFragmentById(R.id.fragment_query)!!
+        controlFragment = supportFragmentManager.findFragmentById(R.id.fragment_control)!!
+        localControlFragment = supportFragmentManager.findFragmentById(R.id.fragment_local_provider)!!
 
-        mInformationFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_information);
-        mQueryFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_query);
-        mControlFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_control);
-        mLocalControlFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_local_provider);
-
-        RadioGroup typeGroup = findViewById(R.id.cast_type_group);
-        typeGroup.setOnCheckedChangeListener(mOnCheckedChangeListener);
-        typeGroup.check(R.id.cast_type_info);
-
-        RecyclerView recyclerView = findViewById(R.id.cast_device_list);
-        recyclerView.setNestedScrollingEnabled(false);
-        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        recyclerView.setAdapter(mDeviceListAdapter = new DeviceAdapter(this, (castDevice, selected) -> {
-            mDeviceListAdapter.setSelectedDevice(selected ? castDevice : null);
-            ((IDisplayDevice) mInformationFragment).setCastDevice(selected ? castDevice : null);
-            ((IDisplayDevice) mControlFragment).setCastDevice(selected ? castDevice : null);
-            ((IDisplayDevice) mLocalControlFragment).setCastDevice(selected ? castDevice : null);
-            ((IDisplayDevice) mQueryFragment).setCastDevice(selected ? castDevice : null);
-        }));
-        DLNACastManager.getInstance().registerDeviceListener(mDeviceListAdapter);
-    }
-
-    private void resetToolbar() {
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("DLNA Cast");
-            getSupportActionBar().setSubtitle(Utils.getWiFiInfoSSID(this));
+        findViewById<RadioGroup>(R.id.cast_type_group).apply {
+            setOnCheckedChangeListener(checkedChangeListener)
+            check(R.id.cast_type_info)
         }
+        val recyclerView = findViewById<RecyclerView>(R.id.cast_device_list)
+        recyclerView.isNestedScrollingEnabled = false
+        recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
+        recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        recyclerView.adapter = DeviceAdapter(this, object : OnItemSelectedListener {
+            override fun onItemSelected(castDevice: Device<*, *, *>?, selected: Boolean) {
+                deviceListAdapter.castDevice = (if (selected) castDevice else null)
+                (informationFragment as? IDisplayDevice)?.setCastDevice(if (selected) castDevice else null)
+                (controlFragment as? IDisplayDevice)?.setCastDevice(if (selected) castDevice else null)
+                (localControlFragment as? IDisplayDevice)?.setCastDevice(if (selected) castDevice else null)
+                (queryFragment as? IDisplayDevice)?.setCastDevice(if (selected) castDevice else null)
+            }
+        }).also { deviceListAdapter = it }
+
+        DLNACastManager.getInstance().registerDeviceListener(deviceListAdapter)
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        resetToolbar();
-        DLNACastManager.getInstance().bindCastService(this);
+    private fun resetToolbar() {
+        supportActionBar?.title = "DLNA Cast"
+        supportActionBar?.subtitle = getWiFiInfoSSID(this)
     }
 
-    @Override
-    protected void onStop() {
-        DLNACastManager.getInstance().unbindCastService(this);
-        super.onStop();
+    override fun onStart() {
+        super.onStart()
+        resetToolbar()
+        DLNACastManager.getInstance().bindCastService(this)
     }
 
-    @Override
-    protected void onDestroy() {
-        DLNACastManager.getInstance().unregisterListener(mDeviceListAdapter);
-        super.onDestroy();
+    override fun onStop() {
+        DLNACastManager.getInstance().unbindCastService(this)
+        super.onStop()
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_options, menu);
-        return super.onCreateOptionsMenu(menu);
+    override fun onDestroy() {
+        DLNACastManager.getInstance().unregisterListener(deviceListAdapter)
+        super.onDestroy()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.main_options, menu)
+        return super.onCreateOptionsMenu(menu)
     }
 
     @SuppressLint("NonConstantResourceId")
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.menu_search_start) {
-            Toast.makeText(this, "开始搜索", Toast.LENGTH_SHORT).show();
-            DLNACastManager.getInstance().search(null, 60);
-        } else if (item.getItemId() == R.id.menu_light) {
-            startActivity(new Intent(this, LightActivity.class));
-        } else if (item.getItemId() == R.id.menu_link_detail) {
-            startActivity(new Intent(this, DetailActivity.class));
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.menu_search_start) {
+            Toast.makeText(this, "开始搜索", Toast.LENGTH_SHORT).show()
+            DLNACastManager.getInstance().search(null, 60)
         }
-        return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected(item)
     }
 
-    private final RadioGroup.OnCheckedChangeListener mOnCheckedChangeListener = new RadioGroup.OnCheckedChangeListener() {
-        @Override
-        public void onCheckedChanged(RadioGroup group, int checkedId) {
-            if (checkedId == R.id.cast_type_info) {
-                getSupportFragmentManager().beginTransaction()
-                        .show(mInformationFragment)
-                        .hide(mControlFragment)
-                        .hide(mLocalControlFragment)
-                        .hide(mQueryFragment)
-                        .commit();
-            } else if (checkedId == R.id.cast_type_query) {
-                getSupportFragmentManager().beginTransaction()
-                        .show(mQueryFragment)
-                        .hide(mInformationFragment)
-                        .hide(mControlFragment)
-                        .hide(mLocalControlFragment)
-                        .commit();
-            } else if (checkedId == R.id.cast_type_ctrl) {
-                getSupportFragmentManager().beginTransaction()
-                        .show(mControlFragment)
-                        .hide(mLocalControlFragment)
-                        .hide(mInformationFragment)
-                        .hide(mQueryFragment)
-                        .commit();
-            } else if (checkedId == R.id.cast_type_ctrl_local) {
-                getSupportFragmentManager().beginTransaction()
-                        .show(mLocalControlFragment)
-                        .hide(mControlFragment)
-                        .hide(mInformationFragment)
-                        .hide(mQueryFragment)
-                        .commit();
+    private val checkedChangeListener = RadioGroup.OnCheckedChangeListener { _, checkedId ->
+        supportFragmentManager.beginTransaction()
+            .apply {
+                when (checkedId) {
+                    R.id.cast_type_info -> {
+                        this
+                            .show(informationFragment)
+                            .hide(controlFragment)
+                            .hide(localControlFragment)
+                            .hide(queryFragment)
+                    }
+                    R.id.cast_type_query -> {
+                        this
+                            .show(queryFragment)
+                            .hide(informationFragment)
+                            .hide(controlFragment)
+                            .hide(localControlFragment)
+                    }
+                    R.id.cast_type_ctrl -> {
+                        this
+                            .show(controlFragment)
+                            .hide(localControlFragment)
+                            .hide(informationFragment)
+                            .hide(queryFragment)
+                    }
+                    R.id.cast_type_ctrl_local -> {
+                        this
+                            .show(localControlFragment)
+                            .hide(controlFragment)
+                            .hide(informationFragment)
+                            .hide(queryFragment)
+                    }
+                }
             }
-        }
-    };
-
+            .commit()
+    }
 }

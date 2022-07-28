@@ -1,94 +1,81 @@
-package com.android.cast.dlna.demo;
+package com.android.cast.dlna.demo
 
-import android.app.Activity;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import android.app.Activity
+import android.content.Intent
+import android.os.Bundle
+import android.preference.PreferenceManager
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.fragment.app.Fragment
+import com.android.cast.dlna.core.Utils
+import com.android.cast.dlna.demo.CastObject.newInstance
+import com.android.cast.dlna.demo.R.layout
+import com.android.cast.dlna.dmc.DLNACastManager
+import com.android.cast.dlna.dms.MediaServer
+import org.fourthline.cling.model.meta.Device
+import java.util.*
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
+class LocalControlFragment : Fragment(), IDisplayDevice {
 
-import com.android.cast.dlna.core.Utils;
-import com.android.cast.dlna.dmc.DLNACastManager;
-import com.android.cast.dlna.dms.MediaServer;
+    private val mPickupContent: TextView? by lazy { view?.findViewById(R.id.local_ctrl_pick_content_text) }
+    private lateinit var mMediaServer: MediaServer
 
-import org.fourthline.cling.model.meta.Device;
-
-public class LocalControlFragment extends Fragment implements IDisplayDevice {
-
-    private static final int REQUEST_CODE_SELECT = 222;
-    private TextView mPickupContent;
-    private MediaServer mMediaServer;
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_local_control, container, false);
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(layout.fragment_local_control, container, false)
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        mMediaServer = new MediaServer(view.getContext());
-        mMediaServer.start();
-        DLNACastManager.getInstance().addMediaServer(mMediaServer.getDevice());
-
-        initComponent(view);
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        mMediaServer = MediaServer(view.context).apply { start() }
+        DLNACastManager.getInstance().addMediaServer(mMediaServer.device)
+        initComponent(view)
     }
 
-    private void initComponent(View view) {
-        String selectPath = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("selectPath", "");
-        mPickupContent = view.findViewById(R.id.local_ctrl_pick_content_text);
-        mPickupContent.setText(selectPath);
-        mCastPathUrl = selectPath;
-        view.findViewById(R.id.local_ctrl_pick_content).setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            // intent.setType("text/plain");
-            intent.setType("video/*;audio/*;image/*");
-            // intent.setType("image/*");
-            startActivityForResult(intent, REQUEST_CODE_SELECT);
-        });
-        view.findViewById(R.id.local_ctrl_cast).setOnClickListener(v -> {
-                    if (mDevice != null) {
-                        DLNACastManager.getInstance().cast(mDevice, CastObject.newInstance(mCastPathUrl, Constants.CAST_ID, Constants.CAST_NAME));
-                    }
-                }
-        );
-    }
-
-    private String mCastPathUrl = "";
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == REQUEST_CODE_SELECT && resultCode == Activity.RESULT_OK && data != null) {
-            Uri uri = data.getData();
-            String path = Utils.parseUri2Path(getActivity(), uri);
-            mCastPathUrl = mMediaServer.getBaseUrl() + path;
-            mPickupContent.setText(mCastPathUrl);
-            PreferenceManager.getDefaultSharedPreferences(getActivity())
-                    .edit().putString("selectPath", mCastPathUrl)
-                    .apply();
+    private fun initComponent(view: View) {
+        val selectPath = PreferenceManager.getDefaultSharedPreferences(activity).getString("selectPath", "")
+        mPickupContent?.text = selectPath
+        mCastPathUrl = selectPath
+        view.findViewById<View>(R.id.local_ctrl_pick_content).setOnClickListener {
+            val intent = Intent(Intent.ACTION_GET_CONTENT)
+            intent.type = "video/*;audio/*;image/*"
+            startActivityForResult(intent, REQUEST_CODE_SELECT)
+        }
+        view.findViewById<View>(R.id.local_ctrl_cast).setOnClickListener {
+            if (mDevice != null) {
+                DLNACastManager.getInstance().cast(mDevice, newInstance(mCastPathUrl!!, UUID.randomUUID().toString(), "Test Sample"))
+            }
         }
     }
 
-    private Device<?, ?, ?> mDevice;
+    private var mCastPathUrl: String? = ""
 
-    @Override
-    public void setCastDevice(Device<?, ?, ?> device) {
-        mDevice = device;
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == REQUEST_CODE_SELECT && resultCode == Activity.RESULT_OK && data != null) {
+            val uri = data.data
+            val path = Utils.parseUri2Path(activity, uri)
+            mCastPathUrl = mMediaServer.baseUrl + path
+            mPickupContent!!.text = mCastPathUrl
+            PreferenceManager.getDefaultSharedPreferences(activity)
+                .edit().putString("selectPath", mCastPathUrl)
+                .apply()
+        }
     }
 
-    @Override
-    public void onDestroyView() {
-        DLNACastManager.getInstance().removeMediaServer(mMediaServer.getDevice());
-        mMediaServer.stop();
-        super.onDestroyView();
+    private var mDevice: Device<*, *, *>? = null
+    override fun setCastDevice(device: Device<*, *, *>?) {
+        mDevice = device
+    }
+
+    override fun onDestroyView() {
+        DLNACastManager.getInstance().removeMediaServer(mMediaServer.device)
+        mMediaServer.stop()
+        super.onDestroyView()
+    }
+
+    companion object {
+        private const val REQUEST_CODE_SELECT = 222
     }
 }

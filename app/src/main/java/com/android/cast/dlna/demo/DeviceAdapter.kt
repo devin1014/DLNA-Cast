@@ -1,108 +1,80 @@
-package com.android.cast.dlna.demo;
+package com.android.cast.dlna.demo
 
-import android.app.Activity;
-import android.os.Handler;
-import android.os.Looper;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.os.Handler
+import android.os.Looper
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView.Adapter
+import com.android.cast.dlna.demo.R.layout
+import com.android.cast.dlna.dmc.OnDeviceRegistryListener
+import org.fourthline.cling.model.meta.Device
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView.Adapter;
+@SuppressLint("NotifyDataSetChanged")
+class DeviceAdapter(activity: Activity, listener: OnItemSelectedListener?) : Adapter<DeviceHolder>(), OnDeviceRegistryListener {
 
-import com.android.cast.dlna.dmc.OnDeviceRegistryListener;
-
-import org.fourthline.cling.model.meta.Device;
-
-import java.util.ArrayList;
-import java.util.List;
-
-
-/**
- *
- */
-public class DeviceAdapter extends Adapter<DeviceHolder> implements OnDeviceRegistryListener {
-    private final LayoutInflater mLayoutInflater;
-    private final Handler mHandler = new Handler(Looper.getMainLooper());
-    private final List<Device<?, ?, ?>> mDeviceList = new ArrayList<>();
-    private final OnItemSelectedListener mOnItemSelectedListener;
-
-    private Device<?, ?, ?> mSelectedDevice;
-
-    public DeviceAdapter(Activity activity, OnItemSelectedListener listener) {
-        mLayoutInflater = activity.getLayoutInflater();
-        mOnItemSelectedListener = listener;
+    interface OnItemSelectedListener {
+        fun onItemSelected(castDevice: Device<*, *, *>?, selected: Boolean)
     }
 
-    @NonNull
-    @Override
-    public DeviceHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new DeviceHolder(mLayoutInflater.inflate(R.layout.item_device, parent, false), mOnItemSelectedListener);
-    }
+    private val handler = Handler(Looper.getMainLooper())
+    private val layoutInflater: LayoutInflater = activity.layoutInflater
+    private val deviceList: MutableList<Device<*, *, *>> = ArrayList()
+    private val itemSelectedListener: OnItemSelectedListener? = listener
 
-    @Override
-    public void onBindViewHolder(@NonNull DeviceHolder holder, int position) {
-        holder.setData(getItem(position), isSelected(position));
-    }
-
-    @Override
-    public int getItemCount() {
-        return mDeviceList.size();
-    }
-
-    private Device<?, ?, ?> getItem(int position) {
-        if (position < 0 || position >= getItemCount()) {
-            return null;
+    var castDevice: Device<*, *, *>? = null
+        set(value) {
+            field = value
+            notifyDataSetChanged()
         }
 
-        return mDeviceList.get(position);
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceHolder {
+        return DeviceHolder(layoutInflater.inflate(layout.item_device, parent, false), itemSelectedListener)
     }
 
-    public void setSelectedDevice(Device<?, ?, ?> device) {
-        mSelectedDevice = device;
-        notifyDataSetChanged();
+    override fun onBindViewHolder(holder: DeviceHolder, position: Int) {
+        holder.setData(getItem(position), isSelected(position))
     }
 
-    public Device<?, ?, ?> getCastDevice() {
-        return mSelectedDevice;
+    override fun getItemCount(): Int {
+        return deviceList.size
     }
 
-    private boolean isSelected(int position) {
-        Device<?, ?, ?> device = getItem(position);
-        if (device != null && mSelectedDevice != null) {
-            return device.getIdentity().getUdn().getIdentifierString().equals(mSelectedDevice.getIdentity().getUdn().getIdentifierString());
-        }
-        return false;
+    private fun getItem(position: Int): Device<*, *, *>? {
+        return if (position < 0 || position >= itemCount) {
+            null
+        } else deviceList[position]
     }
 
-    @Override
-    public void onDeviceAdded(Device<?, ?, ?> device) {
-        if (!mDeviceList.contains(device)) {
-            mDeviceList.add(device);
-            if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
-                mHandler.post(this::notifyDataSetChanged);
+    private fun isSelected(position: Int): Boolean {
+        val device = getItem(position)
+        return if (device != null && castDevice != null) {
+            device.identity.udn.identifierString == castDevice!!.identity.udn.identifierString
+        } else false
+    }
+
+    override fun onDeviceAdded(device: Device<*, *, *>) {
+        if (!deviceList.contains(device)) {
+            deviceList.add(device)
+            if (Thread.currentThread() !== Looper.getMainLooper().thread) {
+                handler.post { notifyDataSetChanged() }
             } else {
-                notifyDataSetChanged();
+                notifyDataSetChanged()
             }
         }
     }
 
-    @Override
-    public void onDeviceUpdated(Device<?, ?, ?> device) {
-    }
+    override fun onDeviceUpdated(device: Device<*, *, *>?) {}
 
-    @Override
-    public void onDeviceRemoved(Device<?, ?, ?> device) {
-        if (mDeviceList.contains(device)) {
-            mDeviceList.remove(device);
-            if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
-                mHandler.post(this::notifyDataSetChanged);
+    override fun onDeviceRemoved(device: Device<*, *, *>) {
+        if (deviceList.contains(device)) {
+            deviceList.remove(device)
+            if (Thread.currentThread() !== Looper.getMainLooper().thread) {
+                handler.post { notifyDataSetChanged() }
             } else {
-                notifyDataSetChanged();
+                notifyDataSetChanged()
             }
         }
-    }
-
-    public interface OnItemSelectedListener {
-        void onItemSelected(Device<?, ?, ?> castDevice, boolean selected);
     }
 }

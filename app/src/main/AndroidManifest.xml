@@ -18,7 +18,9 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name="com.android.cast.dlna.demo.LaunchDispatchActivity"
+            android:name="com.android.cast.dlna.demo.MainActivity"
+            android:configChanges="orientation|screenSize"
+            android:exported="true"
             android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,26 +28,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name="com.android.cast.dlna.demo.MainActivity"
-            android:configChanges="orientation" />
-
-        <activity
-            android:name="com.android.cast.dlna.demo.test.TestMainActivity"
-            android:configChanges="orientation" />
-
-        <activity
-            android:name="com.android.cast.dlna.demo.detail.DetailActivity"
-            android:configChanges="orientation" />
-
-        <activity
-            android:name="com.android.cast.dlna.demo.light.LightActivity"
-            android:configChanges="orientation" />
-
-        <activity
-            android:name="com.android.cast.dlna.demo.browser.BrowserActivity"
-            android:configChanges="orientation" />
 
         <service android:name="com.android.cast.dlna.dmc.DLNACastService" />
 

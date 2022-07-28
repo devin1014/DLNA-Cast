@@ -1,72 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:clipChildren="false">
 
-    <RadioGroup
-        android:id="@+id/cast_url_group"
-        android:layout_width="360dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:clipChildren="false"
+        android:gravity="center"
+        android:minWidth="320dp"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="12dp"
+        tools:ignore="UselessParent">
 
-        <RadioButton
-            android:id="@+id/cast_url_mp4"
-            android:layout_width="360dp"
+        <RadioGroup
+            android:id="@+id/cast_url_group"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?android:attr/selectableItemBackground"
-            android:checked="true"
-            android:padding="2dp"
-            android:text="MP4"
-            tools:ignore="HardcodedText" />
+            android:layout_gravity="center"
+            android:orientation="vertical">
 
-        <RadioButton
-            android:id="@+id/cast_url_hls_1"
-            android:layout_width="360dp"
+            <RadioButton
+                android:id="@+id/cast_video_mp4"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:checked="true"
+                android:padding="2dp"
+                android:text="Video: mp4"
+                tools:ignore="HardcodedText" />
+
+            <RadioButton
+                android:id="@+id/cast_video_m3u8"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="2dp"
+                android:text="Video: m3u8"
+                tools:ignore="HardcodedText" />
+
+            <RadioButton
+                android:id="@+id/cast_image_jpg"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="2dp"
+                android:text="Image: JPG"
+                tools:ignore="HardcodedText" />
+
+        </RadioGroup>
+
+        <Button
+            android:id="@+id/cast_url_ok"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?android:attr/selectableItemBackground"
-            android:padding="2dp"
-            android:text="M3u8: BT"
-            tools:ignore="HardcodedText" />
+            android:layout_gravity="right"
+            android:layout_marginEnd="12dp"
+            android:layout_marginRight="12dp"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+            android:text="@string/OK"
+            tools:ignore="RtlHardcoded" />
 
-        <RadioButton
-            android:id="@+id/cast_url_hls_2"
-            android:layout_width="360dp"
-            android:layout_height="wrap_content"
-            android:background="?android:attr/selectableItemBackground"
-            android:padding="2dp"
-            android:text="M3u8: CC"
-            tools:ignore="HardcodedText" />
+    </LinearLayout>
 
-        <RadioButton
-            android:id="@+id/cast_url_hls_3"
-            android:layout_width="360dp"
-            android:layout_height="wrap_content"
-            android:background="?android:attr/selectableItemBackground"
-            android:padding="2dp"
-            android:text="M3u8: Iphone Sample"
-            tools:ignore="HardcodedText" />
-
-    </RadioGroup>
-
-    <Button
-        android:id="@+id/cast_url_ok"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:layout_marginEnd="12dp"
-        android:layout_marginRight="12dp"
-        android:paddingLeft="12dp"
-        android:paddingRight="12dp"
-        android:text="@string/OK"
-        android:textStyle="bold"
-        tools:ignore="RtlHardcoded" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="12dp" />
-
-</LinearLayout>
+</FrameLayout>

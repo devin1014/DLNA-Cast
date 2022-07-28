@@ -1,58 +1,44 @@
-package com.android.cast.dlna.demo;
+package com.android.cast.dlna.demo
 
-import android.app.Dialog;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.RadioGroup;
+import android.app.Dialog
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.RadioGroup
+import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentManager
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
+class CastFragment(private val callback: Callback?) : DialogFragment() {
 
-public class CastFragment extends DialogFragment {
-
-    public interface Callback {
-        void onCastUrl(String url);
+    interface Callback {
+        fun onCastUrl(url: String?)
     }
 
-    private Callback mCallback;
-
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        setStyle(DialogFragment.STYLE_NO_TITLE, getTheme());
-        return super.onCreateDialog(savedInstanceState);
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        setStyle(STYLE_NO_TITLE, theme)
+        return super.onCreateDialog(savedInstanceState)
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_cast, container, false);
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.fragment_cast, container, false)
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        view.findViewById(R.id.cast_url_ok).setOnClickListener(v -> {
-            RadioGroup group = view.findViewById(R.id.cast_url_group);
-            if (group.getCheckedRadioButtonId() == R.id.cast_url_mp4) {
-                mCallback.onCastUrl(Constants.CAST_URL_MP4_INNER);
-            } else if (group.getCheckedRadioButtonId() == R.id.cast_url_hls_1) {
-                mCallback.onCastUrl(Constants.CAST_URL_HLS_BT_INNER);
-            } else if (group.getCheckedRadioButtonId() == R.id.cast_url_hls_2) {
-                mCallback.onCastUrl(Constants.CAST_URL_HLS_CC_INNER);
-            } else if (group.getCheckedRadioButtonId() == R.id.cast_url_hls_3) {
-                mCallback.onCastUrl(Constants.CAST_URL_IPHONE_SAMPLE);
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        view.findViewById<View>(R.id.cast_url_ok).setOnClickListener {
+            val group = view.findViewById<RadioGroup>(R.id.cast_url_group)
+            when (group.checkedRadioButtonId) {
+                R.id.cast_video_m3u8 -> callback?.onCastUrl(CAST_VIDEO_M3U8)
+                R.id.cast_video_mp4 -> callback?.onCastUrl(CAST_VIDEO_MP4)
+                R.id.cast_image_jpg -> callback?.onCastUrl(CAST_IMAGE_JPG)
+                else -> {}
             }
-            dismiss();
-        });
+            dismiss()
+        }
     }
 
-    public CastFragment setCallback(Callback callback) {
-        mCallback = callback;
-        return this;
+    fun show(fragmentManager: FragmentManager) {
+        show(fragmentManager, "ControlFragment")
     }
 }

@@ -1,249 +1,212 @@
-package com.android.cast.dlna.demo;
+package com.android.cast.dlna.demo
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.media.AudioManager;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.SeekBar;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.content.Context
+import android.media.AudioManager
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.Message
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.SeekBar
+import android.widget.SeekBar.OnSeekBarChangeListener
+import android.widget.TextView
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import com.android.cast.dlna.core.Utils
+import com.android.cast.dlna.demo.CastFragment.Callback
+import com.android.cast.dlna.demo.R.layout
+import com.android.cast.dlna.dmc.DLNACastManager
+import com.android.cast.dlna.dmc.control.ICastInterface.*
+import org.fourthline.cling.model.meta.Device
+import org.fourthline.cling.support.model.PositionInfo
+import org.fourthline.cling.support.model.TransportState
+import java.util.*
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
+class ControlFragment : Fragment(), IDisplayDevice, Callback {
 
-import com.android.cast.dlna.core.Utils;
-import com.android.cast.dlna.dmc.DLNACastManager;
-import com.android.cast.dlna.dmc.control.ICastInterface;
+    private val positionInfo: TextView? by lazy { view?.findViewById(R.id.ctrl_position_info) }
+    private val positionSeekBar: SeekBar? by lazy { view?.findViewById(R.id.ctrl_seek_position) }
+    private val volumeInfo: TextView? by lazy { view?.findViewById(R.id.ctrl_volume_info) }
+    private val volumeSeekBar: SeekBar? by lazy { view?.findViewById(R.id.ctrl_seek_volume) }
+    private val statusInfo: TextView? by lazy { view?.findViewById(R.id.ctrl_status_info) }
 
-import org.fourthline.cling.model.meta.Device;
-
-public class ControlFragment extends Fragment implements IDisplayDevice, CastFragment.Callback {
-
-    private TextView mPositionInfo;
-    private SeekBar mPositionSeekBar;
-    private TextView mVolumeInfo;
-    private SeekBar mVolumeSeekBar;
-    private TextView mStatusInfo;
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_control, container, false);
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(layout.fragment_control, container, false)
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        initComponent(view);
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initComponent(view)
 
         DLNACastManager.getInstance().registerActionCallbacks(
-                new ICastInterface.CastEventListener() {
-                    @Override
-                    public void onSuccess(String result) {
-                        Toast.makeText(getActivity(), "Cast: " + result, Toast.LENGTH_LONG).show();
-                        mPositionMsgHandler.start(0);
-                        mVolumeMsgHandler.start(0);
-                    }
-
-                    @Override
-                    public void onFailed(String errMsg) {
-                        Toast.makeText(getActivity(), errMsg, Toast.LENGTH_LONG).show();
-                    }
-                },
-                new ICastInterface.PlayEventListener() {
-                    @Override
-                    public void onSuccess(Void result) {
-                        Toast.makeText(getActivity(), "Play", Toast.LENGTH_LONG).show();
-                    }
-
-                    @Override
-                    public void onFailed(String errMsg) {
-                        Toast.makeText(getActivity(), errMsg, Toast.LENGTH_LONG).show();
-                    }
-                },
-                new ICastInterface.PauseEventListener() {
-                    @Override
-                    public void onSuccess(Void result) {
-                        Toast.makeText(getActivity(), "Pause", Toast.LENGTH_LONG).show();
-                    }
-
-                    @Override
-                    public void onFailed(String errMsg) {
-                        Toast.makeText(getActivity(), errMsg, Toast.LENGTH_LONG).show();
-                    }
-                },
-                new ICastInterface.StopEventListener() {
-                    @Override
-                    public void onSuccess(Void result) {
-                        Toast.makeText(getActivity(), "Stop", Toast.LENGTH_LONG).show();
-                        mPositionMsgHandler.stop();
-                        mVolumeMsgHandler.stop();
-                    }
-
-                    @Override
-                    public void onFailed(String errMsg) {
-                        Toast.makeText(getActivity(), errMsg, Toast.LENGTH_LONG).show();
-                    }
-                },
-                new ICastInterface.SeekToEventListener() {
-                    @Override
-                    public void onSuccess(Long result) {
-                        Toast.makeText(getActivity(), "SeekTo: " + Utils.getStringTime(result), Toast.LENGTH_LONG).show();
-                    }
-
-                    @Override
-                    public void onFailed(String errMsg) {
-                        Toast.makeText(getActivity(), errMsg, Toast.LENGTH_LONG).show();
-                    }
+            object : CastEventListener {
+                override fun onSuccess(result: String?) {
+                    Toast.makeText(activity, "Cast: $result", Toast.LENGTH_LONG).show()
+                    positionHandler.start()
+                    mVolumeMsgHandler.start()
                 }
-        );
 
-        DLNACastManager.getInstance().registerSubscriptionListener(event -> mStatusInfo.setText(event.getValue()));
-    }
-
-    private void initComponent(View view) {
-        view.findViewById(R.id.btn_cast).setOnClickListener(v -> new CastFragment().setCallback(this).show(getChildFragmentManager(), "CastFragment"));
-        view.findViewById(R.id.btn_cast_pause).setOnClickListener(v -> DLNACastManager.getInstance().pause());
-        view.findViewById(R.id.btn_cast_resume).setOnClickListener(v -> DLNACastManager.getInstance().play());
-        view.findViewById(R.id.btn_cast_stop).setOnClickListener(v -> DLNACastManager.getInstance().stop());
-        view.findViewById(R.id.btn_cast_mute).setOnClickListener(v -> DLNACastManager.getInstance().setMute(true));
-
-        mPositionInfo = view.findViewById(R.id.ctrl_position_info);
-        mPositionSeekBar = view.findViewById(R.id.ctrl_seek_position);
-        mPositionSeekBar.setOnSeekBarChangeListener(mOnSeekBarChangeListener);
-        mVolumeInfo = view.findViewById(R.id.ctrl_volume_info);
-        mVolumeSeekBar = view.findViewById(R.id.ctrl_seek_volume);
-        mVolumeSeekBar.setOnSeekBarChangeListener(mOnSeekBarChangeListener);
-        mStatusInfo = view.findViewById(R.id.ctrl_status_info);
-    }
-
-    @Override
-    public void onDestroyView() {
-        DLNACastManager.getInstance().unregisterActionCallbacks();
-        super.onDestroyView();
-    }
-
-    private final SeekBar.OnSeekBarChangeListener mOnSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
-        @Override
-        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        }
-
-        @Override
-        public void onStartTrackingTouch(SeekBar seekBar) {
-        }
-
-        @SuppressLint("NonConstantResourceId")
-        @Override
-        public void onStopTrackingTouch(SeekBar seekBar) {
-            switch (seekBar.getId()) {
-                case R.id.ctrl_seek_volume: {
-                    DLNACastManager.getInstance().setVolume((int) (seekBar.getProgress() * 100f / seekBar.getMax()));
-                    break;
+                override fun onFailed(errMsg: String) {
+                    Toast.makeText(activity, errMsg, Toast.LENGTH_LONG).show()
                 }
-                case R.id.ctrl_seek_position: {
-                    if (mDurationMillSeconds > 0) {
-                        int position = (int) ((seekBar.getProgress() * 1f / seekBar.getMax()) * mDurationMillSeconds);
-                        DLNACastManager.getInstance().seekTo(position);
+            },
+            object : PlayEventListener {
+                override fun onSuccess(result: Void?) {
+                    Toast.makeText(activity, "Play", Toast.LENGTH_LONG).show()
+                }
+
+                override fun onFailed(errMsg: String) {
+                    Toast.makeText(activity, errMsg, Toast.LENGTH_LONG).show()
+                }
+            },
+            object : PauseEventListener {
+                override fun onSuccess(result: Void?) {
+                    Toast.makeText(activity, "Pause", Toast.LENGTH_LONG).show()
+                }
+
+                override fun onFailed(errMsg: String) {
+                    Toast.makeText(activity, errMsg, Toast.LENGTH_LONG).show()
+                }
+            },
+            object : StopEventListener {
+                override fun onSuccess(result: Void?) {
+                    Toast.makeText(activity, "Stop", Toast.LENGTH_LONG).show()
+                    positionHandler.stop()
+                    mVolumeMsgHandler.stop()
+                }
+
+                override fun onFailed(errMsg: String) {
+                    Toast.makeText(activity, errMsg, Toast.LENGTH_LONG).show()
+                }
+            },
+            object : SeekToEventListener {
+                override fun onSuccess(result: Long) {
+                    Toast.makeText(activity, "SeekTo: " + Utils.getStringTime(result), Toast.LENGTH_LONG).show()
+                }
+
+                override fun onFailed(errMsg: String) {
+                    Toast.makeText(activity, errMsg, Toast.LENGTH_LONG).show()
+                }
+            }
+        )
+        DLNACastManager.getInstance().registerSubscriptionListener { event: TransportState -> statusInfo?.text = event.value }
+    }
+
+    private fun initComponent(view: View) {
+        view.findViewById<View>(R.id.btn_cast).setOnClickListener { CastFragment(this).show(childFragmentManager) }
+        view.findViewById<View>(R.id.btn_cast_pause).setOnClickListener { DLNACastManager.getInstance().pause() }
+        view.findViewById<View>(R.id.btn_cast_resume).setOnClickListener { DLNACastManager.getInstance().play() }
+        view.findViewById<View>(R.id.btn_cast_stop).setOnClickListener { DLNACastManager.getInstance().stop() }
+        view.findViewById<View>(R.id.btn_cast_mute).setOnClickListener { DLNACastManager.getInstance().setMute(true) }
+        positionSeekBar?.setOnSeekBarChangeListener(seekBarChangeListener)
+        volumeSeekBar?.setOnSeekBarChangeListener(seekBarChangeListener)
+    }
+
+    override fun onDestroyView() {
+        DLNACastManager.getInstance().unregisterActionCallbacks()
+        super.onDestroyView()
+    }
+
+    private val seekBarChangeListener: OnSeekBarChangeListener = object : OnSeekBarChangeListener {
+        override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {}
+        override fun onStartTrackingTouch(seekBar: SeekBar) {}
+
+        override fun onStopTrackingTouch(seekBar: SeekBar) {
+            when (seekBar.id) {
+                R.id.ctrl_seek_volume -> {
+                    DLNACastManager.getInstance().setVolume((seekBar.progress * 100f / seekBar.max).toInt())
+                }
+                R.id.ctrl_seek_position -> {
+                    if (durationMillSeconds > 0) {
+                        val position = (seekBar.progress * 1f / seekBar.max * durationMillSeconds).toInt()
+                        DLNACastManager.getInstance().seekTo(position.toLong())
                     }
-                    break;
                 }
             }
         }
-    };
+    }
 
-    private Device<?, ?, ?> mDevice;
+    private var device: Device<*, *, *>? = null
 
-    @Override
-    public void setCastDevice(Device<?, ?, ?> device) {
-        mDevice = device;
+    override fun setCastDevice(device: Device<*, *, *>?) {
+        this.device = device
         if (device == null) {
-            mPositionInfo.setText("");
-            mPositionSeekBar.setProgress(0);
-            mVolumeInfo.setText("");
-            mVolumeSeekBar.setProgress(0);
-            mPositionMsgHandler.stop();
-            mVolumeMsgHandler.stop();
+            positionInfo?.text = ""
+            positionSeekBar?.progress = 0
+            volumeInfo?.text = ""
+            volumeSeekBar?.progress = 0
+            positionHandler.stop()
+            mVolumeMsgHandler.stop()
         }
         // reconnect device, should recover status?
     }
 
-    @Override
-    public void onCastUrl(String url) {
-        if (mDevice != null) {
-            DLNACastManager.getInstance().cast(mDevice, CastObject.CastVideo.newInstance(url, Constants.CAST_ID, Constants.CAST_NAME));
+    override fun onCastUrl(url: String?) {
+        if (device != null) {
+            DLNACastManager.getInstance().cast(device, CastObject.newInstance(url!!, UUID.randomUUID().toString(), "Test Sample"))
         }
     }
 
-    private long mDurationMillSeconds = 0;
+    private var durationMillSeconds: Long = 0
 
-    private final Runnable mPositionRunnable = () -> {
-        if (mDevice == null) return;
+    private val positionHandler = CircleMessageHandler(1000, Runnable {
+        if (device == null) return@Runnable
         // update position text and progress
-        DLNACastManager.getInstance().getPositionInfo(mDevice, (positionInfo, errMsg) -> {
+        DLNACastManager.getInstance().getPositionInfo(device) { positionInfo: PositionInfo?, errMsg: String? ->
             if (positionInfo != null) {
-                mPositionInfo.setText(String.format("%s/%s", positionInfo.getRelTime(), positionInfo.getTrackDuration()));
-                if (positionInfo.getTrackDurationSeconds() != 0) {
-                    mDurationMillSeconds = positionInfo.getTrackDurationSeconds() * 1000;
-                    mPositionSeekBar.setProgress((int) (positionInfo.getTrackElapsedSeconds() * 100 / positionInfo.getTrackDurationSeconds()));
+                this.positionInfo?.text = String.format("%s/%s", positionInfo.relTime, positionInfo.trackDuration)
+                if (positionInfo.trackDurationSeconds != 0L) {
+                    durationMillSeconds = positionInfo.trackDurationSeconds * 1000
+                    positionSeekBar?.progress = (positionInfo.trackElapsedSeconds * 100 / positionInfo.trackDurationSeconds).toInt()
                 } else {
-                    mPositionSeekBar.setProgress(0);
+                    positionSeekBar?.progress = 0
                 }
             } else {
-                mPositionInfo.setText(errMsg);
+                this.positionInfo?.text = errMsg
             }
-        });
-    };
+        }
+    })
 
-    private final Runnable mVolumeRunnable = () -> {
-        if (mDevice == null) return;
+    private val mVolumeMsgHandler = CircleMessageHandler(3000, Runnable {
+        if (device == null) return@Runnable
         // update volume
-        DLNACastManager.getInstance().getVolumeInfo(mDevice, (integer, errMsg) -> {
-            if (integer != null && getActivity() != null) {
-                AudioManager audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
-                int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-                mVolumeSeekBar.setProgress(integer);
-                mVolumeInfo.setText(String.format("%s/%s", (int) (integer / 100f * maxVolume), maxVolume));
+        DLNACastManager.getInstance().getVolumeInfo(device) { integer: Int?, errMsg: String? ->
+            if (integer != null && activity != null) {
+                val audioManager = requireActivity().getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+                volumeSeekBar?.progress = integer
+                volumeInfo?.text = String.format("%s/%s", (integer / 100f * maxVolume).toInt(), maxVolume)
             } else {
-                mVolumeInfo.setText(errMsg);
+                volumeInfo?.text = errMsg
             }
-        });
-    };
+        }
+    })
 
-    private final CircleMessageHandler mPositionMsgHandler = new CircleMessageHandler(1000, mPositionRunnable);
-    private final CircleMessageHandler mVolumeMsgHandler = new CircleMessageHandler(3000, mVolumeRunnable);
-
-    private static class CircleMessageHandler extends Handler {
-        private static final int MSG = 101;
-
-        private final long duration;
-        private final Runnable runnable;
-
-        public CircleMessageHandler(long duration, @NonNull Runnable runnable) {
-            super(Looper.getMainLooper());
-            this.duration = duration;
-            this.runnable = runnable;
+    // ------------------------------------------------------------
+    // ---- Handler
+    // ------------------------------------------------------------
+    private class CircleMessageHandler(
+        private val duration: Long,
+        private val runnable: Runnable
+    ) : Handler(Looper.getMainLooper()) {
+        override fun handleMessage(msg: Message) {
+            runnable.run()
+            sendEmptyMessageDelayed(MSG, duration)
         }
 
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            runnable.run();
-            sendEmptyMessageDelayed(MSG, duration);
+        fun start(delay: Long = 0L) {
+            stop()
+            sendEmptyMessageDelayed(MSG, delay)
         }
 
-        public void start(long delay) {
-            stop();
-            sendEmptyMessageDelayed(MSG, delay);
+        fun stop() {
+            removeMessages(MSG)
         }
 
-        public void stop() {
-            removeMessages(MSG);
+        companion object {
+            private const val MSG = 101
         }
     }
 }

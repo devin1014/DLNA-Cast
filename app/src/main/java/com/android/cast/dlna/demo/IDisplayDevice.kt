@@ -1,7 +1,7 @@
-package com.android.cast.dlna.demo;
+package com.android.cast.dlna.demo
 
-import org.fourthline.cling.model.meta.Device;
+import org.fourthline.cling.model.meta.Device
 
-interface IDisplayDevice {
-    void setCastDevice(Device<?, ?, ?> device);
+internal interface IDisplayDevice {
+    fun setCastDevice(device: Device<*, *, *>?)
 }

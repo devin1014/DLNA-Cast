@@ -11,19 +11,4 @@
         app:showAsAction="never"
         tools:ignore="HardcodedText" />
 
-    <item
-        android:id="@+id/menu_light"
-        android:orderInCategory="100"
-        android:title="Light页面"
-        app:showAsAction="never"
-        tools:ignore="HardcodedText" />
-
-    <item
-        android:id="@+id/menu_link_detail"
-        android:icon="@android:drawable/ic_menu_directions"
-        android:orderInCategory="200"
-        android:title="二级页面（空，测试）"
-        app:showAsAction="never"
-        tools:ignore="AlwaysShowAction,HardcodedText" />
-
 </menu>
