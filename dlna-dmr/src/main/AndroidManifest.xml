@@ -3,12 +3,11 @@
     package="com.android.cast.dlna.dmr">
 
     <application>
-
         <activity
             android:name=".DLNARendererActivity"
             android:configChanges="keyboard|screenSize"
-            android:launchMode="singleTop" />
-
+            android:launchMode="singleTop"
+            android:screenOrientation="landscape" />
     </application>
 
 </manifest>
