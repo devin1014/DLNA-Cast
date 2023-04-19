@@ -8,7 +8,10 @@ buildscript {
         mavenCentral()
         mavenLocal()
         maven { url 'https://maven.aliyun.com/repository/jcenter' }
-        maven { url 'http://4thline.org/m2' }
+        maven {
+            url 'http://4thline.org/m2'
+            allowInsecureProtocol = true
+        }
     }
 
     dependencies {
@@ -23,7 +26,10 @@ allprojects {
         mavenCentral()
         mavenLocal()
         maven { url 'https://maven.aliyun.com/repository/jcenter' }
-        maven { url 'http://4thline.org/m2' }
+        maven {
+            url 'http://4thline.org/m2'
+            allowInsecureProtocol = true
+        }
     }
 }
 
