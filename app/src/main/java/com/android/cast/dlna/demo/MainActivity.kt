@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity() {
             }
         }).also { deviceListAdapter = it }
 
-        DLNACastManager.getInstance().registerDeviceListener(deviceListAdapter)
+        DLNACastManager.registerDeviceListener(deviceListAdapter)
     }
 
     private fun resetToolbar() {
@@ -71,16 +71,16 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         resetToolbar()
-        DLNACastManager.getInstance().bindCastService(this)
+        DLNACastManager.bindCastService(this)
     }
 
     override fun onStop() {
-        DLNACastManager.getInstance().unbindCastService(this)
+        DLNACastManager.unbindCastService(this)
         super.onStop()
     }
 
     override fun onDestroy() {
-        DLNACastManager.getInstance().unregisterListener(deviceListAdapter)
+        DLNACastManager.unregisterListener(deviceListAdapter)
         super.onDestroy()
     }
 
@@ -93,7 +93,7 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.menu_search_start) {
             Toast.makeText(this, "开始搜索", Toast.LENGTH_SHORT).show()
-            DLNACastManager.getInstance().search(null, 60)
+            DLNACastManager.search(null, 60)
         }
         return super.onOptionsItemSelected(item)
     }
@@ -109,6 +109,7 @@ class MainActivity : AppCompatActivity() {
                             .hide(localControlFragment)
                             .hide(queryFragment)
                     }
+
                     R.id.cast_type_query -> {
                         this
                             .show(queryFragment)
@@ -116,6 +117,7 @@ class MainActivity : AppCompatActivity() {
                             .hide(controlFragment)
                             .hide(localControlFragment)
                     }
+
                     R.id.cast_type_ctrl -> {
                         this
                             .show(controlFragment)
@@ -123,6 +125,7 @@ class MainActivity : AppCompatActivity() {
                             .hide(informationFragment)
                             .hide(queryFragment)
                     }
+
                     R.id.cast_type_ctrl_local -> {
                         this
                             .show(localControlFragment)

@@ -65,7 +65,7 @@ class DeviceAdapter(activity: Activity, listener: OnItemSelectedListener?) : Ada
         }
     }
 
-    override fun onDeviceUpdated(device: Device<*, *, *>?) {}
+    override fun onDeviceUpdated(device: Device<*, *, *>) {}
 
     override fun onDeviceRemoved(device: Device<*, *, *>) {
         if (deviceList.contains(device)) {

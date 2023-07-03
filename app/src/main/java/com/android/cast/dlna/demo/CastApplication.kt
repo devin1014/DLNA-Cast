@@ -22,7 +22,7 @@ class CastApplication : Application() {
             .methodCount(0)
             .showThreadInfo(true)
             .build()
-        DLNACastManager.getInstance().enableLog(strategy, Level.FINEST)
+        DLNACastManager.enableLog(strategy, Level.FINEST)
         registerActivityLifecycleCallbacks(LoggingActivityLifecycleCallbacks())
     }
 }

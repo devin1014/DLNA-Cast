@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import org.fourthline.cling.model.meta.Action
 import org.fourthline.cling.model.meta.Device
+import org.fourthline.cling.model.meta.Service
 
 class InfoFragment : Fragment(), IDisplayDevice {
 
@@ -33,7 +34,7 @@ class InfoFragment : Fragment(), IDisplayDevice {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        device.services?.forEach { service ->
+        (device.services as? Array<out Service<*, *>>)?.forEach { service ->
             builder.append("\n")
             builder.append("ServiceId: ").append(service.serviceId.id).append("\n")
             builder.append("ServiceType: ").append(service.serviceType.type).append("\n")

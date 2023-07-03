@@ -29,7 +29,7 @@ class LocalControlFragment : Fragment(), IDisplayDevice {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mMediaServer = MediaServer(requireContext()).apply { start() }
-        DLNACastManager.getInstance().addMediaServer(mMediaServer.device)
+        DLNACastManager.addMediaServer(mMediaServer.device)
         initComponent(view)
     }
 
@@ -44,7 +44,7 @@ class LocalControlFragment : Fragment(), IDisplayDevice {
         }
         view.findViewById<View>(R.id.local_ctrl_cast).setOnClickListener {
             if (mDevice != null) {
-                DLNACastManager.getInstance().cast(mDevice, newInstance(mCastPathUrl!!, UUID.randomUUID().toString(), "Test Sample"))
+                DLNACastManager.cast(mDevice!!, newInstance(mCastPathUrl!!, UUID.randomUUID().toString(), "Test Sample"))
             }
         }
     }
@@ -70,7 +70,7 @@ class LocalControlFragment : Fragment(), IDisplayDevice {
     }
 
     override fun onDestroyView() {
-        DLNACastManager.getInstance().removeMediaServer(mMediaServer.device)
+        DLNACastManager.removeMediaServer(mMediaServer.device)
         mMediaServer.stop()
         super.onDestroyView()
     }

@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.android.cast.dlna.core.ContentType.VIDEO
 import com.android.cast.dlna.dmc.DLNACastManager
+import com.android.cast.dlna.dmc.control.ICastInterface.GetInfoListener
 import org.fourthline.cling.model.meta.Device
 import org.fourthline.cling.support.model.DIDLContent
 import org.fourthline.cling.support.model.MediaInfo
@@ -47,28 +48,40 @@ class QueryFragment : Fragment(), IDisplayDevice {
     }
 
     private fun setInfo() {
-        if (device != null) {
-            DLNACastManager.getInstance().getMediaInfo(device) { mediaInfo: MediaInfo?, errMsg: String? ->
-                this.mediaInfo?.text = String.format("MediaInfo:\n%s", if (mediaInfo != null) mediaInfo.currentURI else errMsg)
-            }
-            DLNACastManager.getInstance().getPositionInfo(device) { positionInfo: PositionInfo?, errMsg: String? ->
-                try {
-                    this.positionInfo?.text = String.format("PositionInfo:\n%s", positionInfo ?: errMsg)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    this.positionInfo?.text = e.toString()
+        device?.let { device ->
+            DLNACastManager.getMediaInfo(device, object : GetInfoListener<MediaInfo> {
+                override fun onGetInfoResult(t: MediaInfo?, errMsg: String?) {
+                    this@QueryFragment.mediaInfo?.text = String.format("MediaInfo:\n%s", if (t != null) t.currentURI else errMsg)
                 }
-            }
-            DLNACastManager.getInstance().getTransportInfo(device) { transportInfo: TransportInfo?, errMsg: String? ->
-                this.transportInfo?.text = String.format("TransportInfo:\n%s", if (transportInfo != null) transportInfo.currentTransportState else errMsg)
-            }
-            DLNACastManager.getInstance().getVolumeInfo(device) { volume: Int?, errMsg: String? ->
-                volumeInfo?.text = String.format("Volume: %s", volume ?: errMsg)
-            }
-            DLNACastManager.getInstance().getContent(device, VIDEO) { s: DIDLContent?, errMsg: String? ->
-                browseInfo?.text = if (s != null) parseContentString(s) else errMsg
-            }
-        } else {
+            })
+            DLNACastManager.getPositionInfo(device, object : GetInfoListener<PositionInfo> {
+                override fun onGetInfoResult(t: PositionInfo?, errMsg: String?) {
+                    try {
+                        this@QueryFragment.positionInfo?.text = String.format("PositionInfo:\n%s", t ?: errMsg)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        this@QueryFragment.positionInfo?.text = e.toString()
+                    }
+                }
+            })
+            DLNACastManager.getTransportInfo(device, object : GetInfoListener<TransportInfo> {
+                override fun onGetInfoResult(t: TransportInfo?, errMsg: String?) {
+                    this@QueryFragment.transportInfo?.text = String.format("TransportInfo:\n%s", if (t != null) t.currentTransportState else errMsg)
+                }
+            })
+            DLNACastManager.getVolumeInfo(device, object : GetInfoListener<Int> {
+                override fun onGetInfoResult(t: Int?, errMsg: String?) {
+                    volumeInfo?.text = String.format("Volume: %s", t ?: errMsg)
+                }
+            })
+            DLNACastManager.getContent(device, VIDEO, object : GetInfoListener<DIDLContent> {
+                override fun onGetInfoResult(t: DIDLContent?, errMsg: String?) {
+                    browseInfo?.text = if (t != null) parseContentString(t) else errMsg
+                }
+            })
+        }
+
+        if (device == null) {
             mediaInfo?.text = ""
             positionInfo?.text = ""
             transportInfo?.text = ""
