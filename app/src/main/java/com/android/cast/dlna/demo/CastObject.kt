@@ -29,32 +29,22 @@ object CastObject {
 }
 
 data class CastImage(
-    private val url: String,
-    private val id: String,
-    private val name: String,
-    private val size: Long = 0L
-) : ICastImage {
-
-    override fun getId(): String = id
-    override fun getUri(): String = url
-    override fun getName(): String = name
-    override fun getSize(): Long = size
-}
+    override val uri: String,
+    override val id: String,
+    override val name: String,
+    override val size: Long = 0L
+) : ICastImage
 
 data class CastVideo(
-    private val url: String,
-    private val id: String,
-    private val name: String,
-    private val size: Long = 0L,
-    private val bitrate: Long = 0
+    override val uri: String,
+    override val id: String,
+    override val name: String,
+    override val size: Long = 0L,
+    override val bitrate: Long = 0
 ) : ICastVideo {
 
     var duration: Long = 0
 
-    override fun getId(): String = id
-    override fun getUri(): String = url
-    override fun getName(): String = name
-    override fun getDurationMillSeconds(): Long = duration
-    override fun getSize(): Long = size
-    override fun getBitrate(): Long = bitrate
+    override val durationMillSeconds: Long
+        get() = duration
 }

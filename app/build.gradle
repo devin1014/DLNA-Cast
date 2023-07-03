@@ -12,7 +12,6 @@ android {
         targetSdkVersion 32
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -30,11 +29,11 @@ android {
 }
 
 dependencies {
-    implementation project(':dlna-dmc')
-    implementation project(':dlna-dms')
+    api project(':dlna-dmc')
+    api project(':dlna-dms')
 
+    //noinspection GradleDependency
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation 'androidx.core:core-ktx:1.8.0'
     implementation 'androidx.appcompat:appcompat:1.4.2'
     implementation 'com.google.android.material:material:1.6.1'
     implementation 'androidx.recyclerview:recyclerview:1.2.1'

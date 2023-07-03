@@ -9,10 +9,10 @@ object ContentFactory {
 
     private var contentFactory: IContentFactory? = null
 
-    fun setServerUrl(context: Context?, url: String?) {
+    fun setServerUrl(context: Context, url: String) {
         contentFactory = ContentFactoryImpl(context, url)
     }
 
     @Throws(ContentDirectoryException::class)
-    fun getContent(objectID: String?): BrowseResult? = contentFactory?.getBrowseResult(objectID)
+    fun getContent(objectID: String): BrowseResult? = contentFactory?.getBrowseResult(objectID)
 }

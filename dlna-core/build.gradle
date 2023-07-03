@@ -32,7 +32,8 @@ dependencies {
     // Cling library required
     api 'org.fourthline.cling:cling-core:2.1.1'
     api 'org.fourthline.cling:cling-support:2.1.1'
-    implementation "androidx.core:core-ktx:1.8.0"
+    // Kotlin
+    //noinspection GradleDependency
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
 repositories {

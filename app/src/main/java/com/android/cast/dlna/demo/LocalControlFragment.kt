@@ -28,7 +28,7 @@ class LocalControlFragment : Fragment(), IDisplayDevice {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mMediaServer = MediaServer(view.context).apply { start() }
+        mMediaServer = MediaServer(requireContext()).apply { start() }
         DLNACastManager.getInstance().addMediaServer(mMediaServer.device)
         initComponent(view)
     }
@@ -55,7 +55,7 @@ class LocalControlFragment : Fragment(), IDisplayDevice {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_CODE_SELECT && resultCode == Activity.RESULT_OK && data != null) {
             val uri = data.data
-            val path = Utils.parseUri2Path(activity, uri)
+            val path = Utils.parseUri2Path(requireContext(), uri)
             mCastPathUrl = mMediaServer.baseUrl + path
             mPickupContent!!.text = mCastPathUrl
             PreferenceManager.getDefaultSharedPreferences(activity)

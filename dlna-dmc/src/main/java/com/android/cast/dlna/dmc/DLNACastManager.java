@@ -396,6 +396,6 @@ public final class DLNACastManager implements ICastInterface.IControl, ICastInte
     }
 
     public void getContent(Device<?, ?, ?> device, ContentType contentType, ICastInterface.GetInfoListener<DIDLContent> listener) {
-        new QueryRequest.BrowseContentRequest(device.findService(SERVICE_CONTENT_DIRECTORY), contentType.id).execute(mDLNACastService.getControlPoint(), listener);
+        new QueryRequest.BrowseContentRequest(device.findService(SERVICE_CONTENT_DIRECTORY), contentType.getId()).execute(mDLNACastService.getControlPoint(), listener);
     }
 }
