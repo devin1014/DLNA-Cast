@@ -222,8 +222,16 @@ object Utils {
                     return Environment.getExternalStorageDirectory().toString() + "/" + split[1]
                 }
             } else if (isDownloadsDocument(uri)) {
-                val id = DocumentsContract.getDocumentId(uri)
-                val contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), id.toLong())
+                //TODO: put file into 'Download' dir, can not get valid document id.
+                //content://com.android.providers.downloads.documents/document/raw%3A%2Fstorage%2Femulated%2F0%2FDownload%2Foceans.mp4
+                val id = DocumentsContract.getDocumentId(uri).let {
+                    try {
+                        it.toLong()
+                    } catch (_: Exception) {
+                        it.hashCode().toLong()
+                    }
+                }
+                val contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), id)
                 return getDataColumn(context, contentUri, null, null)
             } else if (isMediaDocument(uri)) {
                 val docId = DocumentsContract.getDocumentId(uri)

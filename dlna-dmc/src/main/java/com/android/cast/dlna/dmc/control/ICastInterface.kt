@@ -39,7 +39,7 @@ interface ICastInterface {
         fun getPositionInfo(device: Device<*, *, *>, listener: GetInfoListener<PositionInfo>?)
         fun getTransportInfo(device: Device<*, *, *>, listener: GetInfoListener<TransportInfo>?)
         fun getVolumeInfo(device: Device<*, *, *>, listener: GetInfoListener<Int>?)
-        fun getContent(device: Device<*, *, *>, contentType: ContentType?, listener: GetInfoListener<DIDLContent>?)
+        fun getContent(device: Device<*, *, *>, contentType: ContentType, listener: GetInfoListener<DIDLContent>?)
     }
 
     interface GetInfoListener<T> {
@@ -50,9 +50,9 @@ interface ICastInterface {
     // ---- Event Listener
     // ------------------------------------------------------------------
     interface CastEventListener : IServiceActionCallback<String>
-    interface PlayEventListener : IServiceActionCallback<Void>
-    interface PauseEventListener : IServiceActionCallback<Void>
-    interface StopEventListener : IServiceActionCallback<Void>
+    interface PlayEventListener : IServiceActionCallback<Void?>
+    interface PauseEventListener : IServiceActionCallback<Void?>
+    interface StopEventListener : IServiceActionCallback<Void?>
     interface SeekToEventListener : IServiceActionCallback<Long>
 
     // ------------------------------------------------------------------

@@ -59,7 +59,7 @@ class ControlFragment : Fragment(), IDisplayDevice, Callback {
                 }
             },
             object : PlayEventListener {
-                override fun onSuccess(result: Void) {
+                override fun onSuccess(result: Void?) {
                     Toast.makeText(activity, "Play", Toast.LENGTH_LONG).show()
                 }
 
@@ -68,7 +68,7 @@ class ControlFragment : Fragment(), IDisplayDevice, Callback {
                 }
             },
             object : PauseEventListener {
-                override fun onSuccess(result: Void) {
+                override fun onSuccess(result: Void?) {
                     Toast.makeText(activity, "Pause", Toast.LENGTH_LONG).show()
                 }
 
@@ -77,7 +77,7 @@ class ControlFragment : Fragment(), IDisplayDevice, Callback {
                 }
             },
             object : StopEventListener {
-                override fun onSuccess(result: Void) {
+                override fun onSuccess(result: Void?) {
                     Toast.makeText(activity, "Stop", Toast.LENGTH_LONG).show()
                     positionHandler.stop()
                     mVolumeMsgHandler.stop()

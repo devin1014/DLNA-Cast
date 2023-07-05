@@ -121,7 +121,7 @@ object DLNACastManager : IControl, IGetInfo, OnDeviceRegistryListener {
         }
 
         override fun onServiceDisconnected(componentName: ComponentName) {
-            Logger.w(String.format("[%s] onServiceDisconnected", if (componentName != null) componentName.shortClassName else "NULL"))
+            Logger.w(String.format("[%s] onServiceDisconnected", componentName.shortClassName))
             removeRegistryListener()
         }
 
@@ -350,7 +350,7 @@ object DLNACastManager : IControl, IGetInfo, OnDeviceRegistryListener {
         VolumeInfoRequest(device.findService(SERVICE_RENDERING_CONTROL)).execute(service!!.controlPoint, listener)
     }
 
-    override fun getContent(device: Device<*, *, *>, contentType: ContentType?, listener: GetInfoListener<DIDLContent>?) {
-        BrowseContentRequest(device.findService(SERVICE_CONTENT_DIRECTORY), contentType!!.id).execute(service!!.controlPoint, listener)
+    override fun getContent(device: Device<*, *, *>, contentType: ContentType, listener: GetInfoListener<DIDLContent>?) {
+        BrowseContentRequest(device.findService(SERVICE_CONTENT_DIRECTORY), contentType.id).execute(service!!.controlPoint, listener)
     }
 }

@@ -90,7 +90,7 @@ internal abstract class QueryRequest<T>(protected val service: Service<*, *>?) {
     // ---------------------------------------------------------------------------------------------
     // ---- PositionInfo
     // ---------------------------------------------------------------------------------------------
-    internal class PositionInfoRequest(service: Service<*, *>) : QueryRequest<PositionInfo>(service) {
+    internal class PositionInfoRequest(service: Service<*, *>?) : QueryRequest<PositionInfo>(service) {
         override val actionName: String = "GetPositionInfo"
 
         override val action: ActionCallback?
@@ -108,7 +108,7 @@ internal abstract class QueryRequest<T>(protected val service: Service<*, *>?) {
     // ---------------------------------------------------------------------------------------------
     // ---- TransportInfo
     // ---------------------------------------------------------------------------------------------
-    internal class TransportInfoRequest(service: Service<*, *>) : QueryRequest<TransportInfo>(service) {
+    internal class TransportInfoRequest(service: Service<*, *>?) : QueryRequest<TransportInfo>(service) {
         override val actionName: String = "GetTransportInfo"
         override val action: ActionCallback?
             get() = if (service != null) object : GetTransportInfo(service) {
@@ -125,7 +125,7 @@ internal abstract class QueryRequest<T>(protected val service: Service<*, *>?) {
     // ---------------------------------------------------------------------------------------------
     // ---- VolumeInfo
     // ---------------------------------------------------------------------------------------------
-    internal class VolumeInfoRequest(service: Service<*, *>) : QueryRequest<Int>(service) {
+    internal class VolumeInfoRequest(service: Service<*, *>?) : QueryRequest<Int>(service) {
         override val actionName: String = "GetVolume"
         override val action: ActionCallback?
             get() = if (service != null) object : GetVolume(service) {
@@ -142,7 +142,7 @@ internal abstract class QueryRequest<T>(protected val service: Service<*, *>?) {
     // ---------------------------------------------------------------------------------------------
     // ---- Browse
     // ---------------------------------------------------------------------------------------------
-    internal class BrowseContentRequest(service: Service<*, *>, private val containId: String) : QueryRequest<DIDLContent>(service) {
+    internal class BrowseContentRequest(service: Service<*, *>?, private val containId: String) : QueryRequest<DIDLContent>(service) {
         override val actionName: String = "Browse"
         override val action: ActionCallback?
             get() = if (service != null) object : Browse(service, containId, METADATA) {

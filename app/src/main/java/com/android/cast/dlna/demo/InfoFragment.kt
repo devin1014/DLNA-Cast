@@ -19,13 +19,12 @@ class InfoFragment : Fragment(), IDisplayDevice {
     }
 
     override fun setCastDevice(device: Device<*, *, *>?) {
-        if (device == null) {
-            castDeviceInfo?.text = ""
-            return
-        }
+        castDeviceInfo?.text = device?.let { buildDeviceInfo(it) } ?: ""
+    }
+
+    private fun buildDeviceInfo(device: Device<*, *, *>): String {
         val builder = StringBuilder()
-        val url = device.details.baseURL
-        builder.append("URL: ").append(url?.toString() ?: "null").append("\n")
+        builder.append("URL: ").append(device.details.baseURL?.toString() ?: "null").append("\n")
         builder.append("DeviceType: ").append(device.type.type).append("\n")
         builder.append("ModelName: ").append(device.details.modelDetails.modelName).append("\n")
         builder.append("ModelDescription: ").append(device.details.modelDetails.modelDescription).append("\n")
@@ -36,7 +35,6 @@ class InfoFragment : Fragment(), IDisplayDevice {
         }
         (device.services as? Array<out Service<*, *>>)?.forEach { service ->
             builder.append("\n")
-            builder.append("ServiceId: ").append(service.serviceId.id).append("\n")
             builder.append("ServiceType: ").append(service.serviceType.type).append("\n")
             val list = mutableListOf(*service.actions)
             list.sortWith { o1: Action<*>, o2: Action<*> -> o1.name.compareTo(o2.name) }
@@ -46,6 +44,6 @@ class InfoFragment : Fragment(), IDisplayDevice {
             }
             builder.append("\n")
         }
-        castDeviceInfo?.text = builder.toString()
+        return builder.toString()
     }
 }
