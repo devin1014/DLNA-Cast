@@ -26,7 +26,8 @@ class DeviceAdapter(activity: Activity, listener: OnItemSelectedListener?) : Ada
     var castDevice: Device<*, *, *>? = null
         set(value) {
             field = value
-            notifyDataSetChanged()
+            // app maybe crashed here
+            handler.post { notifyDataSetChanged() }
         }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceHolder {

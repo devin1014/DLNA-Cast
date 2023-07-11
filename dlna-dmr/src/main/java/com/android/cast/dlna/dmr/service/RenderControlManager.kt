@@ -1,6 +1,8 @@
 package com.android.cast.dlna.dmr.service
 
-import com.android.cast.dlna.dmr.service.IRendererInterface.*
+import com.android.cast.dlna.dmr.service.IRendererInterface.IAVTransportControl
+import com.android.cast.dlna.dmr.service.IRendererInterface.IAudioControl
+import com.android.cast.dlna.dmr.service.IRendererInterface.IControl
 import org.fourthline.cling.model.types.UnsignedIntegerFourBytes
 
 class RenderControlManager {
@@ -19,9 +21,7 @@ class RenderControlManager {
         }
     }
 
-    // ----------------------------------------------------------------
     // ---- Av
-    // ----------------------------------------------------------------
     fun getAvTransportControl(instanceId: UnsignedIntegerFourBytes): IAVTransportControl? = avControlMap[instanceId]
 
     val avTransportCurrentInstanceIds: Array<UnsignedIntegerFourBytes>
@@ -32,9 +32,7 @@ class RenderControlManager {
             return avControlUnsignedIntegerFourBytes!!
         }
 
-    // ----------------------------------------------------------------
     // ---- Audio
-    // ----------------------------------------------------------------
     fun getAudioControl(instanceId: UnsignedIntegerFourBytes): IAudioControl? = audioControlMap[instanceId]
 
     val audioControlCurrentInstanceIds: Array<UnsignedIntegerFourBytes>

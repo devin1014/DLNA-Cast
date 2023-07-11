@@ -1,13 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.android.cast.dlna.dmr">
-
-    <application>
-        <activity
-            android:name=".DLNARendererActivity"
-            android:configChanges="keyboard|screenSize"
-            android:launchMode="singleTop"
-            android:screenOrientation="landscape" />
-    </application>
-
-</manifest>
+<manifest package="com.android.cast.dlna.dmr" />

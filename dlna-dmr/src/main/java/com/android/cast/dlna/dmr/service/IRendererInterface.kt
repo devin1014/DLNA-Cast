@@ -5,9 +5,10 @@ import org.fourthline.cling.model.types.UnsignedIntegerTwoBytes
 import org.fourthline.cling.support.avtransport.AVTransportException
 import org.fourthline.cling.support.model.*
 
-/**
- *
- */
+const val actionSetAvTransport = "com.dlna.action.SetAvTransport"
+const val keyCurrentURI = "extra.currentURI"
+const val keyCurrentURIMetaData = "extra.currentURIMetaData"
+
 interface IRendererInterface {
     interface IControl {
         val instanceId: UnsignedIntegerFourBytes
@@ -18,8 +19,8 @@ interface IRendererInterface {
     // -------------------------------------------------------------------------------------------
     interface IAVTransportControl : IControl {
         @Throws(AVTransportException::class)
-        fun setAVTransportURI(currentURI: String?, currentURIMetaData: String?)
-        fun setNextAVTransportURI(nextURI: String?, nextURIMetaData: String?)
+        fun setAVTransportURI(currentURI: String, currentURIMetaData: String?)
+        fun setNextAVTransportURI(nextURI: String, nextURIMetaData: String?)
         fun setPlayMode(newPlayMode: String?)
         fun setRecordQualityMode(newRecordQualityMode: String?)
 

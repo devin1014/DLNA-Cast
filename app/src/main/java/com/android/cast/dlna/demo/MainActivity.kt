@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         recyclerView.adapter = DeviceAdapter(this, object : OnItemSelectedListener {
             override fun onItemSelected(castDevice: Device<*, *, *>?, selected: Boolean) {
-                deviceListAdapter.castDevice = (if (selected) castDevice else null)
+                deviceListAdapter.castDevice = if (selected) castDevice else null
                 (informationFragment as? IDisplayDevice)?.setCastDevice(if (selected) castDevice else null)
                 (controlFragment as? IDisplayDevice)?.setCastDevice(if (selected) castDevice else null)
                 (localControlFragment as? IDisplayDevice)?.setCastDevice(if (selected) castDevice else null)

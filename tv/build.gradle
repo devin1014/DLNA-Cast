@@ -30,12 +30,9 @@ android {
 
 dependencies {
     implementation project(':dlna-dmr')
-
     //noinspection GradleDependency
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.4.2'
     implementation 'com.google.android.material:material:1.6.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-
     implementation 'com.permissionx.guolindev:permissionx:1.4.0'
 }
