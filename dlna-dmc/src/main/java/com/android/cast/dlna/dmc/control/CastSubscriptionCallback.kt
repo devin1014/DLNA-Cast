@@ -24,7 +24,7 @@ internal open class CastSubscriptionCallback(
 ) : SubscriptionCallback(service, requestedDurationSeconds) {
 
     @CallSuper
-    override fun failed(subscription: GENASubscription<*>, responseStatus: UpnpResponse, exception: Exception, defaultMsg: String) {
+    override fun failed(subscription: GENASubscription<*>, responseStatus: UpnpResponse?, exception: Exception?, defaultMsg: String?) {
         Logger.e("[%s GENASubscription failed]: %s, %s", subscription.service.serviceType.type, responseStatus, defaultMsg)
     }
 
@@ -34,7 +34,7 @@ internal open class CastSubscriptionCallback(
     }
 
     @CallSuper
-    override fun ended(subscription: GENASubscription<*>, reason: CancelReason, responseStatus: UpnpResponse) {
+    override fun ended(subscription: GENASubscription<*>, reason: CancelReason?, responseStatus: UpnpResponse?) {
         Logger.i("[%s GENASubscription ended]: %s, %s", subscription.service.serviceType.type, responseStatus, reason)
     }
 
@@ -55,7 +55,7 @@ internal open class CastSubscriptionCallback(
                 if (parser != null) {
                     val value = map["LastChange"]!!.value
                     try {
-                        val event = parser.parse(value as String).instanceIDs[0].values[0]
+                        val event = parser.parse(value as String).instanceIDs.firstOrNull()?.values?.get(0)
                         if (event is TransportState) {
                             eventCallback?.onSubscriptionTransportStateChanged(event.value)
                         }

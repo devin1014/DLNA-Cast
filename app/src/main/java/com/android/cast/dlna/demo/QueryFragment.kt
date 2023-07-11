@@ -51,32 +51,27 @@ class QueryFragment : Fragment(), IDisplayDevice {
         device?.let { device ->
             DLNACastManager.getMediaInfo(device, object : GetInfoListener<MediaInfo> {
                 override fun onGetInfoResult(t: MediaInfo?, errMsg: String?) {
-                    this@QueryFragment.mediaInfo?.text = String.format("MediaInfo:\n%s", if (t != null) t.currentURI else errMsg)
+                    mediaInfo?.text = t?.currentURI ?: errMsg
                 }
             })
             DLNACastManager.getPositionInfo(device, object : GetInfoListener<PositionInfo> {
                 override fun onGetInfoResult(t: PositionInfo?, errMsg: String?) {
-                    try {
-                        this@QueryFragment.positionInfo?.text = String.format("PositionInfo:\n%s", t ?: errMsg)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        this@QueryFragment.positionInfo?.text = e.toString()
-                    }
+                    positionInfo?.text = t?.let { "${it.relTime}/${it.trackDuration}" } ?: errMsg
                 }
             })
             DLNACastManager.getTransportInfo(device, object : GetInfoListener<TransportInfo> {
                 override fun onGetInfoResult(t: TransportInfo?, errMsg: String?) {
-                    this@QueryFragment.transportInfo?.text = String.format("TransportInfo:\n%s", if (t != null) t.currentTransportState else errMsg)
+                    transportInfo?.text = t?.currentTransportState?.value ?: errMsg
                 }
             })
             DLNACastManager.getVolumeInfo(device, object : GetInfoListener<Int> {
                 override fun onGetInfoResult(t: Int?, errMsg: String?) {
-                    volumeInfo?.text = String.format("Volume: %s", t ?: errMsg)
+                    volumeInfo?.text = t?.toString() ?: errMsg
                 }
             })
             DLNACastManager.getContent(device, VIDEO, object : GetInfoListener<DIDLContent> {
                 override fun onGetInfoResult(t: DIDLContent?, errMsg: String?) {
-                    browseInfo?.text = if (t != null) parseContentString(t) else errMsg
+                    browseInfo?.text = t?.let { parseContentString(it) } ?: errMsg
                 }
             })
         }
@@ -110,7 +105,7 @@ class QueryFragment : Fragment(), IDisplayDevice {
     }
 
     private fun parseItems(list: List<Item>?): String {
-        if (list == null || list.isEmpty()) return "[]"
+        if (list.isNullOrEmpty()) return "[]"
         val builder = StringBuilder()
         for (item in list) {
             builder.append(item.firstResource.value).append("\n")
