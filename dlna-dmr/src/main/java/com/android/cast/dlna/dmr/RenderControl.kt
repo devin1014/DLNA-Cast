@@ -1,42 +1,66 @@
 package com.android.cast.dlna.dmr
 
-import android.widget.VideoView
+import android.os.Parcel
+import android.os.Parcelable
+import android.os.Parcelable.Creator
+import org.fourthline.cling.support.model.TransportState
 
 /**
  *
  */
 interface RenderControl {
-    val position: Long
+    val currentPosition: Long
     val duration: Long
 
     fun play()
     fun pause()
-    fun seek(position: Long)
+    fun seek(millSeconds: Long)
     fun stop()
+    fun getState(): RenderState
+}
 
-    // -------------------------------------------------------------------------------------------
-    // - VideoView impl
-    // -------------------------------------------------------------------------------------------
-    class VideoViewRenderControl(private val videoView: VideoView) : RenderControl {
-        override val position: Long = videoView.currentPosition.toLong()
-        override val duration: Long = videoView.duration.toLong()
+enum class RenderState {
+    IDLE, PREPARING, PLAYING, PAUSED, STOPPED, ERROR;
 
-        override fun play() = videoView.start()
-        override fun pause() = videoView.pause()
-        override fun seek(position: Long) = videoView.seekTo(position.toInt())
-        override fun stop() = videoView.stopPlayback()
+    fun toTransportState(): TransportState {
+        return when (this) {
+            PLAYING, PREPARING -> TransportState.PLAYING
+            PAUSED -> TransportState.PAUSED_PLAYBACK
+            STOPPED, ERROR -> TransportState.STOPPED
+            else -> TransportState.NO_MEDIA_PRESENT
+        }
+    }
+}
+
+class CastAction(
+    var currentURI: String? = null,
+    var currentURIMetaData: String? = null,
+    var nextURI: String? = null,
+    var nextURIMetaData: String? = null,
+) : Parcelable {
+    constructor(parcel: Parcel) : this(
+        parcel.readString(),
+        parcel.readString(),
+        parcel.readString(),
+        parcel.readString()
+    )
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeString(currentURI)
+        parcel.writeString(currentURIMetaData)
+        parcel.writeString(nextURI)
+        parcel.writeString(nextURIMetaData)
     }
 
-    // -------------------------------------------------------------------------------------------
-    // - Default impl
-    // -------------------------------------------------------------------------------------------
-    class DefaultRenderControl : RenderControl {
-        override val position: Long = 0L
-        override val duration: Long = 0L
+    override fun describeContents(): Int = 0
 
-        override fun play() {}
-        override fun pause() {}
-        override fun seek(position: Long) {}
-        override fun stop() {}
+    companion object CREATOR : Creator<CastAction> {
+        override fun createFromParcel(parcel: Parcel): CastAction {
+            return CastAction(parcel)
+        }
+
+        override fun newArray(size: Int): Array<CastAction?> {
+            return arrayOfNulls(size)
+        }
     }
 }

@@ -28,4 +28,38 @@
         android:visibility="invisible"
         tools:text="Error" />
 
+    <LinearLayout
+        android:id="@+id/player_action_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="#000000"
+        android:orientation="horizontal"
+        android:paddingLeft="12dp"
+        android:paddingTop="6dp"
+        android:paddingRight="12dp"
+        android:paddingBottom="6dp"
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/player_pause"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="暂停"
+            android:textColor="#ffffff"
+            android:textSize="14dp"
+            tools:ignore="HardcodedText,SpUsage" />
+
+        <Button
+            android:id="@+id/player_resume"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="播放"
+            android:textColor="#ffffff"
+            android:textSize="14dp"
+            tools:ignore="HardcodedText,SpUsage" />
+
+    </LinearLayout>
+
 </FrameLayout>

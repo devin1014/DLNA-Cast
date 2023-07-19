@@ -23,7 +23,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:padding="12dp"
-        android:text="播放器，请用手机投屏"
         android:textColor="@color/black"
         android:textSize="32dp"
         android:textStyle="bold"

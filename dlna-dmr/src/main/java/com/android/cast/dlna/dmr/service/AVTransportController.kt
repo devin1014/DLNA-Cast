@@ -1,88 +1,95 @@
 package com.android.cast.dlna.dmr.service
 
 import android.content.Context
-import android.content.Intent
-import com.android.cast.dlna.core.Utils
+import com.android.cast.dlna.core.Logger
 import com.android.cast.dlna.dmr.RenderControl
-import com.android.cast.dlna.dmr.service.IRendererInterface.IAVTransportControl
-import org.fourthline.cling.model.types.ErrorCode.INVALID_ARGS
-import org.fourthline.cling.model.types.UnsignedIntegerFourBytes
-import org.fourthline.cling.support.avtransport.AVTransportErrorCode.SEEKMODE_NOT_SUPPORTED
+import org.fourthline.cling.model.ModelUtil
 import org.fourthline.cling.support.avtransport.AVTransportException
 import org.fourthline.cling.support.model.*
-import org.fourthline.cling.support.model.SeekMode.REL_TIME
-import org.fourthline.cling.support.model.StorageMedium.NETWORK
 import org.fourthline.cling.support.model.TransportAction.*
-import org.fourthline.cling.support.model.TransportState.PAUSED_PLAYBACK
-import org.fourthline.cling.support.model.TransportState.PLAYING
-import java.net.URI
 
-class AVTransportController(
-    context: Context,
-    private val mediaControl: RenderControl,
-    override val instanceId: UnsignedIntegerFourBytes = UnsignedIntegerFourBytes(0)
-) : IAVTransportControl {
-
+class AVTransportController(override val applicationContext: Context) : IAVTransportControl {
     companion object {
         private val TRANSPORT_ACTION_STOPPED = arrayOf(Play)
         private val TRANSPORT_ACTION_PLAYING = arrayOf(Stop, Pause, Seek)
         private val TRANSPORT_ACTION_PAUSE_PLAYBACK = arrayOf(Play, Seek, Stop)
     }
 
-    private val applicationContext: Context = context.applicationContext
-    private var originPositionInfo = PositionInfo()
+    var mediaControl: RenderControl? = null
+        set(value) {
+            field = value
+            if (value != null) {
+                _mediaInfo = MediaInfo(currentURI, currentURIMetaData)
+                _positionInfo = PositionInfo(0, currentURIMetaData, currentURI)
+            }
+        }
+    private var _positionInfo = PositionInfo()
+    private var _mediaInfo = MediaInfo()
 
-    override val transportInfo = TransportInfo()
+    override val logger = Logger.create("AVTransportController")
     override val transportSettings = TransportSettings()
-    override var mediaInfo = MediaInfo()
-        private set
-
-    @get:Synchronized
-    override val currentTransportActions: Array<TransportAction>
+    override val deviceCapabilities: DeviceCapabilities = DeviceCapabilities(arrayOf(StorageMedium.UNKNOWN))
+    override val transportInfo
+        get() = mediaControl?.let { ctrl ->
+            TransportInfo(ctrl.getState().toTransportState(), TransportStatus.OK, "1")
+        } ?: TransportInfo()
+    override val mediaInfo
+        get() = _mediaInfo
+    override val positionInfo: PositionInfo
+        get() = mediaControl?.let { ctrl ->
+            val duration = ModelUtil.toTimeString(ctrl.duration / 1000)
+            val realTime = ModelUtil.toTimeString(ctrl.currentPosition / 1000)
+            PositionInfo(0, duration, currentURI, realTime, realTime)
+        } ?: PositionInfo()
+    override val currentTransportActions: Array<TransportAction> //TODO: check
         get() = when (transportInfo.currentTransportState) {
-            PLAYING -> TRANSPORT_ACTION_PLAYING
-            PAUSED_PLAYBACK -> TRANSPORT_ACTION_PAUSE_PLAYBACK
+            TransportState.PLAYING -> TRANSPORT_ACTION_PLAYING
+            TransportState.PAUSED_PLAYBACK -> TRANSPORT_ACTION_PAUSE_PLAYBACK
             else -> TRANSPORT_ACTION_STOPPED
         }
-    override val deviceCapabilities: DeviceCapabilities
-        get() = DeviceCapabilities(arrayOf(NETWORK))
-    override val positionInfo: PositionInfo
-        get() = PositionInfo(originPositionInfo, mediaControl.position / 1000, mediaControl.duration / 1000)
+
+    private var currentURI: String? = null
+    private var currentURIMetaData: String? = null
 
     @Throws(AVTransportException::class)
     override fun setAVTransportURI(currentURI: String, currentURIMetaData: String?) {
-        try {
-            URI(currentURI)
-        } catch (ex: Exception) {
-            throw AVTransportException(INVALID_ARGS, "CurrentURI can not be null or malformed")
-        }
-        mediaInfo = MediaInfo(currentURI, currentURIMetaData, UnsignedIntegerFourBytes(1), "", NETWORK)
-        originPositionInfo = PositionInfo(1, currentURIMetaData, currentURI)
-        applicationContext.startActivity(Intent().apply {
-            action = actionSetAvTransport
-            putExtra(keyCurrentURI, currentURI)
-            putExtra(keyCurrentURIMetaData, currentURIMetaData)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) // start from service content,should add 'FLAG_ACTIVITY_NEW_TASK' flag.
-        })
+        super.setAVTransportURI(currentURI, currentURIMetaData)
+        this.currentURI = currentURI
+        this.currentURIMetaData = currentURIMetaData
     }
 
-    override fun setNextAVTransportURI(nextURI: String, nextURIMetaData: String?) {}
-    override fun play(speed: String?) = mediaControl.play()
-    override fun pause() = mediaControl.pause()
+    private var nextURI: String? = null
+    private var nextURIMetaData: String? = null
 
-    @Throws(AVTransportException::class)
+    override fun setNextAVTransportURI(nextURI: String, nextURIMetaData: String?) {
+        super.setNextAVTransportURI(nextURI, nextURIMetaData)
+        this.nextURI = nextURI
+        this.nextURIMetaData = nextURIMetaData
+    }
+
+    override fun play(speed: String?) {
+        super.play(speed)
+        mediaControl?.play()
+    }
+
+    override fun pause() {
+        super.pause()
+        mediaControl?.pause()
+    }
+
     override fun seek(unit: String?, target: String?) {
-        val seekMode = SeekMode.valueOrExceptionOf(unit)
-        if (seekMode != REL_TIME) {
-            throw AVTransportException(SEEKMODE_NOT_SUPPORTED, "Unsupported seek mode: $unit")
+        super.seek(unit, target)
+        try {
+            mediaControl?.seek(ModelUtil.fromTimeString(target) * 1000)
+        } catch (e: Exception) {
+            logger.w("seek failed: $e")
         }
-        mediaControl.seek(Utils.getIntTime(target))
     }
 
-    override fun stop() = mediaControl.stop()
-    override fun previous() {}
-    override fun next() {}
-    override fun record() {}
-    override fun setPlayMode(newPlayMode: String?) {}
-    override fun setRecordQualityMode(newRecordQualityMode: String?) {}
+    override fun stop() {
+        super.stop()
+        mediaControl?.stop()
+        _mediaInfo = MediaInfo()
+        _positionInfo = PositionInfo()
+    }
 }
