@@ -2,7 +2,6 @@ package com.android.cast.dlna.dmc.control
 
 import com.android.cast.dlna.core.Logger
 import com.android.cast.dlna.dmc.DLNACastManager
-import com.android.cast.dlna.dmc.control.ICastInterface.ISubscriptionListener
 import org.fourthline.cling.controlpoint.SubscriptionCallback
 import org.fourthline.cling.model.gena.CancelReason
 import org.fourthline.cling.model.gena.GENASubscription
@@ -19,7 +18,7 @@ import org.fourthline.cling.support.renderingcontrol.lastchange.RenderingControl
 internal class CastSubscriptionCallback(
     service: Service<*, *>?,
     requestedDurationSeconds: Int,
-    private val eventCallback: ISubscriptionListener?,
+    private val eventCallback: SubscriptionListener?,
 ) : SubscriptionCallback(service, requestedDurationSeconds) {
 
     private val logger = Logger.create("SubscriptionCallback")

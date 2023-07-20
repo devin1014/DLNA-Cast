@@ -14,20 +14,20 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.android.cast.dlna.core.Utils
 import com.android.cast.dlna.demo.CastObject
 import com.android.cast.dlna.demo.IDisplayDevice
 import com.android.cast.dlna.demo.R
-import com.android.cast.dlna.demo.fragment.CastFragment.Callback
 import com.android.cast.dlna.demo.R.layout
+import com.android.cast.dlna.demo.fragment.CastFragment.Callback
 import com.android.cast.dlna.dmc.DLNACastManager
-import com.android.cast.dlna.dmc.control.ICastInterface
-import com.android.cast.dlna.dmc.control.ICastInterface.CastEventListener
-import com.android.cast.dlna.dmc.control.ICastInterface.GetInfoListener
-import com.android.cast.dlna.dmc.control.ICastInterface.PauseEventListener
-import com.android.cast.dlna.dmc.control.ICastInterface.PlayEventListener
-import com.android.cast.dlna.dmc.control.ICastInterface.SeekToEventListener
-import com.android.cast.dlna.dmc.control.ICastInterface.StopEventListener
+import com.android.cast.dlna.dmc.control.ActionResponse
+import com.android.cast.dlna.dmc.control.CastEventListener
+import com.android.cast.dlna.dmc.control.GetInfoListener
+import com.android.cast.dlna.dmc.control.SubscriptionListener
+import com.android.cast.dlna.dmc.control.PauseEventListener
+import com.android.cast.dlna.dmc.control.PlayEventListener
+import com.android.cast.dlna.dmc.control.SeekToEventListener
+import com.android.cast.dlna.dmc.control.StopEventListener
 import org.fourthline.cling.model.meta.Device
 import org.fourthline.cling.support.model.PositionInfo
 import org.fourthline.cling.support.model.TransportState
@@ -51,56 +51,56 @@ class ControlFragment : Fragment(), IDisplayDevice, Callback {
 
         DLNACastManager.registerActionCallbacks(
             object : CastEventListener {
-                override fun onSuccess(result: String) {
-                    Toast.makeText(activity, "Cast: $result", Toast.LENGTH_LONG).show()
-                    positionHandler.start()
-                    mVolumeMsgHandler.start()
-                }
-
-                override fun onFailed(errMsg: String) {
-                    Toast.makeText(activity, errMsg, Toast.LENGTH_LONG).show()
+                override fun onResponse(response: ActionResponse<String>) {
+                    if (response.exception != null) {
+                        Toast.makeText(activity, response.exception, Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(activity, "Cast: ${response.data}", Toast.LENGTH_LONG).show()
+                        positionHandler.start()
+                        mVolumeMsgHandler.start()
+                    }
                 }
             },
             object : PlayEventListener {
-                override fun onSuccess(result: Void?) {
-                    Toast.makeText(activity, "Play", Toast.LENGTH_LONG).show()
-                }
-
-                override fun onFailed(errMsg: String) {
-                    Toast.makeText(activity, errMsg, Toast.LENGTH_LONG).show()
+                override fun onResponse(response: ActionResponse<String>) {
+                    if (response.exception != null) {
+                        Toast.makeText(activity, response.exception, Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(activity, "${response.data}", Toast.LENGTH_LONG).show()
+                    }
                 }
             },
             object : PauseEventListener {
-                override fun onSuccess(result: Void?) {
-                    Toast.makeText(activity, "Pause", Toast.LENGTH_LONG).show()
-                }
-
-                override fun onFailed(errMsg: String) {
-                    Toast.makeText(activity, errMsg, Toast.LENGTH_LONG).show()
+                override fun onResponse(response: ActionResponse<String>) {
+                    if (response.exception != null) {
+                        Toast.makeText(activity, response.exception, Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(activity, "${response.data}", Toast.LENGTH_LONG).show()
+                    }
                 }
             },
             object : StopEventListener {
-                override fun onSuccess(result: Void?) {
-                    Toast.makeText(activity, "Stop", Toast.LENGTH_LONG).show()
+                override fun onResponse(response: ActionResponse<String>) {
+                    if (response.exception != null) {
+                        Toast.makeText(activity, response.exception, Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(activity, "${response.data}", Toast.LENGTH_LONG).show()
+                    }
                     positionHandler.stop()
                     mVolumeMsgHandler.stop()
                 }
-
-                override fun onFailed(errMsg: String) {
-                    Toast.makeText(activity, errMsg, Toast.LENGTH_LONG).show()
-                }
             },
             object : SeekToEventListener {
-                override fun onSuccess(result: Long) {
-                    Toast.makeText(activity, "SeekTo: " + Utils.getStringTime(result), Toast.LENGTH_LONG).show()
-                }
-
-                override fun onFailed(errMsg: String) {
-                    Toast.makeText(activity, errMsg, Toast.LENGTH_LONG).show()
+                override fun onResponse(response: ActionResponse<Long>) {
+                    if (response.exception != null) {
+                        Toast.makeText(activity, response.exception, Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(activity, "SeekTo: ${response.data}", Toast.LENGTH_LONG).show()
+                    }
                 }
             }
         )
-        DLNACastManager.subscriptionListener = object : ICastInterface.ISubscriptionListener {
+        DLNACastManager.subscriptionListener = object : SubscriptionListener {
             override fun onSubscriptionTransportStateChanged(event: TransportState) {
                 statusInfo?.text = event.value
             }

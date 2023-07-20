@@ -3,20 +3,15 @@ package com.android.cast.dlna.dmc.control
 import android.text.TextUtils
 import com.android.cast.dlna.core.ICast
 import com.android.cast.dlna.core.Utils.getMetadata
-import com.android.cast.dlna.dmc.control.ICastInterface.CastEventListener
-import com.android.cast.dlna.dmc.control.ICastInterface.IControl
-import com.android.cast.dlna.dmc.control.ICastInterface.ISubscriptionListener
-import com.android.cast.dlna.dmc.control.IServiceAction.IServiceActionCallback
-import com.android.cast.dlna.dmc.control.IServiceAction.ServiceAction
-import com.android.cast.dlna.dmc.control.IServiceAction.ServiceAction.CAST
-import com.android.cast.dlna.dmc.control.IServiceAction.ServiceAction.PAUSE
-import com.android.cast.dlna.dmc.control.IServiceAction.ServiceAction.PLAY
-import com.android.cast.dlna.dmc.control.IServiceAction.ServiceAction.SEEK_TO
-import com.android.cast.dlna.dmc.control.IServiceAction.ServiceAction.SET_BRIGHTNESS
-import com.android.cast.dlna.dmc.control.IServiceAction.ServiceAction.SET_MUTE
-import com.android.cast.dlna.dmc.control.IServiceAction.ServiceAction.SET_VOLUME
-import com.android.cast.dlna.dmc.control.IServiceAction.ServiceAction.STOP
-import com.android.cast.dlna.dmc.control.IServiceFactory.ServiceFactoryImpl
+import com.android.cast.dlna.dmc.control.ServiceFactory.ServiceFactoryImpl
+import com.android.cast.dlna.dmc.control.ServiceAction.CAST
+import com.android.cast.dlna.dmc.control.ServiceAction.PAUSE
+import com.android.cast.dlna.dmc.control.ServiceAction.PLAY
+import com.android.cast.dlna.dmc.control.ServiceAction.SEEK_TO
+import com.android.cast.dlna.dmc.control.ServiceAction.SET_BRIGHTNESS
+import com.android.cast.dlna.dmc.control.ServiceAction.SET_MUTE
+import com.android.cast.dlna.dmc.control.ServiceAction.SET_VOLUME
+import com.android.cast.dlna.dmc.control.ServiceAction.STOP
 import org.fourthline.cling.controlpoint.ControlPoint
 import org.fourthline.cling.model.meta.Device
 import org.fourthline.cling.support.model.TransportState
@@ -24,21 +19,21 @@ import org.fourthline.cling.support.model.TransportState
 class ControlImpl(
     controlPoint: ControlPoint,
     private val device: Device<*, *, *>,
-    private val callbackMap: Map<String, IServiceActionCallback<*>>,
-    subscriptionListener: ISubscriptionListener?
-) : IControl {
+    private val callbackMap: Map<String, ServiceActionCallback<*>>,
+    subscriptionListener: SubscriptionListener?,
+) : Control {
 
-    private val serviceFactory: IServiceFactory
+    private val serviceFactory: ServiceFactory
     private var uri: String? = null
 
     init {
         serviceFactory = ServiceFactoryImpl(controlPoint, device)
-        (serviceFactory.avService as BaseServiceExecutor).execute(object : ISubscriptionListener {
+        (serviceFactory.avService as BaseServiceExecutor).execute(object : SubscriptionListener {
             override fun onSubscriptionTransportStateChanged(event: TransportState) {
                 subscriptionListener?.onSubscriptionTransportStateChanged(event)
             }
         })
-        (serviceFactory.renderService as BaseServiceExecutor).execute(object : ISubscriptionListener {
+        (serviceFactory.renderService as BaseServiceExecutor).execute(object : SubscriptionListener {
             override fun onSubscriptionTransportStateChanged(event: TransportState) {
                 subscriptionListener?.onSubscriptionTransportStateChanged(event)
             }
@@ -48,14 +43,8 @@ class ControlImpl(
     override fun cast(device: Device<*, *, *>, cast: ICast) {
         uri = cast.uri
         serviceFactory.avService.cast(object : CastEventListener {
-            override fun onSuccess(result: String) {
-                val listener = getCallback<Any>(CAST)
-                listener?.onSuccess(result)
-            }
-
-            override fun onFailed(errMsg: String) {
-                val listener = getCallback<Any>(CAST)
-                listener?.onFailed(errMsg)
+            override fun onResponse(response: ActionResponse<String>) {
+                getCallback<String>(CAST)?.onResponse(response)
             }
         }, cast.uri, getMetadata(cast))
     }
@@ -97,7 +86,7 @@ class ControlImpl(
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun <T> getCallback(action: ServiceAction): IServiceActionCallback<T>? {
-        return callbackMap[action.name] as? IServiceActionCallback<T>
+    private fun <T> getCallback(action: ServiceAction): ServiceActionCallback<T>? {
+        return callbackMap[action.name] as? ServiceActionCallback<T>
     }
 }

@@ -80,8 +80,7 @@ internal class DeviceRegistryImpl(private val deviceRegistryListener: OnDeviceRe
         handler.post { deviceRegistryListener.onDeviceRemoved(device) }
     }
 
-    private fun parseDeviceInfo(device: RemoteDevice): String =
-        "[${device.type.type}][${device.details.friendlyName}][${device.details.manufacturerDetails.manufacturer}][${device.identity.udn}]"
+    private fun parseDeviceInfo(device: RemoteDevice): String = "[${device.type.type}][${device.details.friendlyName}][${device.identity.udn}]"
 
     private fun parseDeviceService(device: RemoteDevice): String {
         val builder = StringBuilder(device.details.friendlyName)

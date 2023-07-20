@@ -4,7 +4,7 @@ import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
 import com.android.cast.dlna.core.Logger
-import com.android.cast.dlna.dmc.control.ICastInterface.GetInfoListener
+import com.android.cast.dlna.dmc.control.GetInfoListener
 import org.fourthline.cling.controlpoint.ActionCallback
 import org.fourthline.cling.controlpoint.ControlPoint
 import org.fourthline.cling.model.action.ActionInvocation

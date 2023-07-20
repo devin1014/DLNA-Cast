@@ -11,7 +11,7 @@ import com.android.cast.dlna.demo.IDisplayDevice
 import com.android.cast.dlna.demo.R
 import com.android.cast.dlna.demo.R.layout
 import com.android.cast.dlna.dmc.DLNACastManager
-import com.android.cast.dlna.dmc.control.ICastInterface.GetInfoListener
+import com.android.cast.dlna.dmc.control.GetInfoListener
 import org.fourthline.cling.model.meta.Device
 import org.fourthline.cling.support.model.DIDLContent
 import org.fourthline.cling.support.model.MediaInfo

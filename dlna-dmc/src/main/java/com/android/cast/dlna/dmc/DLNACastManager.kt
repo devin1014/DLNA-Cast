@@ -20,22 +20,22 @@ import com.android.cast.dlna.dmc.QueryRequest.MediaInfoRequest
 import com.android.cast.dlna.dmc.QueryRequest.PositionInfoRequest
 import com.android.cast.dlna.dmc.QueryRequest.TransportInfoRequest
 import com.android.cast.dlna.dmc.QueryRequest.VolumeInfoRequest
+import com.android.cast.dlna.dmc.control.CastEventListener
 import com.android.cast.dlna.dmc.control.ControlImpl
-import com.android.cast.dlna.dmc.control.ICastInterface.CastEventListener
-import com.android.cast.dlna.dmc.control.ICastInterface.GetInfoListener
-import com.android.cast.dlna.dmc.control.ICastInterface.IControl
-import com.android.cast.dlna.dmc.control.ICastInterface.IGetInfo
-import com.android.cast.dlna.dmc.control.ICastInterface.ISubscriptionListener
-import com.android.cast.dlna.dmc.control.ICastInterface.PauseEventListener
-import com.android.cast.dlna.dmc.control.ICastInterface.PlayEventListener
-import com.android.cast.dlna.dmc.control.ICastInterface.SeekToEventListener
-import com.android.cast.dlna.dmc.control.ICastInterface.StopEventListener
-import com.android.cast.dlna.dmc.control.IServiceAction.IServiceActionCallback
-import com.android.cast.dlna.dmc.control.IServiceAction.ServiceAction.CAST
-import com.android.cast.dlna.dmc.control.IServiceAction.ServiceAction.PAUSE
-import com.android.cast.dlna.dmc.control.IServiceAction.ServiceAction.PLAY
-import com.android.cast.dlna.dmc.control.IServiceAction.ServiceAction.SEEK_TO
-import com.android.cast.dlna.dmc.control.IServiceAction.ServiceAction.STOP
+import com.android.cast.dlna.dmc.control.GetInfoListener
+import com.android.cast.dlna.dmc.control.Control
+import com.android.cast.dlna.dmc.control.GetInfo
+import com.android.cast.dlna.dmc.control.ServiceActionCallback
+import com.android.cast.dlna.dmc.control.SubscriptionListener
+import com.android.cast.dlna.dmc.control.PauseEventListener
+import com.android.cast.dlna.dmc.control.PlayEventListener
+import com.android.cast.dlna.dmc.control.SeekToEventListener
+import com.android.cast.dlna.dmc.control.ServiceAction.CAST
+import com.android.cast.dlna.dmc.control.ServiceAction.PAUSE
+import com.android.cast.dlna.dmc.control.ServiceAction.PLAY
+import com.android.cast.dlna.dmc.control.ServiceAction.SEEK_TO
+import com.android.cast.dlna.dmc.control.ServiceAction.STOP
+import com.android.cast.dlna.dmc.control.StopEventListener
 import org.fourthline.cling.android.AndroidUpnpService
 import org.fourthline.cling.model.message.header.STAllHeader
 import org.fourthline.cling.model.message.header.UDADeviceTypeHeader
@@ -52,7 +52,7 @@ import org.fourthline.cling.support.model.TransportInfo
 /**
  *
  */
-object DLNACastManager : IControl, IGetInfo, OnDeviceRegistryListener {
+object DLNACastManager : Control, GetInfo, OnDeviceRegistryListener {
 
     //public static final DeviceType DEVICE_TYPE_DMR = new UDADeviceType("MediaRenderer");
     val SERVICE_AV_TRANSPORT: ServiceType = UDAServiceType("AVTransport")
@@ -63,7 +63,7 @@ object DLNACastManager : IControl, IGetInfo, OnDeviceRegistryListener {
     private val logger = Logger.create("CastManager")
     private val deviceRegistryImpl = DeviceRegistryImpl(this)
     private val mainHandler = Handler(Looper.getMainLooper())
-    private val actionEventCallbackMap: MutableMap<String, IServiceActionCallback<*>> = LinkedHashMap()
+    private val actionEventCallbackMap: MutableMap<String, ServiceActionCallback<*>> = LinkedHashMap()
     private var searchDeviceType: DeviceType? = null
     private var controlImpl: ControlImpl? = null
     private var upnpService: AndroidUpnpService? = null
@@ -284,7 +284,7 @@ object DLNACastManager : IControl, IGetInfo, OnDeviceRegistryListener {
     // -----------------------------------------------------------------------------------------
     // ---- Callback
     // -----------------------------------------------------------------------------------------
-    fun registerActionCallbacks(vararg callbacks: IServiceActionCallback<*>) {
+    fun registerActionCallbacks(vararg callbacks: ServiceActionCallback<*>) {
         callbacks.forEach { callback ->
             when (callback) {
                 is CastEventListener -> actionEventCallbackMap[CAST.name] = callback
@@ -298,7 +298,7 @@ object DLNACastManager : IControl, IGetInfo, OnDeviceRegistryListener {
 
     fun unregisterActionCallbacks() = actionEventCallbackMap.clear()
 
-    var subscriptionListener: ISubscriptionListener? = null
+    var subscriptionListener: SubscriptionListener? = null
 
     // -----------------------------------------------------------------------------------------
     // ---- query
