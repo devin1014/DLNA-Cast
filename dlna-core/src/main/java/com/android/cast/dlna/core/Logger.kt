@@ -15,6 +15,9 @@ object Level {
 
 class Logger(private val tag: String) {
     companion object {
+        var prefixTag: String = "WL_"
+        var enabled: Boolean = true
+        var level: Int = Level.I
         var printer: Printer = Printer { level, tag, message, throwable ->
             if (throwable != null) {
                 when (level) {
@@ -38,72 +41,67 @@ class Logger(private val tag: String) {
         fun create(tag: String) = Logger(tag)
     }
 
-    var prefixTag: String = "WL_"
-    var enabled: Boolean = true
-    private val available get() = enabled
-    private val debugAvailable get() = enabled
-
     fun v(message: CharSequence, throwable: Throwable? = null) {
-        if (debugAvailable) {
+        if (enabled && Level.V >= level) {
             printer.print(Level.V, prefixTag + tag, message, throwable)
         }
     }
 
     fun v(function: () -> CharSequence) = d(null, function)
     fun v(throwable: Throwable?, function: () -> CharSequence) {
-        if (debugAvailable) {
+        if (enabled && Level.V >= level) {
             printer.print(Level.V, prefixTag + tag, function(), throwable)
         }
     }
 
     fun d(message: CharSequence, throwable: Throwable? = null) {
-        if (debugAvailable) {
+        if (enabled && Level.D >= level) {
             printer.print(Level.D, prefixTag + tag, message, throwable)
         }
     }
 
     fun d(function: () -> CharSequence) = d(null, function)
     fun d(throwable: Throwable?, function: () -> CharSequence) {
-        if (debugAvailable) {
+        if (enabled && Level.D >= level) {
             printer.print(Level.D, prefixTag + tag, function(), throwable)
         }
     }
 
     fun i(message: CharSequence, throwable: Throwable? = null) {
-        if (available) {
+        if (enabled && Level.I >= level) {
             printer.print(Level.I, prefixTag + tag, message, throwable)
         }
     }
 
     fun i(function: () -> CharSequence) = i(null, function)
     fun i(throwable: Throwable?, function: () -> CharSequence) {
-        if (available) {
+        if (enabled && Level.I >= level) {
             printer.print(Level.I, prefixTag + tag, function(), throwable)
         }
     }
 
     fun w(message: CharSequence, throwable: Throwable? = null) {
-        if (available) {
+        if (enabled && Level.W >= level) {
             printer.print(Level.W, prefixTag + tag, message, throwable)
         }
     }
 
     fun w(function: () -> CharSequence) = w(null, function)
     fun w(throwable: Throwable?, function: () -> CharSequence) {
-        if (available) {
+        if (enabled && Level.W >= level) {
             printer.print(Level.W, prefixTag + tag, function(), throwable)
         }
     }
 
     fun e(message: CharSequence, throwable: Throwable? = null) {
-        if (available) {
+        if (enabled && Level.E >= level) {
             printer.print(Level.E, prefixTag + tag, message, throwable)
         }
     }
 
     fun e(function: () -> CharSequence) = e(null, function)
     fun e(throwable: Throwable?, function: () -> CharSequence) {
-        if (available) {
+        if (enabled && Level.E >= level) {
             printer.print(Level.E, prefixTag + tag, function(), throwable)
         }
     }

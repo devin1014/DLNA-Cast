@@ -1,9 +1,8 @@
 package com.android.cast.dlna.dmc.control
 
-import androidx.annotation.CallSuper
+import com.android.cast.dlna.core.Logger
 import com.android.cast.dlna.dmc.DLNACastManager
 import com.android.cast.dlna.dmc.control.ICastInterface.ISubscriptionListener
-import com.orhanobut.logger.Logger
 import org.fourthline.cling.controlpoint.SubscriptionCallback
 import org.fourthline.cling.model.gena.CancelReason
 import org.fourthline.cling.model.gena.GENASubscription
@@ -17,60 +16,54 @@ import org.fourthline.cling.support.renderingcontrol.lastchange.RenderingControl
 /**
  *
  */
-internal open class CastSubscriptionCallback(
+internal class CastSubscriptionCallback(
     service: Service<*, *>?,
     requestedDurationSeconds: Int,
-    private val eventCallback: ISubscriptionListener?
+    private val eventCallback: ISubscriptionListener?,
 ) : SubscriptionCallback(service, requestedDurationSeconds) {
 
-    @CallSuper
+    private val logger = Logger.create("SubscriptionCallback")
+    private val lastChangeParser: LastChangeParser? = when (getService()?.serviceType?.type) {
+        DLNACastManager.SERVICE_AV_TRANSPORT.type -> AVTransportLastChangeParser()
+        DLNACastManager.SERVICE_RENDERING_CONTROL.type -> RenderingControlLastChangeParser()
+        else -> null
+    }
+
     override fun failed(subscription: GENASubscription<*>, responseStatus: UpnpResponse?, exception: Exception?, defaultMsg: String?) {
-        Logger.e("[%s GENASubscription failed]: %s, %s", subscription.service.serviceType.type, responseStatus, defaultMsg)
+        logger.e("[${subscription.service.serviceType.type}] failed:${responseStatus}, $defaultMsg")
     }
 
-    @CallSuper
+
     override fun established(subscription: GENASubscription<*>) {
-        Logger.i("[%s] [established]", subscription.service.serviceType.type)
+        logger.i("[${subscription.service.serviceType.type}] established")
     }
 
-    @CallSuper
+
     override fun ended(subscription: GENASubscription<*>, reason: CancelReason?, responseStatus: UpnpResponse?) {
-        Logger.i("[%s GENASubscription ended]: %s, %s", subscription.service.serviceType.type, responseStatus, reason)
+        logger.i("[${subscription.service.serviceType.type}] ended: $responseStatus, $reason")
     }
 
     override fun eventsMissed(subscription: GENASubscription<*>, numberOfMissedEvents: Int) {
-        Logger.w("[%s GENASubscription eventsMissed]: %s", subscription.service.serviceType.type, numberOfMissedEvents)
+        logger.w("[${subscription.service.serviceType.type}] eventsMissed: $numberOfMissedEvents")
     }
 
     override fun eventReceived(subscription: GENASubscription<*>) {
-        if (subscription.currentValues != null) {
-            Logger.i("[%s GENASubscription eventReceived]\ncurrentValues: %s", subscription.service.serviceType.type, subscription.currentValues)
-        } else {
-            Logger.i("[%s GENASubscription eventReceived]", subscription.service.serviceType.type)
-        }
-        val map = subscription.currentValues
-        if (map != null && map.isNotEmpty()) {
-            if (map.containsKey("LastChange")) {
-                val parser = lastChangeParser
-                if (parser != null) {
-                    val value = map["LastChange"]!!.value
-                    try {
-                        val event = parser.parse(value as String).instanceIDs.firstOrNull()?.values?.get(0)
-                        if (event is TransportState) {
-                            eventCallback?.onSubscriptionTransportStateChanged(event.value)
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
+        logger.i("[${subscription.service.serviceType.type}] eventReceived\n    events: ${subscription.currentValues.keys}")
+        lastChangeParser?.also { parser ->
+            val lastChangeEventValue = subscription.currentValues["LastChange"]?.value.toString()
+            try {
+                val events = parser.parse(lastChangeEventValue)?.instanceIDs?.firstOrNull()?.values
+                events?.forEach { value ->
+                    logger.i("    value : $value")
+                    //TODO: remove the special class
+                    if (value is TransportState) {
+                        eventCallback?.onSubscriptionTransportStateChanged(value.value)
                     }
                 }
+
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }
-
-    private val lastChangeParser: LastChangeParser?
-        get() = when (getService().serviceType.type) {
-            DLNACastManager.SERVICE_AV_TRANSPORT.type -> AVTransportLastChangeParser()
-            DLNACastManager.SERVICE_RENDERING_CONTROL.type -> RenderingControlLastChangeParser()
-            else -> null
-        }
 }

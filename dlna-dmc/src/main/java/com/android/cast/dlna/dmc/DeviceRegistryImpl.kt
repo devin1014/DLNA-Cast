@@ -2,7 +2,7 @@ package com.android.cast.dlna.dmc
 
 import android.os.Handler
 import android.os.Looper
-import com.orhanobut.logger.Logger
+import com.android.cast.dlna.core.Logger
 import org.fourthline.cling.model.meta.Action
 import org.fourthline.cling.model.meta.Device
 import org.fourthline.cling.model.meta.LocalDevice
@@ -15,6 +15,7 @@ import org.fourthline.cling.registry.Registry
  */
 internal class DeviceRegistryImpl(private val deviceRegistryListener: OnDeviceRegistryListener) : DefaultRegistryListener() {
 
+    private val logger = Logger.create("DeviceRegistry")
     private val handler = Handler(Looper.getMainLooper())
 
     @Volatile
@@ -31,31 +32,30 @@ internal class DeviceRegistryImpl(private val deviceRegistryListener: OnDeviceRe
     // Discovery performance optimization for very slow Android devices!
     // This function will called early than 'remoteDeviceAdded',but the device services maybe not entirely.
     override fun remoteDeviceDiscoveryStarted(registry: Registry, device: RemoteDevice) {
-        Logger.i(String.format("[%s] discovery started...", device.details.friendlyName))
+        logger.i(String.format("[%s] discovery started...", device.details.friendlyName))
     }
 
     //End of optimization, you can remove the whole block if your Android handset is fast (>= 600 Mhz)
     override fun remoteDeviceDiscoveryFailed(registry: Registry, device: RemoteDevice, ex: Exception) {
-        Logger.e(String.format("[%s] discovery failed...", device.details.friendlyName))
-        Logger.e(ex.toString())
+        logger.e(String.format("[%s] discovery failed...", device.details.friendlyName), ex)
     }
 
     // remote device
     override fun remoteDeviceAdded(registry: Registry, device: RemoteDevice) {
-        Logger.i("remoteDeviceAdded: " + parseDeviceInfo(device))
-        Logger.i(parseDeviceService(device))
+        logger.i("remoteDeviceAdded: " + parseDeviceInfo(device))
+        logger.i(parseDeviceService(device))
         notifyDeviceAdd(device)
     }
 
     override fun remoteDeviceUpdated(registry: Registry, device: RemoteDevice) {
         if (!ignoreUpdate) {
-            Logger.d("remoteDeviceUpdated: " + parseDeviceInfo(device))
+            logger.d("remoteDeviceUpdated: " + parseDeviceInfo(device))
             notifyDeviceUpdate(device)
         }
     }
 
     override fun remoteDeviceRemoved(registry: Registry, device: RemoteDevice) {
-        Logger.w("remoteDeviceRemoved: " + parseDeviceInfo(device))
+        logger.w("remoteDeviceRemoved: " + parseDeviceInfo(device))
         notifyDeviceRemove(device)
     }
 
@@ -80,35 +80,23 @@ internal class DeviceRegistryImpl(private val deviceRegistryListener: OnDeviceRe
         handler.post { deviceRegistryListener.onDeviceRemoved(device) }
     }
 
-    companion object {
-        /**
-         * @return device information like: [deviceType][name][manufacturer][udn]
-         */
-        private fun parseDeviceInfo(device: RemoteDevice): String {
-            return String.format(
-                "[%s][%s][%s][%s]",
-                device.type.type,
-                device.details.friendlyName,
-                device.details.manufacturerDetails.manufacturer,
-                device.identity.udn
-            )
-        }
+    private fun parseDeviceInfo(device: RemoteDevice): String =
+        "[${device.type.type}][${device.details.friendlyName}][${device.details.manufacturerDetails.manufacturer}][${device.identity.udn}]"
 
-        private fun parseDeviceService(device: RemoteDevice): String {
-            val builder = StringBuilder(device.details.friendlyName)
-            builder.append(":")
-            for (service in device.services) {
-                builder.append("\nservice:").append(service.serviceType.type)
-                if (service.hasActions()) {
-                    builder.append("\nactions: ")
-                    val list = mutableListOf<Action<*>>(*service.actions)
-                    list.sortWith { o1: Action<*>, o2: Action<*> -> o1.name.compareTo(o2.name) }
-                    for (action in list) {
-                        builder.append(action.name).append(", ")
-                    }
+    private fun parseDeviceService(device: RemoteDevice): String {
+        val builder = StringBuilder(device.details.friendlyName)
+        builder.append(":")
+        for (service in device.services) {
+            builder.append("\nservice:").append(service.serviceType.type)
+            if (service.hasActions()) {
+                builder.append("\nactions: ")
+                val list = mutableListOf<Action<*>>(*service.actions)
+                list.sortWith { o1: Action<*>, o2: Action<*> -> o1.name.compareTo(o2.name) }
+                for (action in list) {
+                    builder.append(action.name).append(", ")
                 }
             }
-            return builder.toString()
         }
+        return builder.toString()
     }
 }

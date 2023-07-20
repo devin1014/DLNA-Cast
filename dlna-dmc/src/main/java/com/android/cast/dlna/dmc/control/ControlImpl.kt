@@ -80,8 +80,8 @@ class ControlImpl(
         serviceFactory.avService.pause(getCallback(PAUSE))
     }
 
-    override fun seekTo(position: Long) {
-        serviceFactory.avService.seek(getCallback(SEEK_TO), position)
+    override fun seekTo(millSeconds: Long) {
+        serviceFactory.avService.seek(getCallback(SEEK_TO), millSeconds)
     }
 
     override fun setVolume(percent: Int) {

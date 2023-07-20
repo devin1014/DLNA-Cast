@@ -1,4 +1,4 @@
-package com.android.cast.dlna.demo
+package com.android.cast.dlna.demo.fragment
 
 import android.app.Dialog
 import android.os.Bundle
@@ -8,6 +8,11 @@ import android.view.ViewGroup
 import android.widget.RadioGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
+import com.android.cast.dlna.demo.CAST_IMAGE_JPG
+import com.android.cast.dlna.demo.CAST_VIDEO_M3U8
+import com.android.cast.dlna.demo.CAST_VIDEO_MP4
+import com.android.cast.dlna.demo.R
+import com.android.cast.dlna.demo.R.layout
 
 class CastFragment(private val callback: Callback?) : DialogFragment() {
 
@@ -21,7 +26,7 @@ class CastFragment(private val callback: Callback?) : DialogFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_cast, container, false)
+        return inflater.inflate(layout.fragment_cast, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

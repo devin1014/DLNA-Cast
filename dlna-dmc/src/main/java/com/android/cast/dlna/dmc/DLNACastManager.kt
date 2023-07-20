@@ -12,6 +12,8 @@ import android.os.IBinder
 import android.os.Looper
 import com.android.cast.dlna.core.ContentType
 import com.android.cast.dlna.core.ICast
+import com.android.cast.dlna.core.Level
+import com.android.cast.dlna.core.Logger
 import com.android.cast.dlna.core.Utils.toHexString
 import com.android.cast.dlna.dmc.QueryRequest.BrowseContentRequest
 import com.android.cast.dlna.dmc.QueryRequest.MediaInfoRequest
@@ -34,10 +36,6 @@ import com.android.cast.dlna.dmc.control.IServiceAction.ServiceAction.PAUSE
 import com.android.cast.dlna.dmc.control.IServiceAction.ServiceAction.PLAY
 import com.android.cast.dlna.dmc.control.IServiceAction.ServiceAction.SEEK_TO
 import com.android.cast.dlna.dmc.control.IServiceAction.ServiceAction.STOP
-import com.orhanobut.logger.AndroidLogAdapter
-import com.orhanobut.logger.FormatStrategy
-import com.orhanobut.logger.Logger
-import com.orhanobut.logger.PrettyFormatStrategy
 import org.fourthline.cling.android.AndroidUpnpService
 import org.fourthline.cling.model.message.header.STAllHeader
 import org.fourthline.cling.model.message.header.UDADeviceTypeHeader
@@ -50,7 +48,6 @@ import org.fourthline.cling.support.model.DIDLContent
 import org.fourthline.cling.support.model.MediaInfo
 import org.fourthline.cling.support.model.PositionInfo
 import org.fourthline.cling.support.model.TransportInfo
-import java.util.logging.Level
 
 /**
  *
@@ -63,29 +60,24 @@ object DLNACastManager : IControl, IGetInfo, OnDeviceRegistryListener {
     val SERVICE_CONNECTION_MANAGER: ServiceType = UDAServiceType("ConnectionManager")
     val SERVICE_CONTENT_DIRECTORY: ServiceType = UDAServiceType("ContentDirectory")
 
-    var service: AndroidUpnpService? = null
-        private set
-
+    private val logger = Logger.create("CastManager")
     private val deviceRegistryImpl = DeviceRegistryImpl(this)
-    private val handler = Handler(Looper.getMainLooper())
+    private val mainHandler = Handler(Looper.getMainLooper())
     private val actionEventCallbackMap: MutableMap<String, IServiceActionCallback<*>> = LinkedHashMap()
     private var searchDeviceType: DeviceType? = null
     private var controlImpl: ControlImpl? = null
+    private var upnpService: AndroidUpnpService? = null
 
-    @JvmOverloads
-    fun enableLog(
-        formatStrategy: FormatStrategy = PrettyFormatStrategy.newBuilder().build(),
-        level: Level = Level.FINEST
-    ) {
-        java.util.logging.Logger.getLogger("org.fourthline.cling").level = level
-        Logger.addLogAdapter(AndroidLogAdapter(formatStrategy))
+    fun enableLog(logging: Boolean = true, level: Int = Level.V) {
+        Logger.enabled = logging
+        Logger.level = level
     }
 
     fun bindCastService(context: Context) {
         if (context is Application || context is Activity) {
             context.bindService(Intent(context, DLNACastService::class.java), serviceConnection, Service.BIND_AUTO_CREATE)
         } else {
-            Logger.e("bindCastService only support Application or Activity implementation.")
+            logger.e("bindCastService only support Application or Activity implementation.")
         }
     }
 
@@ -93,48 +85,46 @@ object DLNACastManager : IControl, IGetInfo, OnDeviceRegistryListener {
         if (context is Application || context is Activity) {
             context.unbindService(serviceConnection)
         } else {
-            Logger.e("bindCastService only support Application or Activity implementation.")
+            logger.e("bindCastService only support Application or Activity implementation.")
         }
     }
 
     private val serviceConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(componentName: ComponentName, iBinder: IBinder) {
-            val upnpService = iBinder as AndroidUpnpService
-            if (service !== upnpService) {
-                service = upnpService
-                Logger.i(String.format("[%s] connected %s", componentName.shortClassName, iBinder.javaClass.name))
-                Logger.i(String.format("[UpnpService]: %s@0x%s", upnpService.get().javaClass.name, toHexString(upnpService.get().hashCode())))
-                Logger.i(String.format("[Registry]: listener=%s, devices=%s", upnpService.registry.listeners.size, upnpService.registry.devices.size))
-                val registry = upnpService.registry
+            val upnpServiceBinder = iBinder as AndroidUpnpService
+            if (upnpService !== upnpServiceBinder) {
+                upnpService = upnpServiceBinder
+                logger.i(String.format("[%s] connected %s", componentName.shortClassName, iBinder.javaClass.name))
+                logger.i(String.format("[UpnpService]: %s@0x%s", upnpServiceBinder.get().javaClass.simpleName, toHexString(upnpServiceBinder.get().hashCode())))
+                logger.i(String.format("[Registry]: listener=%s, devices=%s", upnpServiceBinder.registry.listeners.size, upnpServiceBinder.registry.devices.size))
+                val registry = upnpServiceBinder.registry
                 // add registry listener
                 val collection = registry.listeners
                 if (collection == null || !collection.contains(deviceRegistryImpl)) {
                     registry.addListener(deviceRegistryImpl)
                 }
                 // Now add all devices to the list we already know about
-                deviceRegistryImpl.setDevices(upnpService.registry.devices)
+                deviceRegistryImpl.setDevices(upnpServiceBinder.registry.devices)
             }
             if (mediaServer != null) {
-                service!!.registry.addDevice(mediaServer)
+                upnpService?.registry?.addDevice(mediaServer)
             }
             mediaServer = null
         }
 
         override fun onServiceDisconnected(componentName: ComponentName) {
-            Logger.w(String.format("[%s] onServiceDisconnected", componentName.shortClassName))
+            logger.w(String.format("[%s] onServiceDisconnected", componentName.shortClassName))
             removeRegistryListener()
         }
 
         override fun onBindingDied(componentName: ComponentName) {
-            Logger.e(String.format("[%s] onBindingDied", componentName.className))
+            logger.w(String.format("[%s] onBindingDied", componentName.shortClassName))
             removeRegistryListener()
         }
 
         private fun removeRegistryListener() {
-            if (service != null) {
-                service!!.registry.removeListener(deviceRegistryImpl)
-            }
-            service = null
+            upnpService?.registry?.removeListener(deviceRegistryImpl)
+            upnpService = null
         }
     }
 
@@ -146,32 +136,23 @@ object DLNACastManager : IControl, IGetInfo, OnDeviceRegistryListener {
 
     fun registerDeviceListener(listener: OnDeviceRegistryListener?) {
         if (listener == null) return
-        if (service != null) {
-            val devices: Collection<Device<*, *, *>>? = if (searchDeviceType == null) {
-                service!!.registry.devices
-            } else {
-                service!!.registry.getDevices(searchDeviceType)
-            }
-            // if some devices has been found, notify first.
-            if (!devices.isNullOrEmpty()) {
-                exeActionInUIThread { for (device in devices) listener.onDeviceAdded(device) }
-            }
+        upnpService?.also { service ->
+            service.registry.devices
+                .filter { searchDeviceType == null || searchDeviceType == it.type }
+                .forEach { device ->
+                    // if some devices has been found, notify first.
+                    exeActionInUIThread { listener.onDeviceAdded(device) }
+                }
+
         }
         synchronized(lock) {
-            if (!registerDeviceListeners.contains(listener)) {
-                registerDeviceListeners.add(listener)
-            }
+            if (!registerDeviceListeners.contains(listener)) registerDeviceListeners.add(listener)
         }
     }
 
-    private fun exeActionInUIThread(action: Runnable?) {
-        if (action != null) {
-            if (Thread.currentThread() !== Looper.getMainLooper().thread) {
-                handler.post(action)
-            } else {
-                action.run()
-            }
-        }
+    private fun exeActionInUIThread(action: Runnable) {
+        if (Thread.currentThread() !== Looper.getMainLooper().thread) mainHandler.post(action)
+        else action.run()
     }
 
     fun unregisterListener(listener: OnDeviceRegistryListener) {
@@ -180,39 +161,41 @@ object DLNACastManager : IControl, IGetInfo, OnDeviceRegistryListener {
 
     override fun onDeviceAdded(device: Device<*, *, *>) {
         if (checkDeviceType(device)) {
-            synchronized(lock) { for (listener in registerDeviceListeners) listener.onDeviceAdded(device) }
+            synchronized(lock) {
+                registerDeviceListeners.forEach { listener -> listener.onDeviceAdded(device) }
+            }
         }
     }
 
     override fun onDeviceUpdated(device: Device<*, *, *>) {
         if (checkDeviceType(device)) {
-            synchronized(lock) { for (listener in registerDeviceListeners) listener.onDeviceUpdated(device) }
+            synchronized(lock) {
+                registerDeviceListeners.forEach { listener -> listener.onDeviceUpdated(device) }
+            }
         }
     }
 
     override fun onDeviceRemoved(device: Device<*, *, *>) {
         if (checkDeviceType(device)) {
             // if this device is casting, disconnect first!
-            if (controlImpl?.isCasting(device) == true) {
-                controlImpl?.stop()
-            }
+            if (controlImpl?.isCasting(device) == true) controlImpl?.stop()
             controlImpl = null
-            synchronized(lock) { for (listener in registerDeviceListeners) listener.onDeviceRemoved(device) }
+            synchronized(lock) {
+                registerDeviceListeners.forEach { listener -> listener.onDeviceRemoved(device) }
+            }
         }
     }
 
-    private fun checkDeviceType(device: Device<*, *, *>): Boolean {
-        return searchDeviceType == null || searchDeviceType == device.type
-    }
+    private fun checkDeviceType(device: Device<*, *, *>): Boolean = searchDeviceType == null || searchDeviceType == device.type
 
     // -----------------------------------------------------------------------------------------
     // ---- MediaServer
     // -----------------------------------------------------------------------------------------
     private var mediaServer: LocalDevice? = null
     fun addMediaServer(mediaServer: LocalDevice?) {
-        if (service != null && mediaServer != null) {
-            if (service!!.registry.getDevice(mediaServer.identity.udn, true) == null) {
-                service!!.registry.addDevice(mediaServer)
+        if (upnpService != null && mediaServer != null) {
+            if (upnpService?.registry?.getDevice(mediaServer.identity.udn, true) == null) {
+                upnpService?.registry?.addDevice(mediaServer)
             }
         } else {
             this.mediaServer = mediaServer
@@ -220,8 +203,8 @@ object DLNACastManager : IControl, IGetInfo, OnDeviceRegistryListener {
     }
 
     fun removeMediaServer(mediaServer: LocalDevice?) {
-        if (service != null && mediaServer != null) {
-            service!!.registry.removeDevice(mediaServer)
+        if (upnpService != null && mediaServer != null) {
+            upnpService?.registry?.removeDevice(mediaServer)
         } else {
             this.mediaServer = null
         }
@@ -230,13 +213,12 @@ object DLNACastManager : IControl, IGetInfo, OnDeviceRegistryListener {
     // -----------------------------------------------------------------------------------------
     // ---- search
     // -----------------------------------------------------------------------------------------
-    fun search(type: DeviceType?, maxSeconds: Int) {
+    fun search(type: DeviceType? = null, maxSeconds: Int = 60) {
         searchDeviceType = type
-        if (service != null) {
-            val upnpService = service!!.get()
+        upnpService?.get()?.also { service ->
             //when search device, clear all founded first.
-            upnpService.registry.removeAllRemoteDevices()
-            upnpService.controlPoint.search(type?.let { UDADeviceTypeHeader(it) } ?: STAllHeader(), maxSeconds)
+            service.registry.removeAllRemoteDevices()
+            service.controlPoint.search(type?.let { UDADeviceTypeHeader(it) } ?: STAllHeader(), maxSeconds)
         }
     }
 
@@ -256,7 +238,7 @@ object DLNACastManager : IControl, IGetInfo, OnDeviceRegistryListener {
 //            controlImpl!!.stop()
 //        }
         controlImpl?.stop()
-        service?.let { upnpService ->
+        upnpService?.let { upnpService ->
             controlImpl = ControlImpl(upnpService.controlPoint, device, actionEventCallbackMap, subscriptionListener).also {
                 it.cast(device, cast)
             }
@@ -283,8 +265,8 @@ object DLNACastManager : IControl, IGetInfo, OnDeviceRegistryListener {
         controlImpl?.stop()
     }
 
-    override fun seekTo(position: Long) {
-        controlImpl?.seekTo(position)
+    override fun seekTo(millSeconds: Long) {
+        controlImpl?.seekTo(millSeconds)
     }
 
     override fun setVolume(percent: Int) {
@@ -303,54 +285,51 @@ object DLNACastManager : IControl, IGetInfo, OnDeviceRegistryListener {
     // ---- Callback
     // -----------------------------------------------------------------------------------------
     fun registerActionCallbacks(vararg callbacks: IServiceActionCallback<*>) {
-        _innerRegisterActionCallback(*callbacks)
-    }
-
-    fun unregisterActionCallbacks() {
-        if (actionEventCallbackMap.size > 0) {
-            actionEventCallbackMap.clear()
-        }
-    }
-
-    private fun _innerRegisterActionCallback(vararg callbacks: IServiceActionCallback<*>) {
-        if (callbacks.isNotEmpty()) {
-            for (callback in callbacks) {
-                when (callback) {
-                    is CastEventListener -> actionEventCallbackMap[CAST.name] = callback
-                    is PlayEventListener -> actionEventCallbackMap[PLAY.name] = callback
-                    is PauseEventListener -> actionEventCallbackMap[PAUSE.name] = callback
-                    is StopEventListener -> actionEventCallbackMap[STOP.name] = callback
-                    is SeekToEventListener -> actionEventCallbackMap[SEEK_TO.name] = callback
-                }
+        callbacks.forEach { callback ->
+            when (callback) {
+                is CastEventListener -> actionEventCallbackMap[CAST.name] = callback
+                is PlayEventListener -> actionEventCallbackMap[PLAY.name] = callback
+                is PauseEventListener -> actionEventCallbackMap[PAUSE.name] = callback
+                is StopEventListener -> actionEventCallbackMap[STOP.name] = callback
+                is SeekToEventListener -> actionEventCallbackMap[SEEK_TO.name] = callback
             }
         }
     }
 
-    private var subscriptionListener: ISubscriptionListener? = null
-    fun registerSubscriptionListener(listener: ISubscriptionListener?) {
-        subscriptionListener = listener
-    }
+    fun unregisterActionCallbacks() = actionEventCallbackMap.clear()
+
+    var subscriptionListener: ISubscriptionListener? = null
 
     // -----------------------------------------------------------------------------------------
     // ---- query
     // -----------------------------------------------------------------------------------------
     override fun getMediaInfo(device: Device<*, *, *>, listener: GetInfoListener<MediaInfo>?) {
-        MediaInfoRequest(device.findService(SERVICE_AV_TRANSPORT)).execute(service!!.controlPoint, listener)
+        upnpService?.also { service ->
+            MediaInfoRequest(device.findService(SERVICE_AV_TRANSPORT)).execute(service.controlPoint, listener)
+        }
     }
 
     override fun getPositionInfo(device: Device<*, *, *>, listener: GetInfoListener<PositionInfo>?) {
-        PositionInfoRequest(device.findService(SERVICE_AV_TRANSPORT)).execute(service!!.controlPoint, listener)
+        upnpService?.also { service ->
+            PositionInfoRequest(device.findService(SERVICE_AV_TRANSPORT)).execute(service.controlPoint, listener)
+        }
     }
 
     override fun getTransportInfo(device: Device<*, *, *>, listener: GetInfoListener<TransportInfo>?) {
-        TransportInfoRequest(device.findService(SERVICE_AV_TRANSPORT)).execute(service!!.controlPoint, listener)
+        upnpService?.also { service ->
+            TransportInfoRequest(device.findService(SERVICE_AV_TRANSPORT)).execute(service.controlPoint, listener)
+        }
     }
 
     override fun getVolumeInfo(device: Device<*, *, *>, listener: GetInfoListener<Int>?) {
-        VolumeInfoRequest(device.findService(SERVICE_RENDERING_CONTROL)).execute(service!!.controlPoint, listener)
+        upnpService?.also { service ->
+            VolumeInfoRequest(device.findService(SERVICE_RENDERING_CONTROL)).execute(service.controlPoint, listener)
+        }
     }
 
     override fun getContent(device: Device<*, *, *>, contentType: ContentType, listener: GetInfoListener<DIDLContent>?) {
-        BrowseContentRequest(device.findService(SERVICE_CONTENT_DIRECTORY), contentType.id).execute(service!!.controlPoint, listener)
+        upnpService?.also { service ->
+            BrowseContentRequest(device.findService(SERVICE_CONTENT_DIRECTORY), contentType.id).execute(service.controlPoint, listener)
+        }
     }
 }

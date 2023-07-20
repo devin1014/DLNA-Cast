@@ -1,9 +1,12 @@
 package com.android.cast.dlna.dms
 
 import android.text.TextUtils
-import com.orhanobut.logger.Logger
+import com.android.cast.dlna.core.Logger
 import fi.iki.elonen.NanoHTTPD
-import fi.iki.elonen.NanoHTTPD.Response.Status.*
+import fi.iki.elonen.NanoHTTPD.Response.Status.BAD_REQUEST
+import fi.iki.elonen.NanoHTTPD.Response.Status.NOT_FOUND
+import fi.iki.elonen.NanoHTTPD.Response.Status.OK
+import fi.iki.elonen.NanoHTTPD.Response.Status.SERVICE_UNAVAILABLE
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.ServletContextHandler
 import java.io.File
@@ -15,10 +18,10 @@ import java.io.IOException
 // ---- Jetty Http
 // ------------------------------------------------
 internal class JettyHttpServer(port: Int) : IResourceServer {
-    private val server: Server
+    private val logger = Logger.create("JettyHttpServer")
+    private val server: Server = Server(port) // Has its own QueuedThreadPool
 
     init {
-        server = Server(port)  // Has its own QueuedThreadPool
         server.gracefulShutdown = 1000 // Let's wait a second for ongoing transfers to complete
     }
 
@@ -33,13 +36,15 @@ internal class JettyHttpServer(port: Int) : IResourceServer {
                 // context.addServlet(ContentResourceServlet.VideoResourceServlet.class, "/video/*");
                 context.addServlet(ContentResourceServlet::class.java, "/")
                 server.handler = context
-                Logger.i("JettyServer start.")
+                logger.i("JettyServer start.")
                 try {
                     server.start()
                     server.join()
-                    Logger.i("JettyServer complete.")
                 } catch (ex: Exception) {
                     ex.printStackTrace()
+                    logger.e("Error", ex)
+                } finally {
+                    logger.i("JettyServer complete.")
                 }
             }.start()
         }
@@ -49,10 +54,12 @@ internal class JettyHttpServer(port: Int) : IResourceServer {
     override fun stopServer() {
         if (!server.isStopped && !server.isStopping) {
             try {
-                Logger.i("JettyServer stop.")
                 server.stop()
             } catch (ex: Exception) {
+                logger.e("Error", ex)
                 ex.printStackTrace()
+            } finally {
+                logger.i("JettyServer stop.")
             }
         }
     }

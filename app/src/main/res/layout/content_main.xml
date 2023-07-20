@@ -76,25 +76,25 @@
 
                 <androidx.fragment.app.FragmentContainerView
                     android:id="@+id/fragment_information"
-                    android:name="com.android.cast.dlna.demo.InfoFragment"
+                    android:name="com.android.cast.dlna.demo.fragment.InfoFragment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
                 <androidx.fragment.app.FragmentContainerView
                     android:id="@+id/fragment_query"
-                    android:name="com.android.cast.dlna.demo.QueryFragment"
+                    android:name="com.android.cast.dlna.demo.fragment.QueryFragment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
                 <androidx.fragment.app.FragmentContainerView
                     android:id="@+id/fragment_control"
-                    android:name="com.android.cast.dlna.demo.ControlFragment"
+                    android:name="com.android.cast.dlna.demo.fragment.ControlFragment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
                 <androidx.fragment.app.FragmentContainerView
                     android:id="@+id/fragment_local_provider"
-                    android:name="com.android.cast.dlna.demo.LocalControlFragment"
+                    android:name="com.android.cast.dlna.demo.fragment.LocalControlFragment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 

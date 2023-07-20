@@ -27,8 +27,6 @@ android {
 }
 
 dependencies {
-    // Logger
-    api('com.orhanobut:logger:2.2.0')
     // Cling library required
     api 'org.fourthline.cling:cling-core:2.1.1'
     api 'org.fourthline.cling:cling-support:2.1.1'

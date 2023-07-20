@@ -21,11 +21,7 @@ interface ICastInterface {
         fun stop()
         fun play()
         fun pause()
-
-        /**
-         * @param position, current watch time(ms)
-         */
-        fun seekTo(position: Long)
+        fun seekTo(millSeconds: Long)
         fun setVolume(percent: Int)
         fun setMute(mute: Boolean)
         fun setBrightness(percent: Int)

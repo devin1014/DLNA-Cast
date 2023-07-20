@@ -3,8 +3,8 @@ package com.android.cast.dlna.dmc
 import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
+import com.android.cast.dlna.core.Logger
 import com.android.cast.dlna.dmc.control.ICastInterface.GetInfoListener
-import com.orhanobut.logger.Logger
 import org.fourthline.cling.controlpoint.ActionCallback
 import org.fourthline.cling.controlpoint.ControlPoint
 import org.fourthline.cling.model.action.ActionInvocation
@@ -25,6 +25,7 @@ internal abstract class QueryRequest<T>(protected val service: Service<*, *>?) {
 
     private var listener: GetInfoListener<T>? = null
     private val handler = Handler(Looper.getMainLooper())
+    private val logger = Logger.create("QueryRequest")
 
     protected abstract val actionName: String?
     protected abstract val action: ActionCallback?
@@ -40,7 +41,7 @@ internal abstract class QueryRequest<T>(protected val service: Service<*, *>?) {
     }
 
     protected fun setError(errorMsg: String?) {
-        Logger.e(errorMsg ?: "error")
+        logger.e(errorMsg ?: "error")
         listener?.let { l ->
             if (Thread.currentThread() !== Looper.getMainLooper().thread) {
                 handler.post { l.onGetInfoResult(null, errorMsg ?: "error") }
@@ -81,7 +82,7 @@ internal abstract class QueryRequest<T>(protected val service: Service<*, *>?) {
                     setResult(mediaInfo)
                 }
 
-                override fun failure(invocation: ActionInvocation<*>?, operation: UpnpResponse, defaultMsg: String) {
+                override fun failure(invocation: ActionInvocation<*>?, operation: UpnpResponse?, defaultMsg: String?) {
                     setError(defaultMsg)
                 }
             } else null

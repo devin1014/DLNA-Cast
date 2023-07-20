@@ -1,4 +1,4 @@
-package com.android.cast.dlna.demo
+package com.android.cast.dlna.demo.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,6 +7,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.android.cast.dlna.core.ContentType.VIDEO
+import com.android.cast.dlna.demo.IDisplayDevice
+import com.android.cast.dlna.demo.R
+import com.android.cast.dlna.demo.R.layout
 import com.android.cast.dlna.dmc.DLNACastManager
 import com.android.cast.dlna.dmc.control.ICastInterface.GetInfoListener
 import org.fourthline.cling.model.meta.Device
@@ -25,7 +28,7 @@ class QueryFragment : Fragment(), IDisplayDevice {
     private val browseInfo: TextView? by lazy { view?.findViewById(R.id.ctrl_device_browse_info) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_query, container, false)
+        return inflater.inflate(layout.fragment_query, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

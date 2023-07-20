@@ -1,4 +1,4 @@
-package com.android.cast.dlna.demo
+package com.android.cast.dlna.demo.fragment
 
 import android.app.Activity
 import android.content.Intent
@@ -11,6 +11,8 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.android.cast.dlna.core.Utils
 import com.android.cast.dlna.demo.CastObject.newInstance
+import com.android.cast.dlna.demo.IDisplayDevice
+import com.android.cast.dlna.demo.R
 import com.android.cast.dlna.demo.R.layout
 import com.android.cast.dlna.dmc.DLNACastManager
 import com.android.cast.dlna.dms.MediaServer

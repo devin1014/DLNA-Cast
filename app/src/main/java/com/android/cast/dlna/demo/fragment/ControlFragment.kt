@@ -1,4 +1,4 @@
-package com.android.cast.dlna.demo
+package com.android.cast.dlna.demo.fragment
 
 import android.content.Context
 import android.media.AudioManager
@@ -15,7 +15,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.android.cast.dlna.core.Utils
-import com.android.cast.dlna.demo.CastFragment.Callback
+import com.android.cast.dlna.demo.CastObject
+import com.android.cast.dlna.demo.IDisplayDevice
+import com.android.cast.dlna.demo.R
+import com.android.cast.dlna.demo.fragment.CastFragment.Callback
 import com.android.cast.dlna.demo.R.layout
 import com.android.cast.dlna.dmc.DLNACastManager
 import com.android.cast.dlna.dmc.control.ICastInterface
@@ -97,11 +100,11 @@ class ControlFragment : Fragment(), IDisplayDevice, Callback {
                 }
             }
         )
-        DLNACastManager.registerSubscriptionListener(object : ICastInterface.ISubscriptionListener {
+        DLNACastManager.subscriptionListener = object : ICastInterface.ISubscriptionListener {
             override fun onSubscriptionTransportStateChanged(event: TransportState) {
                 statusInfo?.text = event.value
             }
-        })
+        }
     }
 
     private fun initComponent(view: View) {
@@ -205,7 +208,7 @@ class ControlFragment : Fragment(), IDisplayDevice, Callback {
     // ------------------------------------------------------------
     private class CircleMessageHandler(
         private val duration: Long,
-        private val runnable: Runnable
+        private val runnable: Runnable,
     ) : Handler(Looper.getMainLooper()) {
         override fun handleMessage(msg: Message) {
             runnable.run()
