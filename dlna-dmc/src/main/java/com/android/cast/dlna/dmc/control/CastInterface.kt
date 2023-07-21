@@ -3,11 +3,11 @@ package com.android.cast.dlna.dmc.control
 import com.android.cast.dlna.core.ContentType
 import com.android.cast.dlna.core.ICast
 import org.fourthline.cling.model.meta.Device
+import org.fourthline.cling.support.lastchange.EventedValue
 import org.fourthline.cling.support.model.DIDLContent
 import org.fourthline.cling.support.model.MediaInfo
 import org.fourthline.cling.support.model.PositionInfo
 import org.fourthline.cling.support.model.TransportInfo
-import org.fourthline.cling.support.model.TransportState
 
 // ------------------------------------------------------------------
 // ---- control
@@ -53,5 +53,5 @@ interface SeekToEventListener : ServiceActionCallback<Long>
 // ---- Subscriber Listener
 // ------------------------------------------------------------------
 interface SubscriptionListener {
-    fun onSubscriptionTransportStateChanged(event: TransportState)
+    fun onSubscriptionTransportStateChanged(event: EventedValue<*>)
 }

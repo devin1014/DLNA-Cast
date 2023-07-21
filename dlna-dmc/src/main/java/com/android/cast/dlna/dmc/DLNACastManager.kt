@@ -14,19 +14,16 @@ import com.android.cast.dlna.core.ContentType
 import com.android.cast.dlna.core.ICast
 import com.android.cast.dlna.core.Level
 import com.android.cast.dlna.core.Logger
-import com.android.cast.dlna.core.Utils.toHexString
 import com.android.cast.dlna.dmc.QueryRequest.BrowseContentRequest
 import com.android.cast.dlna.dmc.QueryRequest.MediaInfoRequest
 import com.android.cast.dlna.dmc.QueryRequest.PositionInfoRequest
 import com.android.cast.dlna.dmc.QueryRequest.TransportInfoRequest
 import com.android.cast.dlna.dmc.QueryRequest.VolumeInfoRequest
 import com.android.cast.dlna.dmc.control.CastEventListener
-import com.android.cast.dlna.dmc.control.ControlImpl
-import com.android.cast.dlna.dmc.control.GetInfoListener
 import com.android.cast.dlna.dmc.control.Control
+import com.android.cast.dlna.dmc.control.ControlImpl
 import com.android.cast.dlna.dmc.control.GetInfo
-import com.android.cast.dlna.dmc.control.ServiceActionCallback
-import com.android.cast.dlna.dmc.control.SubscriptionListener
+import com.android.cast.dlna.dmc.control.GetInfoListener
 import com.android.cast.dlna.dmc.control.PauseEventListener
 import com.android.cast.dlna.dmc.control.PlayEventListener
 import com.android.cast.dlna.dmc.control.SeekToEventListener
@@ -35,7 +32,9 @@ import com.android.cast.dlna.dmc.control.ServiceAction.PAUSE
 import com.android.cast.dlna.dmc.control.ServiceAction.PLAY
 import com.android.cast.dlna.dmc.control.ServiceAction.SEEK_TO
 import com.android.cast.dlna.dmc.control.ServiceAction.STOP
+import com.android.cast.dlna.dmc.control.ServiceActionCallback
 import com.android.cast.dlna.dmc.control.StopEventListener
+import com.android.cast.dlna.dmc.control.SubscriptionListener
 import org.fourthline.cling.android.AndroidUpnpService
 import org.fourthline.cling.model.message.header.STAllHeader
 import org.fourthline.cling.model.message.header.UDADeviceTypeHeader
@@ -94,9 +93,8 @@ object DLNACastManager : Control, GetInfo, OnDeviceRegistryListener {
             val upnpServiceBinder = iBinder as AndroidUpnpService
             if (upnpService !== upnpServiceBinder) {
                 upnpService = upnpServiceBinder
-                logger.i(String.format("[%s] connected %s", componentName.shortClassName, iBinder.javaClass.name))
-                logger.i(String.format("[UpnpService]: %s@0x%s", upnpServiceBinder.get().javaClass.simpleName, toHexString(upnpServiceBinder.get().hashCode())))
-                logger.i(String.format("[Registry]: listener=%s, devices=%s", upnpServiceBinder.registry.listeners.size, upnpServiceBinder.registry.devices.size))
+                logger.i(String.format("onServiceConnected: [%s]", componentName.shortClassName))
+                //logger.i(String.format("[Registry]: listener= %s, devices= %s", upnpServiceBinder.registry.listeners.size, upnpServiceBinder.registry.devices.size))
                 val registry = upnpServiceBinder.registry
                 // add registry listener
                 val collection = registry.listeners

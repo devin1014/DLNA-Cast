@@ -23,14 +23,15 @@ import com.android.cast.dlna.dmc.DLNACastManager
 import com.android.cast.dlna.dmc.control.ActionResponse
 import com.android.cast.dlna.dmc.control.CastEventListener
 import com.android.cast.dlna.dmc.control.GetInfoListener
-import com.android.cast.dlna.dmc.control.SubscriptionListener
 import com.android.cast.dlna.dmc.control.PauseEventListener
 import com.android.cast.dlna.dmc.control.PlayEventListener
 import com.android.cast.dlna.dmc.control.SeekToEventListener
 import com.android.cast.dlna.dmc.control.StopEventListener
+import com.android.cast.dlna.dmc.control.SubscriptionListener
 import org.fourthline.cling.model.meta.Device
+import org.fourthline.cling.support.avtransport.lastchange.AVTransportVariable.TransportState
+import org.fourthline.cling.support.lastchange.EventedValue
 import org.fourthline.cling.support.model.PositionInfo
-import org.fourthline.cling.support.model.TransportState
 import java.util.UUID
 
 class ControlFragment : Fragment(), IDisplayDevice, Callback {
@@ -101,8 +102,11 @@ class ControlFragment : Fragment(), IDisplayDevice, Callback {
             }
         )
         DLNACastManager.subscriptionListener = object : SubscriptionListener {
-            override fun onSubscriptionTransportStateChanged(event: TransportState) {
-                statusInfo?.text = event.value
+            override fun onSubscriptionTransportStateChanged(event: EventedValue<*>) {
+                //TODO:check
+                if (event is TransportState) {
+                    statusInfo?.text = event.value.value
+                }
             }
         }
     }

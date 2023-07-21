@@ -83,12 +83,12 @@ internal class DeviceRegistryImpl(private val deviceRegistryListener: OnDeviceRe
     private fun parseDeviceInfo(device: RemoteDevice): String = "[${device.type.type}][${device.details.friendlyName}][${device.identity.udn}]"
 
     private fun parseDeviceService(device: RemoteDevice): String {
-        val builder = StringBuilder(device.details.friendlyName)
-        builder.append(":")
+        val builder = StringBuilder()
         for (service in device.services) {
-            builder.append("\nservice:").append(service.serviceType.type)
+            if (builder.isNotEmpty()) builder.append("\n")
+            builder.append("  service:").append(service.serviceType.type)
             if (service.hasActions()) {
-                builder.append("\nactions: ")
+                builder.append("\n    actions: ")
                 val list = mutableListOf<Action<*>>(*service.actions)
                 list.sortWith { o1: Action<*>, o2: Action<*> -> o1.name.compareTo(o2.name) }
                 for (action in list) {

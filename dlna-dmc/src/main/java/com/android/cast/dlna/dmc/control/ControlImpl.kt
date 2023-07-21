@@ -15,7 +15,7 @@ import com.android.cast.dlna.dmc.control.ServiceFactory.ServiceFactoryImpl
 import org.fourthline.cling.controlpoint.ControlPoint
 import org.fourthline.cling.model.meta.Device
 import org.fourthline.cling.support.avtransport.lastchange.AVTransportLastChangeParser
-import org.fourthline.cling.support.model.TransportState
+import org.fourthline.cling.support.lastchange.EventedValue
 import org.fourthline.cling.support.renderingcontrol.lastchange.RenderingControlLastChangeParser
 
 class ControlImpl(
@@ -31,7 +31,7 @@ class ControlImpl(
     init {
         (serviceFactory.avService as BaseServiceExecutor).subscribe(
             subscriptionCallback = object : SubscriptionListener {
-                override fun onSubscriptionTransportStateChanged(event: TransportState) {
+                override fun onSubscriptionTransportStateChanged(event: EventedValue<*>) {
                     subscriptionListener?.onSubscriptionTransportStateChanged(event)
                 }
             },
@@ -39,7 +39,7 @@ class ControlImpl(
         )
         (serviceFactory.renderService as BaseServiceExecutor).subscribe(
             subscriptionCallback = object : SubscriptionListener {
-                override fun onSubscriptionTransportStateChanged(event: TransportState) {
+                override fun onSubscriptionTransportStateChanged(event: EventedValue<*>) {
                     subscriptionListener?.onSubscriptionTransportStateChanged(event)
                 }
             },

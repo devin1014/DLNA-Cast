@@ -6,7 +6,6 @@ import org.fourthline.cling.model.gena.CancelReason
 import org.fourthline.cling.model.gena.GENASubscription
 import org.fourthline.cling.model.message.UpnpResponse
 import org.fourthline.cling.model.meta.Service
-import org.fourthline.cling.support.avtransport.lastchange.AVTransportVariable.TransportState
 import org.fourthline.cling.support.lastchange.LastChangeParser
 
 /**
@@ -44,11 +43,8 @@ internal class CastSubscriptionCallback(
         try {
             val events = lastChangeParser.parse(lastChangeEventValue)?.instanceIDs?.firstOrNull()?.values
             events?.forEach { value ->
-                logger.i("    value : $value")
-                //TODO: remove the special class
-                if (value is TransportState) {
-                    callback.onSubscriptionTransportStateChanged(value.value)
-                }
+                logger.i("    value: [${value.javaClass.simpleName}] $value")
+                callback.onSubscriptionTransportStateChanged(value)
             }
         } catch (e: Exception) {
             logger.w("${getTag(subscription)} currentValues: ${subscription.currentValues}")

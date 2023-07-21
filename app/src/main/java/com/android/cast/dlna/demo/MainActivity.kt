@@ -8,12 +8,15 @@ import android.view.MenuItem
 import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.cast.dlna.demo.DeviceAdapter.OnItemSelectedListener
 import com.android.cast.dlna.demo.Utils.Companion.getWiFiInfoSSID
+import com.android.cast.dlna.demo.fragment.ControlFragment
+import com.android.cast.dlna.demo.fragment.InfoFragment
+import com.android.cast.dlna.demo.fragment.LocalControlFragment
+import com.android.cast.dlna.demo.fragment.QueryFragment
 import com.android.cast.dlna.dmc.DLNACastManager
 import com.permissionx.guolindev.PermissionX
 import org.fourthline.cling.model.meta.Device
@@ -21,10 +24,6 @@ import org.fourthline.cling.model.meta.Device
 class MainActivity : AppCompatActivity() {
 
     private lateinit var deviceListAdapter: DeviceAdapter
-    private lateinit var informationFragment: Fragment
-    private lateinit var queryFragment: Fragment
-    private lateinit var controlFragment: Fragment
-    private lateinit var localControlFragment: Fragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,11 +36,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun initComponent() {
         setSupportActionBar(findViewById(R.id.toolbar))
-        informationFragment = supportFragmentManager.findFragmentById(R.id.fragment_information)!!
-        queryFragment = supportFragmentManager.findFragmentById(R.id.fragment_query)!!
-        controlFragment = supportFragmentManager.findFragmentById(R.id.fragment_control)!!
-        localControlFragment = supportFragmentManager.findFragmentById(R.id.fragment_local_provider)!!
-
         findViewById<RadioGroup>(R.id.cast_type_group).apply {
             setOnCheckedChangeListener(checkedChangeListener)
             check(R.id.cast_type_info)
@@ -52,11 +46,9 @@ class MainActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         recyclerView.adapter = DeviceAdapter(this, object : OnItemSelectedListener {
             override fun onItemSelected(castDevice: Device<*, *, *>?, selected: Boolean) {
-                deviceListAdapter.castDevice = if (selected) castDevice else null
-                (informationFragment as? IDisplayDevice)?.setCastDevice(if (selected) castDevice else null)
-                (controlFragment as? IDisplayDevice)?.setCastDevice(if (selected) castDevice else null)
-                (localControlFragment as? IDisplayDevice)?.setCastDevice(if (selected) castDevice else null)
-                (queryFragment as? IDisplayDevice)?.setCastDevice(if (selected) castDevice else null)
+                val device = if (selected) castDevice else null
+                deviceListAdapter.castDevice = device
+                (supportFragmentManager.findFragmentById(R.id.fragment_container) as IDisplayDevice).setCastDevice(device)
             }
         }).also { deviceListAdapter = it }
 
@@ -102,37 +94,10 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction()
             .apply {
                 when (checkedId) {
-                    R.id.cast_type_info -> {
-                        this
-                            .show(informationFragment)
-                            .hide(controlFragment)
-                            .hide(localControlFragment)
-                            .hide(queryFragment)
-                    }
-
-                    R.id.cast_type_query -> {
-                        this
-                            .show(queryFragment)
-                            .hide(informationFragment)
-                            .hide(controlFragment)
-                            .hide(localControlFragment)
-                    }
-
-                    R.id.cast_type_ctrl -> {
-                        this
-                            .show(controlFragment)
-                            .hide(localControlFragment)
-                            .hide(informationFragment)
-                            .hide(queryFragment)
-                    }
-
-                    R.id.cast_type_ctrl_local -> {
-                        this
-                            .show(localControlFragment)
-                            .hide(controlFragment)
-                            .hide(informationFragment)
-                            .hide(queryFragment)
-                    }
+                    R.id.cast_type_info -> replace(R.id.fragment_container, InfoFragment())
+                    R.id.cast_type_query -> replace(R.id.fragment_container, QueryFragment())
+                    R.id.cast_type_ctrl -> replace(R.id.fragment_container, ControlFragment())
+                    R.id.cast_type_ctrl_local -> replace(R.id.fragment_container, LocalControlFragment())
                 }
             }
             .commit()
