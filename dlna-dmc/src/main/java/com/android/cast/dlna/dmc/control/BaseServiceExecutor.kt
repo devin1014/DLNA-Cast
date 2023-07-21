@@ -18,6 +18,7 @@ import org.fourthline.cling.support.avtransport.callback.Play
 import org.fourthline.cling.support.avtransport.callback.Seek
 import org.fourthline.cling.support.avtransport.callback.SetAVTransportURI
 import org.fourthline.cling.support.avtransport.callback.Stop
+import org.fourthline.cling.support.lastchange.LastChangeParser
 import org.fourthline.cling.support.model.MediaInfo
 import org.fourthline.cling.support.model.PositionInfo
 import org.fourthline.cling.support.model.TransportInfo
@@ -37,12 +38,12 @@ internal abstract class BaseServiceExecutor(
 
     protected fun invalidServiceAction(actionName: String?): Boolean = service?.getAction(actionName) == null
 
-    protected fun execute(actionCallback: ActionCallback?) {
+    protected fun executeAction(actionCallback: ActionCallback?) {
         controlPoint.execute(actionCallback)
     }
 
-    fun execute(subscriptionCallback: SubscriptionListener?) {
-        controlPoint.execute(CastSubscriptionCallback(service, 600, subscriptionCallback))
+    fun subscribe(subscriptionCallback: SubscriptionListener, lastChangeParser: LastChangeParser) {
+        controlPoint.execute(CastSubscriptionCallback(service, callback = subscriptionCallback, lastChangeParser = lastChangeParser))
     }
 
     protected fun <T> notifyResponse(listener: ServiceActionCallback<T>?, result: T? = null, exception: String? = null) {
@@ -60,7 +61,7 @@ internal abstract class BaseServiceExecutor(
     }
 
     // ---------------------------------------------------------------------------------------------------------
-    // Implement
+    // AvService
     // ---------------------------------------------------------------------------------------------------------
     internal class AVServiceExecutorImpl(
         controlPoint: ControlPoint,
@@ -68,8 +69,11 @@ internal abstract class BaseServiceExecutor(
     ) : BaseServiceExecutor(controlPoint, service), AVServiceAction {
 
         override fun cast(listener: ServiceActionCallback<String>?, uri: String, metadata: String?) {
-            if (invalidServiceAction("SetAVTransportURI")) return
-            execute(object : SetAVTransportURI(service, uri, metadata) {
+            if (invalidServiceAction("SetAVTransportURI")) {
+                notifyResponse(listener, exception = "service not support this action.")
+                return
+            }
+            executeAction(object : SetAVTransportURI(service, uri, metadata) {
                 override fun success(invocation: ActionInvocation<*>?) {
                     notifyResponse(listener, result = uri)
                 }
@@ -81,8 +85,11 @@ internal abstract class BaseServiceExecutor(
         }
 
         override fun play(listener: ServiceActionCallback<String>?) {
-            if (invalidServiceAction("Play")) return
-            execute(object : Play(service) {
+            if (invalidServiceAction("Play")) {
+                notifyResponse(listener, exception = "service not support this action.")
+                return
+            }
+            executeAction(object : Play(service) {
                 override fun success(invocation: ActionInvocation<*>?) {
                     notifyResponse(listener, result = "Play")
                 }
@@ -94,8 +101,11 @@ internal abstract class BaseServiceExecutor(
         }
 
         override fun pause(listener: ServiceActionCallback<String>?) {
-            if (invalidServiceAction("Pause")) return
-            execute(object : Pause(service) {
+            if (invalidServiceAction("Pause")) {
+                notifyResponse(listener, exception = "service not support this action.")
+                return
+            }
+            executeAction(object : Pause(service) {
                 override fun success(invocation: ActionInvocation<*>?) {
                     notifyResponse(listener, result = "Pause")
                 }
@@ -107,8 +117,11 @@ internal abstract class BaseServiceExecutor(
         }
 
         override fun stop(listener: ServiceActionCallback<String>?) {
-            if (invalidServiceAction("Stop")) return
-            execute(object : Stop(service) {
+            if (invalidServiceAction("Stop")) {
+                notifyResponse(listener, exception = "service not support this action.")
+                return
+            }
+            executeAction(object : Stop(service) {
                 override fun success(invocation: ActionInvocation<*>?) {
                     notifyResponse(listener, result = "Stop")
                 }
@@ -120,8 +133,11 @@ internal abstract class BaseServiceExecutor(
         }
 
         override fun seek(listener: ServiceActionCallback<Long>?, position: Long) {
-            if (invalidServiceAction("Seek")) return
-            execute(object : Seek(service, getStringTime(position)) {
+            if (invalidServiceAction("Seek")) {
+                notifyResponse(listener, exception = "service not support this action.")
+                return
+            }
+            executeAction(object : Seek(service, getStringTime(position)) {
                 override fun success(invocation: ActionInvocation<*>?) {
                     notifyResponse(listener, result = position)
                 }
@@ -133,8 +149,11 @@ internal abstract class BaseServiceExecutor(
         }
 
         override fun getPositionInfo(listener: ServiceActionCallback<PositionInfo>?) {
-            if (invalidServiceAction("GetPositionInfo")) return
-            execute(object : GetPositionInfo(service) {
+            if (invalidServiceAction("GetPositionInfo")) {
+                notifyResponse(listener, exception = "service not support this action.")
+                return
+            }
+            executeAction(object : GetPositionInfo(service) {
                 override fun received(invocation: ActionInvocation<*>?, positionInfo: PositionInfo) {
                     notifyResponse(listener, result = positionInfo)
                 }
@@ -146,8 +165,11 @@ internal abstract class BaseServiceExecutor(
         }
 
         override fun getMediaInfo(listener: ServiceActionCallback<MediaInfo>?) {
-            if (invalidServiceAction("GetMediaInfo")) return
-            execute(object : GetMediaInfo(service) {
+            if (invalidServiceAction("GetMediaInfo")) {
+                notifyResponse(listener, exception = "service not support this action.")
+                return
+            }
+            executeAction(object : GetMediaInfo(service) {
                 override fun received(invocation: ActionInvocation<*>?, mediaInfo: MediaInfo) {
                     notifyResponse(listener, result = mediaInfo)
                 }
@@ -159,8 +181,11 @@ internal abstract class BaseServiceExecutor(
         }
 
         override fun getTransportInfo(listener: ServiceActionCallback<TransportInfo>?) {
-            if (invalidServiceAction("GetTransportInfo")) return
-            execute(object : GetTransportInfo(service) {
+            if (invalidServiceAction("GetTransportInfo")) {
+                notifyResponse(listener, exception = "service not support this action.")
+                return
+            }
+            executeAction(object : GetTransportInfo(service) {
                 override fun received(invocation: ActionInvocation<*>?, transportInfo: TransportInfo) {
                     notifyResponse(listener, result = transportInfo)
                 }
@@ -173,7 +198,7 @@ internal abstract class BaseServiceExecutor(
     }
 
     // ---------------------------------------------------------------------------------------------------------
-    // Implement
+    // RendererService
     // ---------------------------------------------------------------------------------------------------------
     internal class RendererServiceExecutorImpl(
         controlPoint: ControlPoint,
@@ -181,8 +206,11 @@ internal abstract class BaseServiceExecutor(
     ) : BaseServiceExecutor(controlPoint, service), RendererServiceAction {
 
         override fun setVolume(listener: ServiceActionCallback<Int>?, volume: Int) {
-            if (invalidServiceAction("SetVolume")) return
-            execute(object : SetVolume(service, volume.toLong()) {
+            if (invalidServiceAction("SetVolume")) {
+                notifyResponse(listener, exception = "service not support this action.")
+                return
+            }
+            executeAction(object : SetVolume(service, volume.toLong()) {
                 override fun success(invocation: ActionInvocation<*>?) {
                     notifyResponse(listener, result = null)
                 }
@@ -194,8 +222,11 @@ internal abstract class BaseServiceExecutor(
         }
 
         override fun getVolume(listener: ServiceActionCallback<Int>?) {
-            if (invalidServiceAction("GetVolume")) return
-            execute(object : GetVolume(service) {
+            if (invalidServiceAction("GetVolume")) {
+                notifyResponse(listener, exception = "service not support this action.")
+                return
+            }
+            executeAction(object : GetVolume(service) {
                 override fun received(invocation: ActionInvocation<*>?, currentVolume: Int) {
                     notifyResponse(listener, result = currentVolume)
                 }
@@ -207,8 +238,11 @@ internal abstract class BaseServiceExecutor(
         }
 
         override fun setMute(listener: ServiceActionCallback<Boolean>?, mute: Boolean) {
-            if (invalidServiceAction("SetMute")) return
-            execute(object : SetMute(service, mute) {
+            if (invalidServiceAction("SetMute")) {
+                notifyResponse(listener, exception = "service not support this action.")
+                return
+            }
+            executeAction(object : SetMute(service, mute) {
                 override fun success(invocation: ActionInvocation<*>?) {
                     notifyResponse(listener, result = mute)
                 }
@@ -220,8 +254,11 @@ internal abstract class BaseServiceExecutor(
         }
 
         override fun isMute(listener: ServiceActionCallback<Boolean>?) {
-            if (invalidServiceAction("GetMute")) return
-            execute(object : GetMute(service) {
+            if (invalidServiceAction("GetMute")) {
+                notifyResponse(listener, exception = "service not support this action.")
+                return
+            }
+            executeAction(object : GetMute(service) {
                 override fun received(invocation: ActionInvocation<*>?, currentMute: Boolean) {
                     notifyResponse(listener, result = currentMute)
                 }
@@ -233,8 +270,11 @@ internal abstract class BaseServiceExecutor(
         }
 
         override fun setBrightness(listener: ServiceActionCallback<Int>?, percent: Int) {
-            if (invalidServiceAction("SetBrightness")) return
-            execute(object : SetBrightness(service!!, percent.toLong()) {
+            if (invalidServiceAction("SetBrightness")) {
+                notifyResponse(listener, exception = "service not support this action.")
+                return
+            }
+            executeAction(object : SetBrightness(service!!, percent.toLong()) {
                 override fun success(invocation: ActionInvocation<*>?) {
                     notifyResponse(listener, result = percent)
                 }
@@ -246,9 +286,11 @@ internal abstract class BaseServiceExecutor(
         }
 
         override fun getBrightness(listener: ServiceActionCallback<Int>?) {
-            if (invalidServiceAction("GetBrightness")) return
-            execute(object : GetBrightness(service!!) {
-
+            if (invalidServiceAction("GetBrightness")) {
+                notifyResponse(listener, exception = "service not support this action.")
+                return
+            }
+            executeAction(object : GetBrightness(service!!) {
                 override fun received(actionInvocation: ActionInvocation<*>?, brightness: Int) {
                     notifyResponse(listener, result = brightness)
                 }

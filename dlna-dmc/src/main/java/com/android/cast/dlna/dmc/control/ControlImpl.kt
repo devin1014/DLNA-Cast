@@ -3,7 +3,6 @@ package com.android.cast.dlna.dmc.control
 import android.text.TextUtils
 import com.android.cast.dlna.core.ICast
 import com.android.cast.dlna.core.Utils.getMetadata
-import com.android.cast.dlna.dmc.control.ServiceFactory.ServiceFactoryImpl
 import com.android.cast.dlna.dmc.control.ServiceAction.CAST
 import com.android.cast.dlna.dmc.control.ServiceAction.PAUSE
 import com.android.cast.dlna.dmc.control.ServiceAction.PLAY
@@ -12,9 +11,12 @@ import com.android.cast.dlna.dmc.control.ServiceAction.SET_BRIGHTNESS
 import com.android.cast.dlna.dmc.control.ServiceAction.SET_MUTE
 import com.android.cast.dlna.dmc.control.ServiceAction.SET_VOLUME
 import com.android.cast.dlna.dmc.control.ServiceAction.STOP
+import com.android.cast.dlna.dmc.control.ServiceFactory.ServiceFactoryImpl
 import org.fourthline.cling.controlpoint.ControlPoint
 import org.fourthline.cling.model.meta.Device
+import org.fourthline.cling.support.avtransport.lastchange.AVTransportLastChangeParser
 import org.fourthline.cling.support.model.TransportState
+import org.fourthline.cling.support.renderingcontrol.lastchange.RenderingControlLastChangeParser
 
 class ControlImpl(
     controlPoint: ControlPoint,
@@ -23,21 +25,26 @@ class ControlImpl(
     subscriptionListener: SubscriptionListener?,
 ) : Control {
 
-    private val serviceFactory: ServiceFactory
+    private val serviceFactory: ServiceFactory = ServiceFactoryImpl(controlPoint, device)
     private var uri: String? = null
 
     init {
-        serviceFactory = ServiceFactoryImpl(controlPoint, device)
-        (serviceFactory.avService as BaseServiceExecutor).execute(object : SubscriptionListener {
-            override fun onSubscriptionTransportStateChanged(event: TransportState) {
-                subscriptionListener?.onSubscriptionTransportStateChanged(event)
-            }
-        })
-        (serviceFactory.renderService as BaseServiceExecutor).execute(object : SubscriptionListener {
-            override fun onSubscriptionTransportStateChanged(event: TransportState) {
-                subscriptionListener?.onSubscriptionTransportStateChanged(event)
-            }
-        })
+        (serviceFactory.avService as BaseServiceExecutor).subscribe(
+            subscriptionCallback = object : SubscriptionListener {
+                override fun onSubscriptionTransportStateChanged(event: TransportState) {
+                    subscriptionListener?.onSubscriptionTransportStateChanged(event)
+                }
+            },
+            lastChangeParser = AVTransportLastChangeParser()
+        )
+        (serviceFactory.renderService as BaseServiceExecutor).subscribe(
+            subscriptionCallback = object : SubscriptionListener {
+                override fun onSubscriptionTransportStateChanged(event: TransportState) {
+                    subscriptionListener?.onSubscriptionTransportStateChanged(event)
+                }
+            },
+            lastChangeParser = RenderingControlLastChangeParser()
+        )
     }
 
     override fun cast(device: Device<*, *, *>, cast: ICast) {

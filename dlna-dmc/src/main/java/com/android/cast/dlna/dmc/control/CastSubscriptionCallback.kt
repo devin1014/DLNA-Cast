@@ -1,68 +1,60 @@
 package com.android.cast.dlna.dmc.control
 
 import com.android.cast.dlna.core.Logger
-import com.android.cast.dlna.dmc.DLNACastManager
 import org.fourthline.cling.controlpoint.SubscriptionCallback
 import org.fourthline.cling.model.gena.CancelReason
 import org.fourthline.cling.model.gena.GENASubscription
 import org.fourthline.cling.model.message.UpnpResponse
 import org.fourthline.cling.model.meta.Service
-import org.fourthline.cling.support.avtransport.lastchange.AVTransportLastChangeParser
 import org.fourthline.cling.support.avtransport.lastchange.AVTransportVariable.TransportState
 import org.fourthline.cling.support.lastchange.LastChangeParser
-import org.fourthline.cling.support.renderingcontrol.lastchange.RenderingControlLastChangeParser
 
 /**
  *
  */
 internal class CastSubscriptionCallback(
     service: Service<*, *>?,
-    requestedDurationSeconds: Int,
-    private val eventCallback: SubscriptionListener?,
+    requestedDurationSeconds: Int = 1800, // Cling default 1800
+    private val lastChangeParser: LastChangeParser,
+    private val callback: SubscriptionListener,
 ) : SubscriptionCallback(service, requestedDurationSeconds) {
 
     private val logger = Logger.create("SubscriptionCallback")
-    private val lastChangeParser: LastChangeParser? = when (getService()?.serviceType?.type) {
-        DLNACastManager.SERVICE_AV_TRANSPORT.type -> AVTransportLastChangeParser()
-        DLNACastManager.SERVICE_RENDERING_CONTROL.type -> RenderingControlLastChangeParser()
-        else -> null
-    }
 
     override fun failed(subscription: GENASubscription<*>, responseStatus: UpnpResponse?, exception: Exception?, defaultMsg: String?) {
-        logger.e("[${subscription.service.serviceType.type}] failed:${responseStatus}, $defaultMsg")
+        logger.e("${getTag(subscription)} failed:${responseStatus}, $exception, $defaultMsg")
     }
 
-
     override fun established(subscription: GENASubscription<*>) {
-        logger.i("[${subscription.service.serviceType.type}] established")
+        logger.i("${getTag(subscription)} established")
     }
 
 
     override fun ended(subscription: GENASubscription<*>, reason: CancelReason?, responseStatus: UpnpResponse?) {
-        logger.i("[${subscription.service.serviceType.type}] ended: $responseStatus, $reason")
+        logger.w("${getTag(subscription)} ended: $reason, $responseStatus")
     }
 
     override fun eventsMissed(subscription: GENASubscription<*>, numberOfMissedEvents: Int) {
-        logger.w("[${subscription.service.serviceType.type}] eventsMissed: $numberOfMissedEvents")
+        logger.w("${getTag(subscription)} eventsMissed: $numberOfMissedEvents")
     }
 
     override fun eventReceived(subscription: GENASubscription<*>) {
-        logger.i("[${subscription.service.serviceType.type}] eventReceived\n    events: ${subscription.currentValues.keys}")
-        lastChangeParser?.also { parser ->
-            val lastChangeEventValue = subscription.currentValues["LastChange"]?.value.toString()
-            try {
-                val events = parser.parse(lastChangeEventValue)?.instanceIDs?.firstOrNull()?.values
-                events?.forEach { value ->
-                    logger.i("    value : $value")
-                    //TODO: remove the special class
-                    if (value is TransportState) {
-                        eventCallback?.onSubscriptionTransportStateChanged(value.value)
-                    }
+        logger.i("${getTag(subscription)} eventReceived: ${subscription.currentValues.keys}")
+        val lastChangeEventValue = subscription.currentValues["LastChange"]?.value.toString()
+        try {
+            val events = lastChangeParser.parse(lastChangeEventValue)?.instanceIDs?.firstOrNull()?.values
+            events?.forEach { value ->
+                logger.i("    value : $value")
+                //TODO: remove the special class
+                if (value is TransportState) {
+                    callback.onSubscriptionTransportStateChanged(value.value)
                 }
-
-            } catch (e: Exception) {
-                e.printStackTrace()
             }
+        } catch (e: Exception) {
+            logger.w("${getTag(subscription)} currentValues: ${subscription.currentValues}")
+            e.printStackTrace()
         }
     }
+
+    private fun getTag(subscription: GENASubscription<*>) = "[${subscription.service.serviceType.type}](${subscription.subscriptionId.replace("uuid:", "")})"
 }
