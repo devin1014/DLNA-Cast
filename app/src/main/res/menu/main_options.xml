@@ -8,7 +8,7 @@
         android:icon="@android:drawable/ic_menu_search"
         android:orderInCategory="100"
         android:title="搜索设备"
-        app:showAsAction="never"
+        app:showAsAction="always"
         tools:ignore="HardcodedText" />
 
 </menu>

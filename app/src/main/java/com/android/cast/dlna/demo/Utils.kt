@@ -9,8 +9,6 @@ import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import androidx.core.app.ActivityCompat
 
-fun getTag(any: Any): String = "${any.javaClass.simpleName}@(${any.hashCode().toString(16)})"
-
 class Utils {
     companion object {
         private const val WIFI_DISABLED = "<disabled>"

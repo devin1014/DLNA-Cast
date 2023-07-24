@@ -42,6 +42,7 @@ import org.fourthline.cling.model.meta.Device
 import org.fourthline.cling.model.meta.LocalDevice
 import org.fourthline.cling.model.types.DeviceType
 import org.fourthline.cling.model.types.ServiceType
+import org.fourthline.cling.model.types.UDADeviceType
 import org.fourthline.cling.model.types.UDAServiceType
 import org.fourthline.cling.support.model.DIDLContent
 import org.fourthline.cling.support.model.MediaInfo
@@ -53,7 +54,8 @@ import org.fourthline.cling.support.model.TransportInfo
  */
 object DLNACastManager : Control, GetInfo, OnDeviceRegistryListener {
 
-    //public static final DeviceType DEVICE_TYPE_DMR = new UDADeviceType("MediaRenderer");
+    val DEVICE_TYPE_MEDIA_RENDERER = UDADeviceType("MediaRenderer")
+
     val SERVICE_AV_TRANSPORT: ServiceType = UDAServiceType("AVTransport")
     val SERVICE_RENDERING_CONTROL: ServiceType = UDAServiceType("RenderingControl")
     val SERVICE_CONNECTION_MANAGER: ServiceType = UDAServiceType("ConnectionManager")

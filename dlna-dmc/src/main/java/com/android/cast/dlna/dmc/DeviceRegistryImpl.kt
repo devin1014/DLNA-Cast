@@ -17,6 +17,7 @@ internal class DeviceRegistryImpl(private val deviceRegistryListener: OnDeviceRe
 
     private val logger = Logger.create("DeviceRegistry")
     private val handler = Handler(Looper.getMainLooper())
+    private val list = mutableListOf<Device<*, *, *>>()
 
     @Volatile
     var ignoreUpdate = true
@@ -26,18 +27,22 @@ internal class DeviceRegistryImpl(private val deviceRegistryListener: OnDeviceRe
             for (device in collection) {
                 notifyDeviceAdd(device)
             }
+
+            list.clear()
+            list.addAll(collection)
+            notifyDeviceListChanged(list)
         }
     }
 
     // Discovery performance optimization for very slow Android devices!
     // This function will called early than 'remoteDeviceAdded',but the device services maybe not entirely.
     override fun remoteDeviceDiscoveryStarted(registry: Registry, device: RemoteDevice) {
-        logger.i(String.format("[%s] discovery started...", device.details.friendlyName))
+        logger.d(String.format("[%s] discovery started...", device.details.friendlyName))
     }
 
     //End of optimization, you can remove the whole block if your Android handset is fast (>= 600 Mhz)
     override fun remoteDeviceDiscoveryFailed(registry: Registry, device: RemoteDevice, ex: Exception) {
-        logger.e(String.format("[%s] discovery failed...", device.details.friendlyName), ex)
+        logger.w(String.format("[%s] discovery failed...", device.details.friendlyName), ex)
     }
 
     // remote device
@@ -45,6 +50,10 @@ internal class DeviceRegistryImpl(private val deviceRegistryListener: OnDeviceRe
         logger.i("remoteDeviceAdded: " + parseDeviceInfo(device))
         logger.i(parseDeviceService(device))
         notifyDeviceAdd(device)
+        if (!list.contains(device)) {
+            list.add(device)
+            notifyDeviceListChanged(list)
+        }
     }
 
     override fun remoteDeviceUpdated(registry: Registry, device: RemoteDevice) {
@@ -57,19 +66,29 @@ internal class DeviceRegistryImpl(private val deviceRegistryListener: OnDeviceRe
     override fun remoteDeviceRemoved(registry: Registry, device: RemoteDevice) {
         logger.w("remoteDeviceRemoved: " + parseDeviceInfo(device))
         notifyDeviceRemove(device)
+        if (list.contains(device)) {
+            list.remove(device)
+            notifyDeviceListChanged(list)
+        }
     }
 
     // local device
     override fun localDeviceAdded(registry: Registry, device: LocalDevice) {
         super.localDeviceAdded(registry, device)
+        //TODO: notify local device???
     }
 
     override fun localDeviceRemoved(registry: Registry, device: LocalDevice) {
         super.localDeviceRemoved(registry, device)
+        //TODO: notify local device???
     }
 
     private fun notifyDeviceAdd(device: Device<*, *, *>) {
         handler.post { deviceRegistryListener.onDeviceAdded(device) }
+    }
+
+    private fun notifyDeviceListChanged(list: List<Device<*, *, *>>) {
+        handler.post { deviceRegistryListener.onDeviceListChanged(list) }
     }
 
     private fun notifyDeviceUpdate(device: Device<*, *, *>) {

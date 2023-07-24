@@ -6,16 +6,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?android:attr/selectableItemBackground"
-    android:padding="4dp"
+    android:paddingStart="12dp"
+    android:paddingTop="6dp"
+    android:paddingEnd="12dp"
+    android:paddingBottom="6dp"
     tools:ignore="SpUsage">
-
-    <CheckBox
-        android:id="@+id/device_selector"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/device_name"
@@ -40,6 +35,19 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/device_name"
         tools:text="Description" />
+
+    <TextView
+        android:id="@+id/device_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:textColor="@color/colorAccent"
+        android:textSize="14dp"
+        android:textStyle="italic"
+        app:layout_constraintBottom_toBottomOf="@id/device_description"
+        app:layout_constraintLeft_toRightOf="@id/device_description"
+        app:layout_constraintTop_toTopOf="@id/device_description"
+        tools:text="Media Renderer" />
 
     <TextView
         android:id="@+id/device_id"
