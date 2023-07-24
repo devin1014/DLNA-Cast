@@ -11,10 +11,10 @@ import com.android.cast.dlna.core.getLogger
 import com.android.cast.dlna.core.toIcon
 import com.android.cast.dlna.dmr.service.AVTransportController
 import com.android.cast.dlna.dmr.service.AVTransportServiceImpl
+import com.android.cast.dlna.dmr.service.AudioControl
 import com.android.cast.dlna.dmr.service.AudioRenderController
 import com.android.cast.dlna.dmr.service.AudioRenderServiceImpl
-import com.android.cast.dlna.dmr.service.IAVTransportControl
-import com.android.cast.dlna.dmr.service.IAudioControl
+import com.android.cast.dlna.dmr.service.AvTransportControl
 import org.fourthline.cling.UpnpServiceConfiguration
 import org.fourthline.cling.android.AndroidUpnpServiceConfiguration
 import org.fourthline.cling.android.AndroidUpnpServiceImpl
@@ -31,9 +31,9 @@ import org.fourthline.cling.model.types.UDAServiceId
 import org.fourthline.cling.model.types.UDN
 import org.fourthline.cling.support.avtransport.lastchange.AVTransportLastChangeParser
 import org.fourthline.cling.support.avtransport.lastchange.AVTransportVariable
+import org.fourthline.cling.support.lastchange.EventedValue
 import org.fourthline.cling.support.lastchange.LastChangeAwareServiceManager
 import org.fourthline.cling.support.model.Channel
-import org.fourthline.cling.support.model.TransportState
 import org.fourthline.cling.support.renderingcontrol.lastchange.ChannelVolume
 import org.fourthline.cling.support.renderingcontrol.lastchange.RenderingControlLastChangeParser
 import org.fourthline.cling.support.renderingcontrol.lastchange.RenderingControlVariable.Volume
@@ -51,8 +51,8 @@ open class DLNARendererService : AndroidUpnpServiceImpl() {
 
     private val logger = getLogger("DLNARendererService")
     private val serviceBinder = RendererServiceBinderWrapper()
-    private lateinit var avTransportControl: IAVTransportControl
-    private lateinit var audioControl: IAudioControl
+    private lateinit var avTransportControl: AvTransportControl
+    private lateinit var audioControl: AudioControl
     private var localDevice: LocalDevice? = null
 
     override fun createConfiguration(): UpnpServiceConfiguration {
@@ -134,13 +134,17 @@ open class DLNARendererService : AndroidUpnpServiceImpl() {
         (avTransportControl as? AVTransportController)?.mediaControl = control
     }
 
-    fun changeTransportState(transportState: TransportState) {
+    fun notifyAvTransportLastChange(state: RenderState) {
+        notifyAvTransportLastChange(AVTransportVariable.TransportState(state.toTransportState()))
+    }
+
+    fun notifyAvTransportLastChange(event: EventedValue<*>) {
         val manager = localDevice?.findService(UDAServiceId("AVTransport"))?.manager
-        (manager?.implementation as? AVTransportServiceImpl)?.lastChange?.setEventedValue(0, AVTransportVariable.TransportState(transportState))
+        (manager?.implementation as? AVTransportServiceImpl)?.lastChange?.setEventedValue(0, event)
         (manager as? LastChangeAwareServiceManager)?.fireLastChange()
     }
 
-    fun changeVolume(volume: Int) {
+    fun notifyRenderControlLastChange(volume: Int) {
         val manager = localDevice?.findService(UDAServiceId("RenderingControl"))?.manager
         (manager?.implementation as? AudioRenderServiceImpl)?.lastChange?.setEventedValue(0, Volume(ChannelVolume(Channel.Master, volume)))
         (manager as? LastChangeAwareServiceManager)?.fireLastChange()

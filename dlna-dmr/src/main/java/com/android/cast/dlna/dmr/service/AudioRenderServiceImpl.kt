@@ -5,7 +5,7 @@ import org.fourthline.cling.model.types.UnsignedIntegerTwoBytes
 import org.fourthline.cling.support.model.Channel
 import org.fourthline.cling.support.renderingcontrol.AbstractAudioRenderingControl
 
-class AudioRenderServiceImpl(private val audioControl: IAudioControl) : AbstractAudioRenderingControl() {
+class AudioRenderServiceImpl(private val audioControl: AudioControl) : AbstractAudioRenderingControl() {
     override fun setMute(instanceId: UnsignedIntegerFourBytes, channelName: String, desiredMute: Boolean) = audioControl.setMute(channelName, desiredMute)
     override fun getMute(instanceId: UnsignedIntegerFourBytes, channelName: String): Boolean = audioControl.getMute(channelName)
     override fun setVolume(instanceId: UnsignedIntegerFourBytes, channelName: String, desiredVolume: UnsignedIntegerTwoBytes) =

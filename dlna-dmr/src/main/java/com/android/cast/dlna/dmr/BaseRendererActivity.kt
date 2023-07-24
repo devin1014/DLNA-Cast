@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.os.IBinder
 import androidx.appcompat.app.AppCompatActivity
 import com.android.cast.dlna.dmr.service.keyExtraCastAction
-import org.fourthline.cling.support.model.TransportState.STOPPED
 
 abstract class BaseRendererActivity : AppCompatActivity() {
 
@@ -44,7 +43,6 @@ abstract class BaseRendererActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        rendererService?.changeTransportState(STOPPED)
         unbindService(serviceConnection)
         rendererService?.bindRealPlayer(null)
         super.onDestroy()

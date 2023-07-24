@@ -9,7 +9,7 @@ import org.fourthline.cling.support.model.TransportAction
 import org.fourthline.cling.support.model.TransportInfo
 import org.fourthline.cling.support.model.TransportSettings
 
-class AVTransportServiceImpl(private val avTransportControl: IAVTransportControl) : AbstractAVTransportService() {
+class AVTransportServiceImpl(private val avTransportControl: AvTransportControl) : AbstractAVTransportService() {
     override fun getCurrentInstanceIds(): Array<UnsignedIntegerFourBytes> = arrayOf(UnsignedIntegerFourBytes(0))
     override fun getCurrentTransportActions(instanceId: UnsignedIntegerFourBytes): Array<TransportAction> = avTransportControl.currentTransportActions
     override fun getDeviceCapabilities(instanceId: UnsignedIntegerFourBytes): DeviceCapabilities = avTransportControl.deviceCapabilities

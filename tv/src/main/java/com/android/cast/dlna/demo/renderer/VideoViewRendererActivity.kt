@@ -13,9 +13,6 @@ import android.widget.VideoView
 import com.android.cast.dlna.dmr.BaseRendererActivity
 import com.android.cast.dlna.dmr.RenderControl
 import com.android.cast.dlna.dmr.RenderState
-import org.fourthline.cling.support.model.TransportState.PAUSED_PLAYBACK
-import org.fourthline.cling.support.model.TransportState.PLAYING
-import org.fourthline.cling.support.model.TransportState.STOPPED
 
 class VideoViewRendererActivity : BaseRendererActivity() {
 
@@ -23,6 +20,12 @@ class VideoViewRendererActivity : BaseRendererActivity() {
     private val progressBar: ProgressBar by lazy { findViewById(R.id.video_progress) }
     private val errorMsg: TextView by lazy { findViewById(R.id.video_error) }
     private var renderState: RenderState = RenderState.IDLE
+        set(value) {
+            if (field != value) {
+                field = value
+                rendererService?.notifyAvTransportLastChange(field)
+            }
+        }
 
     override fun onServiceConnected() {
         rendererService?.bindRealPlayer(VideoViewRenderControl(videoView))
@@ -45,14 +48,12 @@ class VideoViewRendererActivity : BaseRendererActivity() {
             if (videoView.isPlaying) {
                 videoView.pause()
                 renderState = RenderState.PAUSED
-                rendererService?.changeTransportState(PAUSED_PLAYBACK)
             }
         }
         findViewById<View>(R.id.player_resume).setOnClickListener {
             if (!videoView.isPlaying) {
                 videoView.start()
                 renderState = RenderState.PLAYING
-                rendererService?.changeTransportState(PLAYING)
             }
         }
     }
@@ -74,20 +75,17 @@ class VideoViewRendererActivity : BaseRendererActivity() {
                 mp.start()
                 renderState = RenderState.PLAYING
                 progressBar.visibility = View.INVISIBLE
-                rendererService?.changeTransportState(PLAYING)
             }
             videoView.setOnErrorListener { _, what, extra ->
                 renderState = RenderState.ERROR
                 progressBar.visibility = View.INVISIBLE
                 errorMsg.visibility = View.VISIBLE
                 errorMsg.text = "播放错误: $what, $extra"
-                rendererService?.changeTransportState(STOPPED)
                 true
             }
             videoView.setOnCompletionListener {
                 renderState = RenderState.STOPPED
                 progressBar.visibility = View.INVISIBLE
-                rendererService?.changeTransportState(STOPPED)
                 finish()
             }
         } else {
@@ -107,16 +105,14 @@ class VideoViewRendererActivity : BaseRendererActivity() {
         if (rendererService != null) {
             if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_MUTE) {
                 val volume = (application.getSystemService(AUDIO_SERVICE) as AudioManager).getStreamVolume(AudioManager.STREAM_MUSIC)
-                rendererService?.changeVolume(volume)
+                rendererService?.notifyRenderControlLastChange(volume)
             } else if (keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
                 if (videoView.isPlaying) {
                     videoView.pause()
                     renderState = RenderState.PAUSED
-                    rendererService?.changeTransportState(PAUSED_PLAYBACK)
                 } else {
                     videoView.resume()
                     renderState = RenderState.PLAYING
-                    rendererService?.changeTransportState(PLAYING)
                 }
             }
         }
@@ -129,10 +125,22 @@ class VideoViewRendererActivity : BaseRendererActivity() {
         override val duration: Long
             get() = videoView.duration.toLong()
 
-        override fun play() = videoView.start()
-        override fun pause() = videoView.pause()
+        override fun play() {
+            videoView.start()
+            renderState = RenderState.PLAYING
+        }
+
+        override fun pause() {
+            videoView.pause()
+            renderState = RenderState.PAUSED
+        }
+
         override fun seek(millSeconds: Long) = videoView.seekTo(millSeconds.toInt())
-        override fun stop() = videoView.stopPlayback()
+        override fun stop() {
+            videoView.stopPlayback()
+            renderState = RenderState.STOPPED
+        }
+
         override fun getState(): RenderState = renderState
     }
 }

@@ -8,7 +8,7 @@ import org.fourthline.cling.support.avtransport.AVTransportException
 import org.fourthline.cling.support.model.*
 import org.fourthline.cling.support.model.TransportAction.*
 
-class AVTransportController(override val applicationContext: Context) : IAVTransportControl {
+class AVTransportController(override val applicationContext: Context) : AvTransportControl {
     companion object {
         private val TRANSPORT_ACTION_STOPPED = arrayOf(Play)
         private val TRANSPORT_ACTION_PLAYING = arrayOf(Stop, Pause, Seek)
@@ -17,11 +17,15 @@ class AVTransportController(override val applicationContext: Context) : IAVTrans
 
     var mediaControl: RenderControl? = null
         set(value) {
-            field = value
             if (value != null) {
                 _mediaInfo = MediaInfo(currentURI, currentURIMetaData)
                 _positionInfo = PositionInfo(0, currentURIMetaData, currentURI)
+            } else {
+                mediaControl?.stop()
+                _mediaInfo = MediaInfo()
+                _positionInfo = PositionInfo()
             }
+            field = value
         }
     private var _positionInfo = PositionInfo()
     private var _mediaInfo = MediaInfo()

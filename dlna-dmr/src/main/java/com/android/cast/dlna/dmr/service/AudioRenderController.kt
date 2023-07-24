@@ -8,7 +8,7 @@ import org.fourthline.cling.model.types.UnsignedIntegerTwoBytes
 /**
  *
  */
-class AudioRenderController constructor(context: Context) : IAudioControl {
+class AudioRenderController constructor(context: Context) : AudioControl {
 
     private val muteVolume = UnsignedIntegerTwoBytes(0)
     private val audioManager: AudioManager

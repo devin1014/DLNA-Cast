@@ -18,12 +18,12 @@ import java.net.URI
 const val actionSetAvTransport = "com.dlna.action.SetAvTransport"
 const val keyExtraCastAction = "extra.castAction"
 
-interface IControl
+interface RendererControl
 
 // -------------------------------------------------------------------------------------------
 // - AvTransport
 // -------------------------------------------------------------------------------------------
-interface IAVTransportControl : IControl {
+interface AvTransportControl : RendererControl {
     val logger: Logger
     val applicationContext: Context
     fun setAVTransportURI(currentURI: String, currentURIMetaData: String?) {
@@ -100,7 +100,7 @@ interface IAVTransportControl : IControl {
 // -------------------------------------------------------------------------------------------
 // - Audio
 // -------------------------------------------------------------------------------------------
-interface IAudioControl : IControl {
+interface AudioControl : RendererControl {
     val logger: Logger
     fun setMute(channelName: String, desiredMute: Boolean) {
         logger.i("setMute: $desiredMute")
