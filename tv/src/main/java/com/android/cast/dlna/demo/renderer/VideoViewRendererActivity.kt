@@ -50,7 +50,7 @@ class VideoViewRendererActivity : BaseRendererActivity() {
         }
         findViewById<View>(R.id.player_resume).setOnClickListener {
             if (!videoView.isPlaying) {
-                videoView.resume()
+                videoView.start()
                 renderState = RenderState.PLAYING
                 rendererService?.changeTransportState(PLAYING)
             }
