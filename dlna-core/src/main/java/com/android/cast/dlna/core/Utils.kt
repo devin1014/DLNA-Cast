@@ -22,6 +22,8 @@ import android.net.ConnectivityManager
 import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.Environment
+import android.os.Handler
+import android.os.Looper
 import android.provider.DocumentsContract
 import android.provider.MediaStore.Audio
 import android.provider.MediaStore.Images.Media
@@ -297,5 +299,15 @@ object Utils {
     @JvmStatic
     fun toHexString(hashCode: Int): String {
         return Integer.toHexString(hashCode).uppercase()
+    }
+}
+
+private val mainHandler = Handler(Looper.getMainLooper())
+
+fun executeInMainThread(runnable: Runnable) {
+    if (Thread.currentThread() == Looper.getMainLooper().thread) {
+        runnable.run()
+    } else {
+        mainHandler.post(runnable)
     }
 }

@@ -10,30 +10,11 @@ import android.content.ServiceConnection
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import com.android.cast.dlna.core.ContentType
-import com.android.cast.dlna.core.ICast
 import com.android.cast.dlna.core.Level
 import com.android.cast.dlna.core.Logger
-import com.android.cast.dlna.dmc.QueryRequest.BrowseContentRequest
-import com.android.cast.dlna.dmc.QueryRequest.MediaInfoRequest
-import com.android.cast.dlna.dmc.QueryRequest.PositionInfoRequest
-import com.android.cast.dlna.dmc.QueryRequest.TransportInfoRequest
-import com.android.cast.dlna.dmc.QueryRequest.VolumeInfoRequest
-import com.android.cast.dlna.dmc.control.CastControl
 import com.android.cast.dlna.dmc.control.CastControlImpl
-import com.android.cast.dlna.dmc.control.CastEventListener
-import com.android.cast.dlna.dmc.control.GetInfo
-import com.android.cast.dlna.dmc.control.GetInfoListener
-import com.android.cast.dlna.dmc.control.PauseEventListener
-import com.android.cast.dlna.dmc.control.PlayEventListener
-import com.android.cast.dlna.dmc.control.SeekToEventListener
-import com.android.cast.dlna.dmc.control.ServiceAction.CAST
-import com.android.cast.dlna.dmc.control.ServiceAction.PAUSE
-import com.android.cast.dlna.dmc.control.ServiceAction.PLAY
-import com.android.cast.dlna.dmc.control.ServiceAction.SEEK_TO
-import com.android.cast.dlna.dmc.control.ServiceAction.STOP
-import com.android.cast.dlna.dmc.control.ServiceActionCallback
-import com.android.cast.dlna.dmc.control.StopEventListener
+import com.android.cast.dlna.dmc.control.DeviceControl
+import com.android.cast.dlna.dmc.control.EmptyDeviceControl
 import com.android.cast.dlna.dmc.control.SubscriptionListener
 import org.fourthline.cling.android.AndroidUpnpService
 import org.fourthline.cling.model.message.header.STAllHeader
@@ -44,30 +25,24 @@ import org.fourthline.cling.model.types.DeviceType
 import org.fourthline.cling.model.types.ServiceType
 import org.fourthline.cling.model.types.UDADeviceType
 import org.fourthline.cling.model.types.UDAServiceType
-import org.fourthline.cling.support.model.DIDLContent
-import org.fourthline.cling.support.model.MediaInfo
-import org.fourthline.cling.support.model.PositionInfo
-import org.fourthline.cling.support.model.TransportInfo
+import org.fourthline.cling.support.lastchange.EventedValue
+import org.fourthline.cling.support.model.TransportState
 
 /**
  *
  */
-object DLNACastManager : CastControl, GetInfo, OnDeviceRegistryListener {
+object DLNACastManager : OnDeviceRegistryListener {
 
     val DEVICE_TYPE_MEDIA_RENDERER = UDADeviceType("MediaRenderer")
 
     val SERVICE_AV_TRANSPORT: ServiceType = UDAServiceType("AVTransport")
     val SERVICE_RENDERING_CONTROL: ServiceType = UDAServiceType("RenderingControl")
-
-    //val SERVICE_CONNECTION_MANAGER: ServiceType = UDAServiceType("ConnectionManager")
     val SERVICE_CONTENT_DIRECTORY: ServiceType = UDAServiceType("ContentDirectory")
 
     private val logger = Logger.create("CastManager")
     private val deviceRegistryImpl = DeviceRegistryImpl(this)
     private val mainHandler = Handler(Looper.getMainLooper())
-    private val actionEventCallbackMap: MutableMap<String, ServiceActionCallback<*>> = LinkedHashMap()
     private var searchDeviceType: DeviceType? = null
-    private var controlImpl: CastControlImpl? = null
     private var upnpService: AndroidUpnpService? = null
 
     fun enableLog(logging: Boolean = true, level: Int = Level.V) {
@@ -179,8 +154,8 @@ object DLNACastManager : CastControl, GetInfo, OnDeviceRegistryListener {
     override fun onDeviceRemoved(device: Device<*, *, *>) {
         if (checkDeviceType(device)) {
             // if this device is casting, disconnect first!
-            if (controlImpl?.isCasting(device) == true) controlImpl?.stop()
-            controlImpl = null
+            //TODO:check
+//            if (controlImpl?.isCasting(device) == true) controlImpl?.stop()
             synchronized(lock) {
                 registerDeviceListeners.forEach { listener -> listener.onDeviceRemoved(device) }
             }
@@ -211,9 +186,6 @@ object DLNACastManager : CastControl, GetInfo, OnDeviceRegistryListener {
         }
     }
 
-    // -----------------------------------------------------------------------------------------
-    // ---- search
-    // -----------------------------------------------------------------------------------------
     fun search(type: DeviceType? = null, maxSeconds: Int = 60) {
         searchDeviceType = type
         upnpService?.get()?.also { service ->
@@ -223,114 +195,44 @@ object DLNACastManager : CastControl, GetInfo, OnDeviceRegistryListener {
         }
     }
 
-    // -----------------------------------------------------------------------------------------
-    // ---- action
-    // -----------------------------------------------------------------------------------------
-    override fun cast(device: Device<*, *, *>, cast: ICast) {
-        // check device has been connected.
-//        if (controlImpl != null) {
-//            // the device is casting! should not recast and syc control status.
-//            // the device is casting! should not recast and syc control status.
-//            // the device is casting! should not recast and syc control status.
-//            // if (mControlImpl.isCasting(device, object.getUri())) {
-//            //     syc status
-//            //     return;
-//            // }
-//            controlImpl!!.stop()
-//        }
-        controlImpl?.stop()
-        upnpService?.let { upnpService ->
-            controlImpl = CastControlImpl(upnpService.controlPoint, device, actionEventCallbackMap, subscriptionListener).also {
-                it.cast(device, cast)
-            }
-        }
-    }
-
-    override fun play() {
-        controlImpl?.play()
-    }
-
-    override fun pause() {
-        controlImpl?.pause()
-    }
-
-    override fun isCasting(device: Device<*, *, *>?): Boolean {
-        return controlImpl?.isCasting(device) == true
-    }
-
-    override fun isCasting(device: Device<*, *, *>?, uri: String?): Boolean {
-        return controlImpl?.isCasting(device, uri) == true
-    }
-
-    override fun stop() {
-        controlImpl?.stop()
-    }
-
-    override fun seekTo(millSeconds: Long) {
-        controlImpl?.seekTo(millSeconds)
-    }
-
-    override fun setVolume(percent: Int) {
-        controlImpl?.setVolume(percent)
-    }
-
-    override fun setMute(mute: Boolean) {
-        controlImpl?.setMute(mute)
-    }
-
-    override fun setBrightness(percent: Int) {
-        controlImpl?.setBrightness(percent)
-    }
-
-    // -----------------------------------------------------------------------------------------
-    // ---- Callback
-    // -----------------------------------------------------------------------------------------
-    fun registerActionCallbacks(vararg callbacks: ServiceActionCallback<*>) {
-        callbacks.forEach { callback ->
-            when (callback) {
-                is CastEventListener -> actionEventCallbackMap[CAST.name] = callback
-                is PlayEventListener -> actionEventCallbackMap[PLAY.name] = callback
-                is PauseEventListener -> actionEventCallbackMap[PAUSE.name] = callback
-                is StopEventListener -> actionEventCallbackMap[STOP.name] = callback
-                is SeekToEventListener -> actionEventCallbackMap[SEEK_TO.name] = callback
-            }
-        }
-    }
-
-    fun unregisterActionCallbacks() = actionEventCallbackMap.clear()
-
     var subscriptionListener: SubscriptionListener? = null
 
-    // -----------------------------------------------------------------------------------------
-    // ---- query
-    // -----------------------------------------------------------------------------------------
-    override fun getMediaInfo(device: Device<*, *, *>, listener: GetInfoListener<MediaInfo>?) {
-        upnpService?.also { service ->
-            MediaInfoRequest(device.findService(SERVICE_AV_TRANSPORT)).execute(service.controlPoint, listener)
+    private val subscriptionListenerWrapper = object : SubscriptionListener {
+        override fun established(subscriptionId: String?) {
+            subscriptionListener?.established(subscriptionId)
+        }
+
+        override fun ended(subscriptionId: String?) {
+            subscriptionListener?.ended(subscriptionId)
+        }
+
+        override fun failed(subscriptionId: String?) {
+            subscriptionListener?.failed(subscriptionId)
+        }
+
+        override fun onReceived(subscriptionId: String?, event: EventedValue<*>) {
+            subscriptionListener?.onReceived(subscriptionId, event)
+        }
+
+        override fun onTransportStateChanged(subscriptionId: String?, state: TransportState) {
+            subscriptionListener?.onTransportStateChanged(subscriptionId, state)
         }
     }
 
-    override fun getPositionInfo(device: Device<*, *, *>, listener: GetInfoListener<PositionInfo>?) {
-        upnpService?.also { service ->
-            PositionInfoRequest(device.findService(SERVICE_AV_TRANSPORT)).execute(service.controlPoint, listener)
+    private val deviceControlMap = mutableMapOf<Device<*, *, *>, DeviceControl?>()
+    fun connectDevice(device: Device<*, *, *>): DeviceControl {
+        val service = upnpService?.get() ?: return EmptyDeviceControl
+        var control = deviceControlMap[device]
+        if (control == null) {
+            val newController = CastControlImpl(service.controlPoint, device, subscriptionListenerWrapper)
+            deviceControlMap[device] = newController
+            control = newController
         }
+        return control
     }
 
-    override fun getTransportInfo(device: Device<*, *, *>, listener: GetInfoListener<TransportInfo>?) {
-        upnpService?.also { service ->
-            TransportInfoRequest(device.findService(SERVICE_AV_TRANSPORT)).execute(service.controlPoint, listener)
-        }
-    }
-
-    override fun getVolumeInfo(device: Device<*, *, *>, listener: GetInfoListener<Int>?) {
-        upnpService?.also { service ->
-            VolumeInfoRequest(device.findService(SERVICE_RENDERING_CONTROL)).execute(service.controlPoint, listener)
-        }
-    }
-
-    override fun getContent(device: Device<*, *, *>, contentType: ContentType, listener: GetInfoListener<DIDLContent>?) {
-        upnpService?.also { service ->
-            BrowseContentRequest(device.findService(SERVICE_CONTENT_DIRECTORY), contentType.id).execute(service.controlPoint, listener)
-        }
+    fun disconnectDevice(device: Device<*, *, *>) {
+        // val control = deviceControlMap[device]
+        deviceControlMap[device] = null
     }
 }

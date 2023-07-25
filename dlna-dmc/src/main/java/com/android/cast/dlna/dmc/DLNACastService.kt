@@ -27,9 +27,6 @@ class DLNACastService : AndroidUpnpServiceImpl() { private val logger = Logger.c
     }
 
     override fun createConfiguration(): UpnpServiceConfiguration = object : AndroidUpnpServiceConfiguration() {
-        override fun getRegistryMaintenanceIntervalMillis(): Int {
-            return 5000 //default is 3000!
-        }
 //        arrayOf(
 //        DLNACastManager.SERVICE_RENDERING_CONTROL,
 //        DLNACastManager.SERVICE_AV_TRANSPORT,

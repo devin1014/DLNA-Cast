@@ -2,10 +2,7 @@ package com.android.cast.dlna.dmc.control
 
 import android.os.Handler
 import android.os.Looper
-import com.android.cast.dlna.core.Logger
 import com.android.cast.dlna.core.Utils.getStringTime
-import com.android.cast.dlna.dmc.action.GetBrightness
-import com.android.cast.dlna.dmc.action.SetBrightness
 import org.fourthline.cling.controlpoint.ActionCallback
 import org.fourthline.cling.controlpoint.ControlPoint
 import org.fourthline.cling.model.action.ActionInvocation
@@ -68,9 +65,6 @@ internal abstract class BaseServiceExecutor(
         controlPoint: ControlPoint,
         service: Service<*, *>?,
     ) : BaseServiceExecutor(controlPoint, service), AvTransportServiceAction {
-
-        override val logger: Logger = Logger.create("AvTransportService")
-
         override fun cast(uri: String, metadata: String?, callback: ServiceActionCallback<String>?) {
             super.cast(uri, metadata, callback)
             if (invalidServiceAction("SetAVTransportURI")) {
@@ -212,7 +206,6 @@ internal abstract class BaseServiceExecutor(
         controlPoint: ControlPoint,
         service: Service<*, *>?,
     ) : BaseServiceExecutor(controlPoint, service), RendererServiceAction {
-        override val logger: Logger = Logger.create("RendererService")
         override fun setVolume(volume: Int, callback: ServiceActionCallback<Int>?) {
             super.setVolume(volume, callback)
             if (invalidServiceAction("SetVolume")) {
@@ -278,40 +271,9 @@ internal abstract class BaseServiceExecutor(
                 }
             })
         }
-
-        override fun setBrightness(percent: Int, callback: ServiceActionCallback<Int>?) {
-            super.setBrightness(percent, callback)
-            if (invalidServiceAction("SetBrightness")) {
-                notifyResponse(callback, exception = "service not support this action.")
-                return
-            }
-            executeAction(object : SetBrightness(service!!, percent.toLong()) {
-                override fun success(invocation: ActionInvocation<*>?) {
-                    notifyResponse(callback, result = percent)
-                }
-
-                override fun failure(invocation: ActionInvocation<*>?, operation: UpnpResponse?, defaultMsg: String?) {
-                    notifyResponse(callback, exception = defaultMsg ?: "play failed.")
-                }
-            })
-        }
-
-        override fun getBrightness(callback: ServiceActionCallback<Int>?) {
-            if (invalidServiceAction("GetBrightness")) {
-                notifyResponse(callback, exception = "service not support this action.")
-                return
-            }
-            executeAction(object : GetBrightness(service!!) {
-                override fun received(actionInvocation: ActionInvocation<*>?, brightness: Int) {
-                    notifyResponse(callback, result = brightness)
-                }
-
-                override fun failure(invocation: ActionInvocation<*>?, operation: UpnpResponse?, defaultMsg: String?) {
-                    notifyResponse(callback, exception = defaultMsg ?: "getBrightness failed.")
-                }
-            })
-        }
     }
 }
 
-class ActionResponse<T>(val data: T?, val exception: String?)
+class ActionResponse<T>(val data: T?, val exception: String?) {
+    val success: Boolean = exception.isNullOrBlank()
+}

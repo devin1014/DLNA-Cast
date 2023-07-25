@@ -11,3 +11,7 @@ interface OnDeviceRegistryListener {
     fun onDeviceRemoved(device: Device<*, *, *>) {}
     fun onDeviceListChanged(list: List<Device<*, *, *>>) {}
 }
+
+interface Callback<T> {
+    fun onCallback(t: T?)
+}

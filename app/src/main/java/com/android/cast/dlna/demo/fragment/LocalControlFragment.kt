@@ -46,7 +46,7 @@ class LocalControlFragment : Fragment(), IDisplayDevice {
         }
         view.findViewById<View>(R.id.local_ctrl_cast).setOnClickListener {
             if (mDevice != null) {
-                DLNACastManager.cast(mDevice!!, newInstance(mCastPathUrl!!, UUID.randomUUID().toString(), "Test Sample"))
+                //DLNACastManager.cast(mDevice!!, newInstance(mCastPathUrl!!, UUID.randomUUID().toString(), "Test Sample"))
             }
         }
     }

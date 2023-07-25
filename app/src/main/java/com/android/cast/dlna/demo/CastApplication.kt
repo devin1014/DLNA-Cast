@@ -8,6 +8,7 @@ class CastApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         java.util.logging.Logger.getLogger("org.fourthline.cling").level = Level.CONFIG
+        com.android.cast.dlna.core.Logger.printThread = true
         com.android.cast.dlna.core.Logger.create("CastApplication").i("Application onCreate.")
         DLNACastManager.enableLog(true)
     }

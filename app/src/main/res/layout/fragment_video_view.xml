@@ -15,12 +15,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#000000"
-        android:padding="12dp">
+        android:padding="6dp">
 
         <ImageView
             android:id="@+id/video_cast"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:background="?android:selectableItemBackground"
             android:contentDescription="@null"
             android:padding="4dp"
             android:src="@drawable/cast_video"
@@ -29,9 +30,22 @@
             app:tint="@android:color/white" />
 
         <ImageView
+            android:id="@+id/video_cast_stop"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?android:selectableItemBackground"
+            android:contentDescription="@null"
+            android:padding="4dp"
+            android:src="@drawable/cast_stop"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@android:color/white" />
+
+        <ImageView
             android:id="@+id/video_cast_previous"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:background="?android:selectableItemBackground"
             android:contentDescription="@null"
             android:src="@drawable/cast_previous"
             app:layout_constraintBottom_toTopOf="@id/video_cast_position"
@@ -45,8 +59,9 @@
             android:id="@+id/video_cast_pause"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:background="?android:selectableItemBackground"
             android:contentDescription="@null"
-            android:src="@drawable/cast_pause"
+            android:src="@drawable/cast_play"
             app:layout_constraintBottom_toBottomOf="@id/video_cast_previous"
             app:layout_constraintLeft_toRightOf="@id/video_cast_previous"
             app:layout_constraintRight_toLeftOf="@id/video_cast_next"
@@ -57,6 +72,7 @@
             android:id="@+id/video_cast_next"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:background="?android:selectableItemBackground"
             android:contentDescription="@null"
             android:src="@drawable/cast_next"
             app:layout_constraintBottom_toBottomOf="@id/video_cast_pause"
@@ -69,6 +85,7 @@
             android:id="@+id/video_cast_mute"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:background="?android:selectableItemBackground"
             android:contentDescription="@null"
             android:padding="4dp"
             android:src="@drawable/cast_mute"
@@ -76,19 +93,7 @@
             app:layout_constraintLeft_toRightOf="@id/video_cast_next"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="@id/video_cast_next"
-            app:tint="@android:color/white" />
-
-        <ImageView
-            android:id="@+id/video_cast_stop"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:contentDescription="@null"
-            android:src="@drawable/cast_stop"
-            app:layout_constraintBottom_toTopOf="@id/video_cast_position"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/video_cast_pause"
-            app:tint="@android:color/white" />
+            app:tint="@color/colorAccent" />
 
         <TextView
             android:id="@+id/video_cast_position"
@@ -96,7 +101,7 @@
             android:layout_height="32dp"
             android:gravity="center"
             android:minWidth="90dp"
-            android:text="--:--"
+            android:text="--:--/--:--"
             android:textColor="#ffffff"
             android:textSize="12dp"
             app:layout_constraintBottom_toBottomOf="parent"

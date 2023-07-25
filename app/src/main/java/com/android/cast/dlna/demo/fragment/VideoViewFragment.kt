@@ -7,36 +7,38 @@ import android.os.Message
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.fragment.app.Fragment
-import com.android.cast.dlna.demo.CastObject
 import com.android.cast.dlna.demo.DetailContainer
 import com.android.cast.dlna.demo.R
 import com.android.cast.dlna.dmc.DLNACastManager
 import com.android.cast.dlna.dmc.control.ActionResponse
-import com.android.cast.dlna.dmc.control.CastEventListener
-import com.android.cast.dlna.dmc.control.GetInfoListener
-import com.android.cast.dlna.dmc.control.PauseEventListener
-import com.android.cast.dlna.dmc.control.PlayEventListener
-import com.android.cast.dlna.dmc.control.SeekToEventListener
-import com.android.cast.dlna.dmc.control.StopEventListener
+import com.android.cast.dlna.dmc.control.DeviceControl
+import com.android.cast.dlna.dmc.control.ServiceActionCallback
 import com.android.cast.dlna.dmc.control.SubscriptionListener
 import org.fourthline.cling.model.meta.Device
-import org.fourthline.cling.support.lastchange.EventedValue
 import org.fourthline.cling.support.model.PositionInfo
+import org.fourthline.cling.support.model.TransportState
+import org.fourthline.cling.support.model.TransportState.NO_MEDIA_PRESENT
 import java.util.Formatter
 import java.util.Locale
-import java.util.UUID
 
 class VideoViewFragment : Fragment(), CastCallback {
 
+    private val colorAccent: Int by lazy { resources.getColor(R.color.colorAccent) }
     private val device: Device<*, *, *> by lazy { (requireParentFragment() as DetailContainer).getDevice() }
     private val castControlContainer: View by lazy { requireView().findViewById(R.id.video_cast_control) }
-    private val positionInfo: TextView? by lazy { view?.findViewById(R.id.video_cast_position) }
-    private val positionSeekBar: SeekBar? by lazy { view?.findViewById(R.id.video_cast_seekbar) }
+    private val positionInfo: TextView by lazy { requireView().findViewById(R.id.video_cast_position) }
+    private val positionSeekBar: SeekBar by lazy { requireView().findViewById(R.id.video_cast_seekbar) }
+    private val pauseButton: ImageView by lazy { requireView().findViewById(R.id.video_cast_pause) }
+    private val volumeMuteButton: AppCompatImageView by lazy { requireView().findViewById(R.id.video_cast_mute) }
+    private lateinit var deviceControl: DeviceControl
+    private var currentState: TransportState = NO_MEDIA_PRESENT
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_video_view, container, false)
@@ -45,85 +47,69 @@ class VideoViewFragment : Fragment(), CastCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initComponent(view)
-
-        DLNACastManager.registerActionCallbacks(
-            object : CastEventListener {
-                override fun onResponse(response: ActionResponse<String>) {
-                    if (response.exception != null) {
-                        Toast.makeText(activity, response.exception, Toast.LENGTH_LONG).show()
-                    } else {
-                        Toast.makeText(activity, "Cast: ${response.data}", Toast.LENGTH_LONG).show()
-                        positionHandler.start()
-                    }
-                }
-            },
-            object : PlayEventListener {
-                override fun onResponse(response: ActionResponse<String>) {
-                    if (response.exception != null) {
-                        Toast.makeText(activity, response.exception, Toast.LENGTH_LONG).show()
-                    } else {
-                        Toast.makeText(activity, "${response.data}", Toast.LENGTH_LONG).show()
-                    }
-                }
-            },
-            object : PauseEventListener {
-                override fun onResponse(response: ActionResponse<String>) {
-                    if (response.exception != null) {
-                        Toast.makeText(activity, response.exception, Toast.LENGTH_LONG).show()
-                    } else {
-                        Toast.makeText(activity, "${response.data}", Toast.LENGTH_LONG).show()
-                    }
-                }
-            },
-            object : StopEventListener {
-                override fun onResponse(response: ActionResponse<String>) {
-                    if (response.exception != null) {
-                        Toast.makeText(activity, response.exception, Toast.LENGTH_LONG).show()
-                    } else {
-                        Toast.makeText(activity, "${response.data}", Toast.LENGTH_LONG).show()
-                    }
-                    positionHandler.stop()
-                }
-            },
-            object : SeekToEventListener {
-                override fun onResponse(response: ActionResponse<Long>) {
-                    if (response.exception != null) {
-                        Toast.makeText(activity, response.exception, Toast.LENGTH_LONG).show()
-                    } else {
-                        Toast.makeText(activity, "SeekTo: ${response.data}", Toast.LENGTH_LONG).show()
-                    }
-                }
-            }
-        )
         DLNACastManager.subscriptionListener = object : SubscriptionListener {
-            override fun onSubscriptionTransportStateChanged(event: EventedValue<*>) {
-                //TODO:check
+            override fun onTransportStateChanged(subscriptionId: String?, state: TransportState) {
+                currentState = state
+                pauseButton.setImageResource(if (state == TransportState.PLAYING) R.drawable.cast_pause else R.drawable.cast_play)
             }
         }
+        deviceControl = DLNACastManager.connectDevice(device)
+        deviceControl.isMute(object : ServiceActionCallback<Boolean> {
+            override fun onResponse(response: ActionResponse<Boolean>) {
+                val mute = response.data == true
+                volumeMuteButton.isSelected = mute
+                volumeMuteButton.setColorFilter(if (mute) colorAccent else 0xFFFFFF)
+            }
+        })
     }
 
     private fun initComponent(view: View) {
         view.findViewById<View>(R.id.video_cast).setOnClickListener { CastFragment.show(childFragmentManager) }
-        view.findViewById<View>(R.id.video_cast_pause).setOnClickListener { DLNACastManager.pause() }
-        view.findViewById<View>(R.id.video_cast_stop).setOnClickListener { DLNACastManager.stop() }
-        view.findViewById<View>(R.id.video_cast_mute).setOnClickListener { DLNACastManager.setMute(true) }
-        positionSeekBar?.setOnSeekBarChangeListener(seekBarChangeListener)
+        view.findViewById<View>(R.id.video_cast_stop).setOnClickListener { deviceControl.stop() }
+        pauseButton.setOnClickListener {
+            if (currentState == TransportState.PLAYING) {
+                deviceControl.pause()
+            } else {
+                deviceControl.play()
+            }
+        }
+        volumeMuteButton.setOnClickListener {
+            val mute = !it.isSelected
+            deviceControl.setMute(mute)
+            it.isSelected = mute
+            volumeMuteButton.setColorFilter(if (mute) colorAccent else 0xFFFFFF)
+        }
+        positionSeekBar.setOnSeekBarChangeListener(seekBarChangeListener)
     }
 
     override fun onCastUrl(url: String) {
-        DLNACastManager.cast(device, CastObject.newInstance(url, UUID.randomUUID().toString(), "Test Sample"))
+        durationMillSeconds = 0L
+        deviceControl.cast(url, null, object : ServiceActionCallback<String> {
+            override fun onResponse(response: ActionResponse<String>) {
+                if (response.success) {
+                    positionHandler.start()
+                } else {
+                    Toast.makeText(requireContext(), response.exception, Toast.LENGTH_SHORT).show()
+                }
+            }
+        })
     }
 
     private var durationMillSeconds: Long = 0
 
     private val positionHandler = CircleMessageHandler(1000) {
-        DLNACastManager.getPositionInfo(device, object : GetInfoListener<PositionInfo> {
-            override fun onGetInfoResult(t: PositionInfo?, errMsg: String?) {
-                if (t != null) {
-                    positionInfo?.text = String.format("%s:%s", getStringTime(t.trackElapsedSeconds), getStringTime(t.trackDurationSeconds))
-                    positionSeekBar?.progress = t.elapsedPercent
+        deviceControl.getPositionInfo(object : ServiceActionCallback<PositionInfo> {
+            override fun onResponse(response: ActionResponse<PositionInfo>) {
+                if (response.success) {
+                    response.data?.also { t ->
+                        if (durationMillSeconds == 0L) {
+                            durationMillSeconds = t.trackDurationSeconds * 1000
+                        }
+                        positionInfo.text = String.format("%s/%s", getStringTime(t.trackElapsedSeconds * 1000), getStringTime(t.trackDurationSeconds * 1000))
+                        positionSeekBar.progress = t.elapsedPercent
+                    }
                 } else {
-                    positionInfo?.text = "--:--"
+                    positionInfo.text = "--:--/--:--"
                 }
             }
         })
@@ -145,12 +131,16 @@ class VideoViewFragment : Fragment(), CastCallback {
         override fun onStartTrackingTouch(seekBar: SeekBar) {}
         override fun onStopTrackingTouch(seekBar: SeekBar) {
             if (durationMillSeconds > 0) {
-                val position = (seekBar.progress * durationMillSeconds.toFloat() / seekBar.max).toLong()
-                DLNACastManager.seekTo(position)
+                deviceControl.seek(seekBar.progress * durationMillSeconds / seekBar.max)
             }
         }
     }
 
+    override fun onDestroyView() {
+        DLNACastManager.disconnectDevice(device)
+        positionHandler.stop()
+        super.onDestroyView()
+    }
 }
 
 // ------------------------------------------------------------

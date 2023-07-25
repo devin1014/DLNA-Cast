@@ -18,6 +18,8 @@ class Logger(private val tag: String) {
         var prefixTag: String = "WL_"
         var enabled: Boolean = true
         var level: Int = Level.I
+        var printThread: Boolean = false
+
         var printer: Printer = Printer { level, tag, message, throwable ->
             if (throwable != null) {
                 when (level) {
@@ -43,67 +45,66 @@ class Logger(private val tag: String) {
 
     fun v(message: CharSequence, throwable: Throwable? = null) {
         if (enabled && Level.V >= level) {
-            printer.print(Level.V, prefixTag + tag, message, throwable)
+            printer.print(Level.V, getTag(), message, throwable)
         }
     }
 
-    fun v(function: () -> CharSequence) = d(null, function)
     fun v(throwable: Throwable?, function: () -> CharSequence) {
         if (enabled && Level.V >= level) {
-            printer.print(Level.V, prefixTag + tag, function(), throwable)
+            printer.print(Level.V, getTag(), function(), throwable)
         }
     }
 
     fun d(message: CharSequence, throwable: Throwable? = null) {
         if (enabled && Level.D >= level) {
-            printer.print(Level.D, prefixTag + tag, message, throwable)
+            printer.print(Level.D, getTag(), message, throwable)
         }
     }
 
-    fun d(function: () -> CharSequence) = d(null, function)
     fun d(throwable: Throwable?, function: () -> CharSequence) {
         if (enabled && Level.D >= level) {
-            printer.print(Level.D, prefixTag + tag, function(), throwable)
+            printer.print(Level.D, getTag(), function(), throwable)
         }
     }
 
     fun i(message: CharSequence, throwable: Throwable? = null) {
         if (enabled && Level.I >= level) {
-            printer.print(Level.I, prefixTag + tag, message, throwable)
+            printer.print(Level.I, getTag(), message, throwable)
         }
     }
 
-    fun i(function: () -> CharSequence) = i(null, function)
     fun i(throwable: Throwable?, function: () -> CharSequence) {
         if (enabled && Level.I >= level) {
-            printer.print(Level.I, prefixTag + tag, function(), throwable)
+            printer.print(Level.I, getTag(), function(), throwable)
         }
     }
 
     fun w(message: CharSequence, throwable: Throwable? = null) {
         if (enabled && Level.W >= level) {
-            printer.print(Level.W, prefixTag + tag, message, throwable)
+            printer.print(Level.W, getTag(), message, throwable)
         }
     }
 
-    fun w(function: () -> CharSequence) = w(null, function)
     fun w(throwable: Throwable?, function: () -> CharSequence) {
         if (enabled && Level.W >= level) {
-            printer.print(Level.W, prefixTag + tag, function(), throwable)
+            printer.print(Level.W, getTag(), function(), throwable)
         }
     }
 
     fun e(message: CharSequence, throwable: Throwable? = null) {
         if (enabled && Level.E >= level) {
-            printer.print(Level.E, prefixTag + tag, message, throwable)
+            printer.print(Level.E, getTag(), message, throwable)
         }
     }
 
-    fun e(function: () -> CharSequence) = e(null, function)
     fun e(throwable: Throwable?, function: () -> CharSequence) {
         if (enabled && Level.E >= level) {
-            printer.print(Level.E, prefixTag + tag, function(), throwable)
+            printer.print(Level.E, getTag(), function(), throwable)
         }
+    }
+
+    private fun getTag(): String {
+        return prefixTag + tag + (if (printThread) "[${Thread.currentThread().name}]" else "")
     }
 
     fun interface Printer {
