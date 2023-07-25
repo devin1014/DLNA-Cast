@@ -12,7 +12,7 @@ import org.fourthline.cling.support.model.TransportInfo
 // ------------------------------------------------------------------
 // ---- control
 // ------------------------------------------------------------------
-interface Control {
+interface CastControl {
     fun cast(device: Device<*, *, *>, cast: ICast)
     fun isCasting(device: Device<*, *, *>?): Boolean
     fun isCasting(device: Device<*, *, *>?, uri: String?): Boolean

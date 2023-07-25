@@ -22,7 +22,7 @@ interface ServiceActionCallback<T> {
 // --------------------------------------------------------------------------------
 // ---- AvService
 // --------------------------------------------------------------------------------
-interface AVServiceAction {
+interface AvTransportServiceAction {
     fun cast(listener: ServiceActionCallback<String>?, uri: String, metadata: String?)
     fun play(listener: ServiceActionCallback<String>?)
     fun pause(listener: ServiceActionCallback<String>?)

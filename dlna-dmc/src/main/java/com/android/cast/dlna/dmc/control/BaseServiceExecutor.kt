@@ -66,7 +66,7 @@ internal abstract class BaseServiceExecutor(
     internal class AVServiceExecutorImpl(
         controlPoint: ControlPoint,
         service: Service<*, *>?,
-    ) : BaseServiceExecutor(controlPoint, service), AVServiceAction {
+    ) : BaseServiceExecutor(controlPoint, service), AvTransportServiceAction {
 
         override fun cast(listener: ServiceActionCallback<String>?, uri: String, metadata: String?) {
             if (invalidServiceAction("SetAVTransportURI")) {

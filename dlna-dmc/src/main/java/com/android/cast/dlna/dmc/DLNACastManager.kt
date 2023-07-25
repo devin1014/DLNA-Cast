@@ -19,9 +19,9 @@ import com.android.cast.dlna.dmc.QueryRequest.MediaInfoRequest
 import com.android.cast.dlna.dmc.QueryRequest.PositionInfoRequest
 import com.android.cast.dlna.dmc.QueryRequest.TransportInfoRequest
 import com.android.cast.dlna.dmc.QueryRequest.VolumeInfoRequest
+import com.android.cast.dlna.dmc.control.CastControl
+import com.android.cast.dlna.dmc.control.CastControlImpl
 import com.android.cast.dlna.dmc.control.CastEventListener
-import com.android.cast.dlna.dmc.control.Control
-import com.android.cast.dlna.dmc.control.ControlImpl
 import com.android.cast.dlna.dmc.control.GetInfo
 import com.android.cast.dlna.dmc.control.GetInfoListener
 import com.android.cast.dlna.dmc.control.PauseEventListener
@@ -52,13 +52,14 @@ import org.fourthline.cling.support.model.TransportInfo
 /**
  *
  */
-object DLNACastManager : Control, GetInfo, OnDeviceRegistryListener {
+object DLNACastManager : CastControl, GetInfo, OnDeviceRegistryListener {
 
     val DEVICE_TYPE_MEDIA_RENDERER = UDADeviceType("MediaRenderer")
 
     val SERVICE_AV_TRANSPORT: ServiceType = UDAServiceType("AVTransport")
     val SERVICE_RENDERING_CONTROL: ServiceType = UDAServiceType("RenderingControl")
-    val SERVICE_CONNECTION_MANAGER: ServiceType = UDAServiceType("ConnectionManager")
+
+    //val SERVICE_CONNECTION_MANAGER: ServiceType = UDAServiceType("ConnectionManager")
     val SERVICE_CONTENT_DIRECTORY: ServiceType = UDAServiceType("ContentDirectory")
 
     private val logger = Logger.create("CastManager")
@@ -66,7 +67,7 @@ object DLNACastManager : Control, GetInfo, OnDeviceRegistryListener {
     private val mainHandler = Handler(Looper.getMainLooper())
     private val actionEventCallbackMap: MutableMap<String, ServiceActionCallback<*>> = LinkedHashMap()
     private var searchDeviceType: DeviceType? = null
-    private var controlImpl: ControlImpl? = null
+    private var controlImpl: CastControlImpl? = null
     private var upnpService: AndroidUpnpService? = null
 
     fun enableLog(logging: Boolean = true, level: Int = Level.V) {
@@ -239,7 +240,7 @@ object DLNACastManager : Control, GetInfo, OnDeviceRegistryListener {
 //        }
         controlImpl?.stop()
         upnpService?.let { upnpService ->
-            controlImpl = ControlImpl(upnpService.controlPoint, device, actionEventCallbackMap, subscriptionListener).also {
+            controlImpl = CastControlImpl(upnpService.controlPoint, device, actionEventCallbackMap, subscriptionListener).also {
                 it.cast(device, cast)
             }
         }
