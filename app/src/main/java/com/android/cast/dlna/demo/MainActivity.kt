@@ -36,9 +36,7 @@ class MainActivity : AppCompatActivity(), OnItemClickListener {
     }
 
     override fun onItemClick(device: Device<*, *, *>) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.detail_container, DetailFragment.create(device))
-            .commit()
+        replace(R.id.detail_container, DetailFragment.create(device))
     }
 
     override fun onBackPressed() {

@@ -49,7 +49,7 @@
                 android:layout_height="40dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:padding="2dp"
-                android:text="Image: JPG"
+                android:text="Video: mp4 (10min)"
                 tools:ignore="HardcodedText" />
 
         </RadioGroup>

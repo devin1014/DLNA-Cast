@@ -7,7 +7,9 @@ import android.content.pm.PackageManager
 import android.net.wifi.WifiManager
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.fragment.app.Fragment
 
 class Utils {
     companion object {
@@ -47,4 +49,12 @@ class Utils {
             }
         }
     }
+}
+
+internal fun AppCompatActivity.replace(id: Int, fragment: Fragment) {
+    supportFragmentManager.beginTransaction().replace(id, fragment).commit()
+}
+
+internal fun Fragment.replace(id: Int, fragment: Fragment) {
+    childFragmentManager.beginTransaction().replace(id, fragment).commit()
 }

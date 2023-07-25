@@ -18,7 +18,6 @@ import com.android.cast.dlna.demo.CastObject
 import com.android.cast.dlna.demo.IDisplayDevice
 import com.android.cast.dlna.demo.R
 import com.android.cast.dlna.demo.R.layout
-import com.android.cast.dlna.demo.fragment.CastFragment.Callback
 import com.android.cast.dlna.dmc.DLNACastManager
 import com.android.cast.dlna.dmc.control.ActionResponse
 import com.android.cast.dlna.dmc.control.CastEventListener
@@ -34,7 +33,7 @@ import org.fourthline.cling.support.lastchange.EventedValue
 import org.fourthline.cling.support.model.PositionInfo
 import java.util.UUID
 
-class ControlFragment : Fragment(), IDisplayDevice, Callback {
+class ControlFragment : Fragment(), IDisplayDevice, CastCallback {
 
     private val positionInfo: TextView? by lazy { view?.findViewById(R.id.ctrl_position_info) }
     private val positionSeekBar: SeekBar? by lazy { view?.findViewById(R.id.ctrl_seek_position) }
@@ -112,7 +111,7 @@ class ControlFragment : Fragment(), IDisplayDevice, Callback {
     }
 
     private fun initComponent(view: View) {
-        view.findViewById<View>(R.id.btn_cast).setOnClickListener { CastFragment(this).show(childFragmentManager) }
+        view.findViewById<View>(R.id.btn_cast).setOnClickListener { CastFragment.show(childFragmentManager) }
         view.findViewById<View>(R.id.btn_cast_pause).setOnClickListener { DLNACastManager.pause() }
         view.findViewById<View>(R.id.btn_cast_resume).setOnClickListener { DLNACastManager.play() }
         view.findViewById<View>(R.id.btn_cast_stop).setOnClickListener { DLNACastManager.stop() }
@@ -161,9 +160,9 @@ class ControlFragment : Fragment(), IDisplayDevice, Callback {
         // reconnect device, should recover status?
     }
 
-    override fun onCastUrl(url: String?) {
+    override fun onCastUrl(url: String) {
         if (device != null) {
-            DLNACastManager.cast(device!!, CastObject.newInstance(url!!, UUID.randomUUID().toString(), "Test Sample"))
+            DLNACastManager.cast(device!!, CastObject.newInstance(url, UUID.randomUUID().toString(), "Test Sample"))
         }
     }
 

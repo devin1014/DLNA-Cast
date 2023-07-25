@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.android.cast.dlna.demo.DetailContainer
 import com.android.cast.dlna.demo.R
 import com.android.cast.dlna.demo.R.layout
 import org.fourthline.cling.model.meta.Action
@@ -14,7 +15,7 @@ import org.fourthline.cling.model.meta.Service
 
 class InfoFragment : Fragment() {
 
-    var device: Device<*, *, *>? = null
+    private val device: Device<*, *, *> by lazy { (requireParentFragment() as DetailContainer).getDevice() }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(layout.fragment_information, container, false)
@@ -22,8 +23,8 @@ class InfoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        view.findViewById<TextView>(R.id.info_device_name)?.text = device?.details?.friendlyName ?: device?.identity?.udn?.identifierString
-        view.findViewById<TextView>(R.id.info_device_status)?.text = device?.let { buildDeviceInfo(it) } ?: ""
+        view.findViewById<TextView>(R.id.info_device_name)?.text = device.details?.friendlyName ?: device.identity?.udn?.identifierString
+        view.findViewById<TextView>(R.id.info_device_status)?.text = buildDeviceInfo(device)
     }
 
     private fun buildDeviceInfo(device: Device<*, *, *>): String {

@@ -8,8 +8,9 @@ import com.android.cast.dlna.core.ICast.ICastVideo
 // ---- URL
 // ---------------------------------------------
 const val CAST_VIDEO_MP4 = "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"
+const val CAST_VIDEO_MP4_2 = "http://mirror.aarnet.edu.au/pub/TED-talks/911Mothers_2010W-480p.mp4"
 const val CAST_VIDEO_M3U8 = "https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_ts/master.m3u8"
-const val CAST_IMAGE_JPG = "https://seopic.699pic.com/photo/40011/2135.jpg_wh1200.jpg"
+//const val CAST_IMAGE_JPG = "https://seopic.699pic.com/photo/40011/2135.jpg_wh1200.jpg"
 
 // ---------------------------------------------
 // ---- Cast Object
