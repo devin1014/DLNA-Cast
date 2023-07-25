@@ -1,5 +1,6 @@
 package com.android.cast.dlna.dmc.control
 
+import com.android.cast.dlna.core.Logger
 import org.fourthline.cling.support.model.MediaInfo
 import org.fourthline.cling.support.model.PositionInfo
 import org.fourthline.cling.support.model.TransportInfo
@@ -23,24 +24,42 @@ interface ServiceActionCallback<T> {
 // ---- AvService
 // --------------------------------------------------------------------------------
 interface AvTransportServiceAction {
-    fun cast(listener: ServiceActionCallback<String>?, uri: String, metadata: String?)
-    fun play(listener: ServiceActionCallback<String>?)
-    fun pause(listener: ServiceActionCallback<String>?)
-    fun stop(listener: ServiceActionCallback<String>?)
-    fun seek(listener: ServiceActionCallback<Long>?, position: Long)
-    fun getPositionInfo(listener: ServiceActionCallback<PositionInfo>?)
-    fun getMediaInfo(listener: ServiceActionCallback<MediaInfo>?)
-    fun getTransportInfo(listener: ServiceActionCallback<TransportInfo>?)
+    val logger: Logger
+    fun cast(uri: String, metadata: String?, callback: ServiceActionCallback<String>?) {
+        logger.i("cast: $uri")
+    }
+    fun play(callback: ServiceActionCallback<String>?) {
+        logger.i("play")
+    }
+    fun pause(callback: ServiceActionCallback<String>?){
+        logger.i("pause")
+    }
+    fun stop(callback: ServiceActionCallback<String>?){
+        logger.i("stop")
+    }
+    fun seek(millSeconds: Long, callback: ServiceActionCallback<Long>?){
+        logger.i("seek: $millSeconds")
+    }
+    fun getPositionInfo(callback: ServiceActionCallback<PositionInfo>?)
+    fun getMediaInfo(callback: ServiceActionCallback<MediaInfo>?)
+    fun getTransportInfo(callback: ServiceActionCallback<TransportInfo>?)
 }
 
 // --------------------------------------------------------------------------------
 // ---- RendererService
 // --------------------------------------------------------------------------------
 interface RendererServiceAction {
-    fun setVolume(listener: ServiceActionCallback<Int>?, volume: Int)
-    fun getVolume(listener: ServiceActionCallback<Int>?)
-    fun setMute(listener: ServiceActionCallback<Boolean>?, mute: Boolean)
-    fun isMute(listener: ServiceActionCallback<Boolean>?)
-    fun setBrightness(listener: ServiceActionCallback<Int>?, percent: Int)
-    fun getBrightness(listener: ServiceActionCallback<Int>?)
+    val logger: Logger
+    fun setVolume(volume: Int, callback: ServiceActionCallback<Int>?){
+        logger.i("setVolume: $volume")
+    }
+    fun getVolume(callback: ServiceActionCallback<Int>?)
+    fun setMute(mute: Boolean, callback: ServiceActionCallback<Boolean>?){
+        logger.i("setMute: $mute")
+    }
+    fun isMute(callback: ServiceActionCallback<Boolean>?)
+    fun setBrightness(percent: Int, callback: ServiceActionCallback<Int>?){
+        logger.i("setBrightness: $percent")
+    }
+    fun getBrightness(callback: ServiceActionCallback<Int>?)
 }

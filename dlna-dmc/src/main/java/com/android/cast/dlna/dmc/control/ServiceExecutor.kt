@@ -2,6 +2,7 @@ package com.android.cast.dlna.dmc.control
 
 import android.os.Handler
 import android.os.Looper
+import com.android.cast.dlna.core.Logger
 import com.android.cast.dlna.core.Utils.getStringTime
 import com.android.cast.dlna.dmc.action.GetBrightness
 import com.android.cast.dlna.dmc.action.SetBrightness
@@ -68,130 +69,137 @@ internal abstract class BaseServiceExecutor(
         service: Service<*, *>?,
     ) : BaseServiceExecutor(controlPoint, service), AvTransportServiceAction {
 
-        override fun cast(listener: ServiceActionCallback<String>?, uri: String, metadata: String?) {
+        override val logger: Logger = Logger.create("AvTransportService")
+
+        override fun cast(uri: String, metadata: String?, callback: ServiceActionCallback<String>?) {
+            super.cast(uri, metadata, callback)
             if (invalidServiceAction("SetAVTransportURI")) {
-                notifyResponse(listener, exception = "service not support this action.")
+                notifyResponse(callback, exception = "service not support this action.")
                 return
             }
             executeAction(object : SetAVTransportURI(service, uri, metadata) {
                 override fun success(invocation: ActionInvocation<*>?) {
-                    notifyResponse(listener, result = uri)
+                    notifyResponse(callback, result = uri)
                 }
 
                 override fun failure(invocation: ActionInvocation<*>?, operation: UpnpResponse?, defaultMsg: String?) {
-                    notifyResponse(listener, exception = defaultMsg ?: "cast failed.")
+                    notifyResponse(callback, exception = defaultMsg ?: "cast failed.")
                 }
             })
         }
 
-        override fun play(listener: ServiceActionCallback<String>?) {
+        override fun play(callback: ServiceActionCallback<String>?) {
+            super.play(callback)
             if (invalidServiceAction("Play")) {
-                notifyResponse(listener, exception = "service not support this action.")
+                notifyResponse(callback, exception = "service not support this action.")
                 return
             }
             executeAction(object : Play(service) {
                 override fun success(invocation: ActionInvocation<*>?) {
-                    notifyResponse(listener, result = "Play")
+                    notifyResponse(callback, result = "Play")
                 }
 
                 override fun failure(invocation: ActionInvocation<*>?, operation: UpnpResponse?, defaultMsg: String?) {
-                    notifyResponse(listener, exception = defaultMsg ?: "play failed.")
+                    notifyResponse(callback, exception = defaultMsg ?: "play failed.")
                 }
             })
         }
 
-        override fun pause(listener: ServiceActionCallback<String>?) {
+        override fun pause(callback: ServiceActionCallback<String>?) {
+            super.pause(callback)
             if (invalidServiceAction("Pause")) {
-                notifyResponse(listener, exception = "service not support this action.")
+                notifyResponse(callback, exception = "service not support this action.")
                 return
             }
             executeAction(object : Pause(service) {
                 override fun success(invocation: ActionInvocation<*>?) {
-                    notifyResponse(listener, result = "Pause")
+                    notifyResponse(callback, result = "Pause")
                 }
 
                 override fun failure(invocation: ActionInvocation<*>?, operation: UpnpResponse?, defaultMsg: String?) {
-                    notifyResponse(listener, exception = defaultMsg ?: "pause failed.")
+                    notifyResponse(callback, exception = defaultMsg ?: "pause failed.")
                 }
             })
         }
 
-        override fun stop(listener: ServiceActionCallback<String>?) {
+        override fun stop(callback: ServiceActionCallback<String>?) {
+            super.stop(callback)
             if (invalidServiceAction("Stop")) {
-                notifyResponse(listener, exception = "service not support this action.")
+                notifyResponse(callback, exception = "service not support this action.")
                 return
             }
             executeAction(object : Stop(service) {
                 override fun success(invocation: ActionInvocation<*>?) {
-                    notifyResponse(listener, result = "Stop")
+                    notifyResponse(callback, result = "Stop")
                 }
 
                 override fun failure(invocation: ActionInvocation<*>?, operation: UpnpResponse?, defaultMsg: String?) {
-                    notifyResponse(listener, exception = defaultMsg ?: "stop failed.")
+                    notifyResponse(callback, exception = defaultMsg ?: "stop failed.")
                 }
             })
         }
 
-        override fun seek(listener: ServiceActionCallback<Long>?, position: Long) {
+        override fun seek(millSeconds: Long, callback: ServiceActionCallback<Long>?) {
+            super.seek(millSeconds, callback)
             if (invalidServiceAction("Seek")) {
-                notifyResponse(listener, exception = "service not support this action.")
+                notifyResponse(callback, exception = "service not support this action.")
                 return
             }
-            executeAction(object : Seek(service, getStringTime(position)) {
+            executeAction(object : Seek(service, getStringTime(millSeconds)) {
                 override fun success(invocation: ActionInvocation<*>?) {
-                    notifyResponse(listener, result = position)
+                    notifyResponse(callback, result = millSeconds)
                 }
 
                 override fun failure(invocation: ActionInvocation<*>?, operation: UpnpResponse?, defaultMsg: String?) {
-                    notifyResponse(listener, exception = defaultMsg ?: "seek failed.")
+                    notifyResponse(callback, exception = defaultMsg ?: "seek failed.")
                 }
             })
         }
 
-        override fun getPositionInfo(listener: ServiceActionCallback<PositionInfo>?) {
+        override fun getPositionInfo(callback: ServiceActionCallback<PositionInfo>?) {
             if (invalidServiceAction("GetPositionInfo")) {
-                notifyResponse(listener, exception = "service not support this action.")
+                notifyResponse(callback, exception = "service not support this action.")
                 return
             }
             executeAction(object : GetPositionInfo(service) {
                 override fun received(invocation: ActionInvocation<*>?, positionInfo: PositionInfo) {
-                    notifyResponse(listener, result = positionInfo)
+                    notifyResponse(callback, result = positionInfo)
                 }
 
                 override fun failure(invocation: ActionInvocation<*>?, operation: UpnpResponse?, defaultMsg: String?) {
-                    notifyResponse(listener, exception = defaultMsg ?: "getPosition failed.")
+                    notifyResponse(callback, exception = defaultMsg ?: "getPosition failed.")
                 }
             })
         }
 
-        override fun getMediaInfo(listener: ServiceActionCallback<MediaInfo>?) {
+        override fun getMediaInfo(callback: ServiceActionCallback<MediaInfo>?) {
             if (invalidServiceAction("GetMediaInfo")) {
-                notifyResponse(listener, exception = "service not support this action.")
+                notifyResponse(callback, exception = "service not support this action.")
                 return
             }
             executeAction(object : GetMediaInfo(service) {
                 override fun received(invocation: ActionInvocation<*>?, mediaInfo: MediaInfo) {
-                    notifyResponse(listener, result = mediaInfo)
+                    notifyResponse(callback, result = mediaInfo)
                 }
 
                 override fun failure(invocation: ActionInvocation<*>?, operation: UpnpResponse?, defaultMsg: String?) {
-                    notifyResponse(listener, exception = defaultMsg ?: "getMedia failed.")
+                    notifyResponse(callback, exception = defaultMsg ?: "getMedia failed.")
                 }
             })
         }
 
-        override fun getTransportInfo(listener: ServiceActionCallback<TransportInfo>?) {
+        override fun getTransportInfo(callback: ServiceActionCallback<TransportInfo>?) {
             if (invalidServiceAction("GetTransportInfo")) {
-                notifyResponse(listener, exception = "service not support this action.")
+                notifyResponse(callback, exception = "service not support this action.")
                 return
             }
             executeAction(object : GetTransportInfo(service) {
                 override fun received(invocation: ActionInvocation<*>?, transportInfo: TransportInfo) {
-                    notifyResponse(listener, result = transportInfo)
+                    notifyResponse(callback, result = transportInfo)
                 }
 
                 override fun failure(invocation: ActionInvocation<*>?, operation: UpnpResponse?, defaultMsg: String?) {
-                    notifyResponse(listener, exception = defaultMsg ?: "getTransport failed.")
+                    notifyResponse(callback, exception = defaultMsg ?: "getTransport failed.")
                 }
             })
         }
@@ -204,99 +212,102 @@ internal abstract class BaseServiceExecutor(
         controlPoint: ControlPoint,
         service: Service<*, *>?,
     ) : BaseServiceExecutor(controlPoint, service), RendererServiceAction {
-
-        override fun setVolume(listener: ServiceActionCallback<Int>?, volume: Int) {
+        override val logger: Logger = Logger.create("RendererService")
+        override fun setVolume(volume: Int, callback: ServiceActionCallback<Int>?) {
+            super.setVolume(volume, callback)
             if (invalidServiceAction("SetVolume")) {
-                notifyResponse(listener, exception = "service not support this action.")
+                notifyResponse(callback, exception = "service not support this action.")
                 return
             }
             executeAction(object : SetVolume(service, volume.toLong()) {
                 override fun success(invocation: ActionInvocation<*>?) {
-                    notifyResponse(listener, result = null)
+                    notifyResponse(callback, result = null)
                 }
 
                 override fun failure(invocation: ActionInvocation<*>?, operation: UpnpResponse?, defaultMsg: String?) {
-                    notifyResponse(listener, exception = defaultMsg ?: "setVolume failed.")
+                    notifyResponse(callback, exception = defaultMsg ?: "setVolume failed.")
                 }
             })
         }
 
-        override fun getVolume(listener: ServiceActionCallback<Int>?) {
+        override fun getVolume(callback: ServiceActionCallback<Int>?) {
             if (invalidServiceAction("GetVolume")) {
-                notifyResponse(listener, exception = "service not support this action.")
+                notifyResponse(callback, exception = "service not support this action.")
                 return
             }
             executeAction(object : GetVolume(service) {
                 override fun received(invocation: ActionInvocation<*>?, currentVolume: Int) {
-                    notifyResponse(listener, result = currentVolume)
+                    notifyResponse(callback, result = currentVolume)
                 }
 
                 override fun failure(invocation: ActionInvocation<*>?, operation: UpnpResponse?, defaultMsg: String?) {
-                    notifyResponse(listener, exception = defaultMsg ?: "getVolume failed.")
+                    notifyResponse(callback, exception = defaultMsg ?: "getVolume failed.")
                 }
             })
         }
 
-        override fun setMute(listener: ServiceActionCallback<Boolean>?, mute: Boolean) {
+        override fun setMute(mute: Boolean, callback: ServiceActionCallback<Boolean>?) {
+            super.setMute(mute, callback)
             if (invalidServiceAction("SetMute")) {
-                notifyResponse(listener, exception = "service not support this action.")
+                notifyResponse(callback, exception = "service not support this action.")
                 return
             }
             executeAction(object : SetMute(service, mute) {
                 override fun success(invocation: ActionInvocation<*>?) {
-                    notifyResponse(listener, result = mute)
+                    notifyResponse(callback, result = mute)
                 }
 
                 override fun failure(invocation: ActionInvocation<*>?, operation: UpnpResponse?, defaultMsg: String?) {
-                    notifyResponse(listener, exception = defaultMsg ?: "setMute failed.")
+                    notifyResponse(callback, exception = defaultMsg ?: "setMute failed.")
                 }
             })
         }
 
-        override fun isMute(listener: ServiceActionCallback<Boolean>?) {
+        override fun isMute(callback: ServiceActionCallback<Boolean>?) {
             if (invalidServiceAction("GetMute")) {
-                notifyResponse(listener, exception = "service not support this action.")
+                notifyResponse(callback, exception = "service not support this action.")
                 return
             }
             executeAction(object : GetMute(service) {
                 override fun received(invocation: ActionInvocation<*>?, currentMute: Boolean) {
-                    notifyResponse(listener, result = currentMute)
+                    notifyResponse(callback, result = currentMute)
                 }
 
                 override fun failure(invocation: ActionInvocation<*>?, operation: UpnpResponse?, defaultMsg: String?) {
-                    notifyResponse(listener, exception = defaultMsg ?: "isMute failed.")
+                    notifyResponse(callback, exception = defaultMsg ?: "isMute failed.")
                 }
             })
         }
 
-        override fun setBrightness(listener: ServiceActionCallback<Int>?, percent: Int) {
+        override fun setBrightness(percent: Int, callback: ServiceActionCallback<Int>?) {
+            super.setBrightness(percent, callback)
             if (invalidServiceAction("SetBrightness")) {
-                notifyResponse(listener, exception = "service not support this action.")
+                notifyResponse(callback, exception = "service not support this action.")
                 return
             }
             executeAction(object : SetBrightness(service!!, percent.toLong()) {
                 override fun success(invocation: ActionInvocation<*>?) {
-                    notifyResponse(listener, result = percent)
+                    notifyResponse(callback, result = percent)
                 }
 
                 override fun failure(invocation: ActionInvocation<*>?, operation: UpnpResponse?, defaultMsg: String?) {
-                    notifyResponse(listener, exception = defaultMsg ?: "play failed.")
+                    notifyResponse(callback, exception = defaultMsg ?: "play failed.")
                 }
             })
         }
 
-        override fun getBrightness(listener: ServiceActionCallback<Int>?) {
+        override fun getBrightness(callback: ServiceActionCallback<Int>?) {
             if (invalidServiceAction("GetBrightness")) {
-                notifyResponse(listener, exception = "service not support this action.")
+                notifyResponse(callback, exception = "service not support this action.")
                 return
             }
             executeAction(object : GetBrightness(service!!) {
                 override fun received(actionInvocation: ActionInvocation<*>?, brightness: Int) {
-                    notifyResponse(listener, result = brightness)
+                    notifyResponse(callback, result = brightness)
                 }
 
                 override fun failure(invocation: ActionInvocation<*>?, operation: UpnpResponse?, defaultMsg: String?) {
-                    notifyResponse(listener, exception = defaultMsg ?: "getBrightness failed.")
+                    notifyResponse(callback, exception = defaultMsg ?: "getBrightness failed.")
                 }
             })
         }

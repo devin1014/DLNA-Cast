@@ -58,11 +58,11 @@ class CastControlImpl(
 
     override fun cast(device: Device<*, *, *>, cast: ICast) {
         uri = cast.uri
-        avTransportService.cast(object : CastEventListener {
+        avTransportService.cast(cast.uri, getMetadata(cast), object : CastEventListener {
             override fun onResponse(response: ActionResponse<String>) {
                 getCallback<String>(CAST)?.onResponse(response)
             }
-        }, cast.uri, getMetadata(cast))
+        })
     }
 
     override fun isCasting(device: Device<*, *, *>?): Boolean {
@@ -86,19 +86,19 @@ class CastControlImpl(
     }
 
     override fun seekTo(millSeconds: Long) {
-        avTransportService.seek(getCallback(SEEK_TO), millSeconds)
+        avTransportService.seek(millSeconds, getCallback(SEEK_TO))
     }
 
     override fun setVolume(percent: Int) {
-        renderService.setVolume(getCallback(SET_VOLUME), percent)
+        renderService.setVolume(percent, getCallback(SET_VOLUME))
     }
 
     override fun setMute(mute: Boolean) {
-        renderService.setMute(getCallback(SET_MUTE), mute)
+        renderService.setMute(mute, getCallback(SET_MUTE))
     }
 
     override fun setBrightness(percent: Int) {
-        renderService.setBrightness(getCallback(SET_BRIGHTNESS), percent)
+        renderService.setBrightness(percent, getCallback(SET_BRIGHTNESS))
     }
 
     @Suppress("UNCHECKED_CAST")
