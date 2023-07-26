@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.android.cast.dlna.demo.fragment.InfoFragment
+import com.android.cast.dlna.demo.fragment.DeviceInfoFragment
 import com.android.cast.dlna.demo.fragment.VideoViewFragment
 import com.android.cast.dlna.dmc.DLNACastManager
 import org.fourthline.cling.model.meta.Device
@@ -35,6 +35,6 @@ class DetailFragment : Fragment(), DetailContainer {
         if (device.type == DLNACastManager.DEVICE_TYPE_MEDIA_RENDERER) {
             replace(R.id.top_container, VideoViewFragment())
         }
-        replace(R.id.bottom_container, InfoFragment())
+        replace(R.id.bottom_container, DeviceInfoFragment())
     }
 }

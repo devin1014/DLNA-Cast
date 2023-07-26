@@ -1,7 +1,6 @@
 package com.android.cast.dlna.dmc.control
 
 import com.android.cast.dlna.core.Logger
-import com.android.cast.dlna.core.executeInMainThread
 import org.fourthline.cling.controlpoint.SubscriptionCallback
 import org.fourthline.cling.model.gena.CancelReason
 import org.fourthline.cling.model.gena.GENASubscription

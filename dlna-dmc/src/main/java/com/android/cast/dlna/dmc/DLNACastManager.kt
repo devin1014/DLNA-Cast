@@ -214,8 +214,16 @@ object DLNACastManager : OnDeviceRegistryListener {
             subscriptionListener?.onReceived(subscriptionId, event)
         }
 
-        override fun onTransportStateChanged(subscriptionId: String?, state: TransportState) {
-            subscriptionListener?.onTransportStateChanged(subscriptionId, state)
+        override fun onAvTransportStateChanged(subscriptionId: String?, state: TransportState) {
+            subscriptionListener?.onAvTransportStateChanged(subscriptionId, state)
+        }
+
+        override fun onRendererVolumeChanged(subscriptionId: String?, volume: Int) {
+            subscriptionListener?.onRendererVolumeChanged(subscriptionId, volume)
+        }
+
+        override fun onRendererVolumeMuteChanged(subscriptionId: String?, mute: Boolean) {
+            subscriptionListener?.onRendererVolumeMuteChanged(subscriptionId, mute)
         }
     }
 

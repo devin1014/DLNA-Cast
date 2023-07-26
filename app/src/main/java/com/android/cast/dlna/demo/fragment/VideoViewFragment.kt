@@ -28,7 +28,7 @@ import org.fourthline.cling.support.model.TransportState.NO_MEDIA_PRESENT
 import java.util.Formatter
 import java.util.Locale
 
-class VideoViewFragment : Fragment(), CastCallback {
+class VideoViewFragment : Fragment(), OnUrlSelectCallback {
 
     private val colorAccent: Int by lazy { resources.getColor(R.color.colorAccent) }
     private val device: Device<*, *, *> by lazy { (requireParentFragment() as DetailContainer).getDevice() }
@@ -48,7 +48,7 @@ class VideoViewFragment : Fragment(), CastCallback {
         super.onViewCreated(view, savedInstanceState)
         initComponent(view)
         DLNACastManager.subscriptionListener = object : SubscriptionListener {
-            override fun onTransportStateChanged(subscriptionId: String?, state: TransportState) {
+            override fun onAvTransportStateChanged(subscriptionId: String?, state: TransportState) {
                 currentState = state
                 pauseButton.setImageResource(if (state == TransportState.PLAYING) R.drawable.cast_pause else R.drawable.cast_play)
             }
@@ -64,7 +64,7 @@ class VideoViewFragment : Fragment(), CastCallback {
     }
 
     private fun initComponent(view: View) {
-        view.findViewById<View>(R.id.video_cast).setOnClickListener { CastFragment.show(childFragmentManager) }
+        view.findViewById<View>(R.id.video_cast).setOnClickListener { CastUrlDialogFragment.show(childFragmentManager) }
         view.findViewById<View>(R.id.video_cast_stop).setOnClickListener { deviceControl.stop() }
         pauseButton.setOnClickListener {
             if (currentState == TransportState.PLAYING) {
@@ -82,9 +82,9 @@ class VideoViewFragment : Fragment(), CastCallback {
         positionSeekBar.setOnSeekBarChangeListener(seekBarChangeListener)
     }
 
-    override fun onCastUrl(url: String) {
+    override fun onUrlSelected(url: String) {
         durationMillSeconds = 0L
-        deviceControl.cast(url, null, object : ServiceActionCallback<String> {
+        deviceControl.cast(url, "测试视频", object : ServiceActionCallback<String> {
             override fun onResponse(response: ActionResponse<String>) {
                 if (response.success) {
                     positionHandler.start()

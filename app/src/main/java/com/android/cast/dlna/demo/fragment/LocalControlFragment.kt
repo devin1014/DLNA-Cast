@@ -10,8 +10,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.android.cast.dlna.core.Utils
-import com.android.cast.dlna.demo.CastObject.newInstance
-import com.android.cast.dlna.demo.IDisplayDevice
 import com.android.cast.dlna.demo.R
 import com.android.cast.dlna.demo.R.layout
 import com.android.cast.dlna.dmc.DLNACastManager
@@ -19,7 +17,7 @@ import com.android.cast.dlna.dms.MediaServer
 import org.fourthline.cling.model.meta.Device
 import java.util.*
 
-class LocalControlFragment : Fragment(), IDisplayDevice {
+class LocalControlFragment : Fragment() {
 
     private val mPickupContent: TextView? by lazy { view?.findViewById(R.id.local_ctrl_pick_content_text) }
     private lateinit var mMediaServer: MediaServer
@@ -67,7 +65,7 @@ class LocalControlFragment : Fragment(), IDisplayDevice {
     }
 
     private var mDevice: Device<*, *, *>? = null
-    override fun setCastDevice(device: Device<*, *, *>?) {
+    fun setCastDevice(device: Device<*, *, *>?) {
         mDevice = device
     }
 

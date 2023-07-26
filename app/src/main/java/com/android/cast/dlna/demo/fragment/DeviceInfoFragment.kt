@@ -13,7 +13,7 @@ import org.fourthline.cling.model.meta.Action
 import org.fourthline.cling.model.meta.Device
 import org.fourthline.cling.model.meta.Service
 
-class InfoFragment : Fragment() {
+class DeviceInfoFragment : Fragment() {
 
     private val device: Device<*, *, *> by lazy { (requireParentFragment() as DetailContainer).getDevice() }
 

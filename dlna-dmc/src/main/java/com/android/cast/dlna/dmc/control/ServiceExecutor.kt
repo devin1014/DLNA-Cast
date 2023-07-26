@@ -65,12 +65,14 @@ internal abstract class BaseServiceExecutor(
         controlPoint: ControlPoint,
         service: Service<*, *>?,
     ) : BaseServiceExecutor(controlPoint, service), AvTransportServiceAction {
-        override fun cast(uri: String, metadata: String?, callback: ServiceActionCallback<String>?) {
-            super.cast(uri, metadata, callback)
+        override fun cast(uri: String, title: String, callback: ServiceActionCallback<String>?) {
+            super.cast(uri, title, callback)
             if (invalidServiceAction("SetAVTransportURI")) {
                 notifyResponse(callback, exception = "service not support this action.")
                 return
             }
+            val metadata = MetadataUtils.create(uri, title)
+            getLogger()?.i("cast: $metadata")
             executeAction(object : SetAVTransportURI(service, uri, metadata) {
                 override fun success(invocation: ActionInvocation<*>?) {
                     notifyResponse(callback, result = uri)

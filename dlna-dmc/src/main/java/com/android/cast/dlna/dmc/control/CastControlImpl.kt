@@ -28,9 +28,9 @@ class CastControlImpl(
     }
 
     // ---- AvTransport ------------------------------------------
-    override fun cast(uri: String, metadata: String?, callback: ServiceActionCallback<String>?) {
-        super.cast(uri, metadata, callback)
-        avTransportService.cast(uri, metadata, callback)
+    override fun cast(uri: String, title: String, callback: ServiceActionCallback<String>?) {
+        super.cast(uri, title, callback)
+        avTransportService.cast(uri, title, callback)
     }
 
     override fun play(callback: ServiceActionCallback<String>?) {

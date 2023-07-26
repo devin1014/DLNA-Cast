@@ -15,8 +15,8 @@ interface ServiceActionCallback<T> {
 // --------------------------------------------------------------------------------
 interface AvTransportServiceAction {
     fun getLogger(): Logger? = Logger.create("AvTransportService")
-    fun cast(uri: String, metadata: String?, callback: ServiceActionCallback<String>? = null) {
-        getLogger()?.i("cast: $uri")
+    fun cast(uri: String, title: String, callback: ServiceActionCallback<String>? = null) {
+        getLogger()?.i("cast: $title, $uri")
     }
 
     fun play(callback: ServiceActionCallback<String>? = null) {
@@ -32,7 +32,7 @@ interface AvTransportServiceAction {
     }
 
     fun seek(millSeconds: Long, callback: ServiceActionCallback<Long>? = null) {
-        getLogger()?.i("seek: ${ModelUtil.toTimeString(millSeconds/1000)}")
+        getLogger()?.i("seek: ${ModelUtil.toTimeString(millSeconds / 1000)}")
     }
 
     fun getPositionInfo(callback: ServiceActionCallback<PositionInfo>?) {}
