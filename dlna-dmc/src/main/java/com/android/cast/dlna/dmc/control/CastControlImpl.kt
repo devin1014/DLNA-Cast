@@ -20,24 +20,25 @@ class CastControlImpl(
 
     private val avTransportService: AVServiceExecutorImpl
     private val renderService: RendererServiceExecutorImpl
+    var released = false
 
     init {
         avTransportService = AVServiceExecutorImpl(controlPoint, device.findService(DLNACastManager.SERVICE_AV_TRANSPORT))
         avTransportService.subscribe(object : SubscriptionListener {
             override fun failed(subscriptionId: String?) {
-                listener.onDisconnected(device)
+                if (!released) listener.onDisconnected(device)
             }
 
             override fun established(subscriptionId: String?) {
-                listener.onConnected(device)
+                if (!released) listener.onConnected(device)
             }
 
             override fun ended(subscriptionId: String?) {
-                listener.onDisconnected(device)
+                if (!released) listener.onDisconnected(device)
             }
 
             override fun onReceived(subscriptionId: String?, event: EventedValue<*>) {
-                listener.onEventChanged(event)
+                if (!released) listener.onEventChanged(event)
             }
         }, AVTransportLastChangeParser())
         renderService = RendererServiceExecutorImpl(controlPoint, device.findService(DLNACastManager.SERVICE_RENDERING_CONTROL))

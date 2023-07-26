@@ -206,7 +206,7 @@ object DLNACastManager : OnDeviceRegistryListener {
     }
 
     fun disconnectDevice(device: Device<*, *, *>) {
-        // val control = deviceControlMap[device]
+        (deviceControlMap[device] as? CastControlImpl)?.released = true
         deviceControlMap[device] = null
     }
 }
