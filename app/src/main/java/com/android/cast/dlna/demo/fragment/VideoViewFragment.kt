@@ -15,12 +15,13 @@ import android.widget.Toast
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.fragment.app.Fragment
 import com.android.cast.dlna.demo.DetailContainer
+import com.android.cast.dlna.demo.MainActivity
 import com.android.cast.dlna.demo.R
 import com.android.cast.dlna.dmc.DLNACastManager
 import com.android.cast.dlna.dmc.control.ActionResponse
 import com.android.cast.dlna.dmc.control.DeviceControl
+import com.android.cast.dlna.dmc.control.OnDeviceControlListener
 import com.android.cast.dlna.dmc.control.ServiceActionCallback
-import com.android.cast.dlna.dmc.control.SubscriptionListener
 import org.fourthline.cling.model.meta.Device
 import org.fourthline.cling.support.model.PositionInfo
 import org.fourthline.cling.support.model.TransportState
@@ -32,7 +33,6 @@ class VideoViewFragment : Fragment(), OnUrlSelectCallback {
 
     private val colorAccent: Int by lazy { resources.getColor(R.color.colorAccent) }
     private val device: Device<*, *, *> by lazy { (requireParentFragment() as DetailContainer).getDevice() }
-    private val castControlContainer: View by lazy { requireView().findViewById(R.id.video_cast_control) }
     private val positionInfo: TextView by lazy { requireView().findViewById(R.id.video_cast_position) }
     private val positionSeekBar: SeekBar by lazy { requireView().findViewById(R.id.video_cast_seekbar) }
     private val pauseButton: ImageView by lazy { requireView().findViewById(R.id.video_cast_pause) }
@@ -47,13 +47,21 @@ class VideoViewFragment : Fragment(), OnUrlSelectCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initComponent(view)
-        DLNACastManager.subscriptionListener = object : SubscriptionListener {
-            override fun onAvTransportStateChanged(subscriptionId: String?, state: TransportState) {
+        deviceControl = DLNACastManager.connectDevice(device, object : OnDeviceControlListener {
+            override fun onConnected(device: Device<*, *, *>) {
+                Toast.makeText(requireContext(), "成功连接: ${device.details.friendlyName}", Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onDisconnected(device: Device<*, *, *>) {
+                (requireActivity() as MainActivity).onBackPressed()
+                Toast.makeText(requireContext(), "无法连接: ${device.details.friendlyName}", Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onAvTransportStateChanged(state: TransportState) {
                 currentState = state
                 pauseButton.setImageResource(if (state == TransportState.PLAYING) R.drawable.cast_pause else R.drawable.cast_play)
             }
-        }
-        deviceControl = DLNACastManager.connectDevice(device)
+        })
         deviceControl.isMute(object : ServiceActionCallback<Boolean> {
             override fun onResponse(response: ActionResponse<Boolean>) {
                 val mute = response.data == true

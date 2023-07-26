@@ -6,6 +6,8 @@
 
 [![Download](https://jitpack.io/v/devin1014/DLNA-Cast.svg)](https://jitpack.io/#devin1014/DLNA-Cast)
 
+整理重构中....
+
 有时间会更新这个库，好多人在问Dmr的问题，我这个只是最简单的一个VideoView示例，具体还是需要自己集成播放器，实现各种格式的流。
 另外我也在做DLNA的Flutter库，差不多了也会开源出来。
 

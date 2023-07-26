@@ -15,7 +15,7 @@ import com.android.cast.dlna.core.Logger
 import com.android.cast.dlna.dmc.control.CastControlImpl
 import com.android.cast.dlna.dmc.control.DeviceControl
 import com.android.cast.dlna.dmc.control.EmptyDeviceControl
-import com.android.cast.dlna.dmc.control.SubscriptionListener
+import com.android.cast.dlna.dmc.control.OnDeviceControlListener
 import org.fourthline.cling.android.AndroidUpnpService
 import org.fourthline.cling.model.message.header.STAllHeader
 import org.fourthline.cling.model.message.header.UDADeviceTypeHeader
@@ -25,8 +25,6 @@ import org.fourthline.cling.model.types.DeviceType
 import org.fourthline.cling.model.types.ServiceType
 import org.fourthline.cling.model.types.UDADeviceType
 import org.fourthline.cling.model.types.UDAServiceType
-import org.fourthline.cling.support.lastchange.EventedValue
-import org.fourthline.cling.support.model.TransportState
 
 /**
  *
@@ -195,44 +193,12 @@ object DLNACastManager : OnDeviceRegistryListener {
         }
     }
 
-    var subscriptionListener: SubscriptionListener? = null
-
-    private val subscriptionListenerWrapper = object : SubscriptionListener {
-        override fun established(subscriptionId: String?) {
-            subscriptionListener?.established(subscriptionId)
-        }
-
-        override fun ended(subscriptionId: String?) {
-            subscriptionListener?.ended(subscriptionId)
-        }
-
-        override fun failed(subscriptionId: String?) {
-            subscriptionListener?.failed(subscriptionId)
-        }
-
-        override fun onReceived(subscriptionId: String?, event: EventedValue<*>) {
-            subscriptionListener?.onReceived(subscriptionId, event)
-        }
-
-        override fun onAvTransportStateChanged(subscriptionId: String?, state: TransportState) {
-            subscriptionListener?.onAvTransportStateChanged(subscriptionId, state)
-        }
-
-        override fun onRendererVolumeChanged(subscriptionId: String?, volume: Int) {
-            subscriptionListener?.onRendererVolumeChanged(subscriptionId, volume)
-        }
-
-        override fun onRendererVolumeMuteChanged(subscriptionId: String?, mute: Boolean) {
-            subscriptionListener?.onRendererVolumeMuteChanged(subscriptionId, mute)
-        }
-    }
-
     private val deviceControlMap = mutableMapOf<Device<*, *, *>, DeviceControl?>()
-    fun connectDevice(device: Device<*, *, *>): DeviceControl {
+    fun connectDevice(device: Device<*, *, *>, listener: OnDeviceControlListener): DeviceControl {
         val service = upnpService?.get() ?: return EmptyDeviceControl
         var control = deviceControlMap[device]
         if (control == null) {
-            val newController = CastControlImpl(service.controlPoint, device, subscriptionListenerWrapper)
+            val newController = CastControlImpl(service.controlPoint, device, listener)
             deviceControlMap[device] = newController
             control = newController
         }

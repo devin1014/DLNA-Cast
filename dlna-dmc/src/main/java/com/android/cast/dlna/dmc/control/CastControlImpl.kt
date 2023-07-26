@@ -6,6 +6,7 @@ import com.android.cast.dlna.dmc.control.BaseServiceExecutor.RendererServiceExec
 import org.fourthline.cling.controlpoint.ControlPoint
 import org.fourthline.cling.model.meta.Device
 import org.fourthline.cling.support.avtransport.lastchange.AVTransportLastChangeParser
+import org.fourthline.cling.support.lastchange.EventedValue
 import org.fourthline.cling.support.model.MediaInfo
 import org.fourthline.cling.support.model.PositionInfo
 import org.fourthline.cling.support.model.TransportInfo
@@ -14,7 +15,7 @@ import org.fourthline.cling.support.renderingcontrol.lastchange.RenderingControl
 class CastControlImpl(
     controlPoint: ControlPoint,
     device: Device<*, *, *>,
-    subscriptionListener: SubscriptionListener,
+    listener: OnDeviceControlListener,
 ) : DeviceControl {
 
     private val avTransportService: AVServiceExecutorImpl
@@ -22,9 +23,25 @@ class CastControlImpl(
 
     init {
         avTransportService = AVServiceExecutorImpl(controlPoint, device.findService(DLNACastManager.SERVICE_AV_TRANSPORT))
-        avTransportService.subscribe(subscriptionListener, AVTransportLastChangeParser())
+        avTransportService.subscribe(object : SubscriptionListener {
+            override fun failed(subscriptionId: String?) {
+                listener.onDisconnected(device)
+            }
+
+            override fun established(subscriptionId: String?) {
+                listener.onConnected(device)
+            }
+
+            override fun ended(subscriptionId: String?) {
+                listener.onDisconnected(device)
+            }
+
+            override fun onReceived(subscriptionId: String?, event: EventedValue<*>) {
+                listener.onEventChanged(event)
+            }
+        }, AVTransportLastChangeParser())
         renderService = RendererServiceExecutorImpl(controlPoint, device.findService(DLNACastManager.SERVICE_RENDERING_CONTROL))
-        renderService.subscribe(subscriptionListener, RenderingControlLastChangeParser())
+        renderService.subscribe(object : SubscriptionListener {}, RenderingControlLastChangeParser())
     }
 
     // ---- AvTransport ------------------------------------------
