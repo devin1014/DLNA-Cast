@@ -7,10 +7,12 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import androidx.appcompat.app.AppCompatActivity
+import com.android.cast.dlna.core.Logger
 import com.android.cast.dlna.dmr.service.keyExtraCastAction
 
 abstract class BaseRendererActivity : AppCompatActivity() {
 
+    protected val logger = Logger.create(this.javaClass.simpleName)
     protected var rendererService: DLNARendererService? = null
         private set
 
@@ -25,24 +27,28 @@ abstract class BaseRendererActivity : AppCompatActivity() {
         }
     }
 
-    open fun onServiceConnected() {
-    }
+    open fun onServiceConnected() {}
 
-    protected var castAction: CastAction? = null
+    protected val castAction: CastAction?
+        get() = intent.getParcelableExtra(keyExtraCastAction)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        logger.i("onCreate")
         super.onCreate(savedInstanceState)
-        castAction = intent.getParcelableExtra(keyExtraCastAction)
         bindService(Intent(this, DLNARendererService::class.java), serviceConnection, Context.BIND_AUTO_CREATE)
     }
 
     override fun onNewIntent(newIntent: Intent) {
-        super.onNewIntent(intent)
+        logger.i("onNewIntent: $intent")
+        super.onNewIntent(newIntent)
         intent = newIntent
-        castAction = newIntent.getParcelableExtra(keyExtraCastAction)
+        if (!castAction?.stop.isNullOrBlank()) {
+            finish()
+        }
     }
 
     override fun onDestroy() {
+        logger.w("onDestroy")
         unbindService(serviceConnection)
         rendererService?.bindRealPlayer(null)
         super.onDestroy()

@@ -35,8 +35,7 @@
             android:padding="4dp"
             android:src="@drawable/cast"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@android:color/white" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/local_server"
@@ -48,8 +47,7 @@
             android:padding="4dp"
             android:src="@drawable/local_http"
             app:layout_constraintEnd_toStartOf="@id/video_cast"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@android:color/white" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/video_cast_stop"
@@ -60,8 +58,7 @@
             android:padding="4dp"
             android:src="@drawable/cast_stop"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@android:color/white" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/video_cast_previous"
@@ -74,8 +71,7 @@
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@id/video_cast_pause"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@android:color/white" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/video_cast_pause"
@@ -87,8 +83,7 @@
             app:layout_constraintBottom_toBottomOf="@id/video_cast_previous"
             app:layout_constraintLeft_toRightOf="@id/video_cast_previous"
             app:layout_constraintRight_toLeftOf="@id/video_cast_next"
-            app:layout_constraintTop_toTopOf="@id/video_cast_previous"
-            app:tint="@android:color/white" />
+            app:layout_constraintTop_toTopOf="@id/video_cast_previous" />
 
         <ImageView
             android:id="@+id/video_cast_next"
@@ -100,8 +95,7 @@
             app:layout_constraintBottom_toBottomOf="@id/video_cast_pause"
             app:layout_constraintLeft_toRightOf="@id/video_cast_pause"
             app:layout_constraintRight_toLeftOf="@id/video_cast_mute"
-            app:layout_constraintTop_toTopOf="@id/video_cast_pause"
-            app:tint="@android:color/white" />
+            app:layout_constraintTop_toTopOf="@id/video_cast_pause" />
 
         <ImageView
             android:id="@+id/video_cast_mute"
@@ -113,9 +107,22 @@
             android:src="@drawable/cast_mute"
             app:layout_constraintBottom_toBottomOf="@id/video_cast_next"
             app:layout_constraintLeft_toRightOf="@id/video_cast_next"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/video_cast_add"
             app:layout_constraintTop_toTopOf="@id/video_cast_next"
             app:tint="@color/colorAccent" />
+
+        <ImageView
+            android:id="@+id/video_cast_add"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?android:selectableItemBackground"
+            android:contentDescription="@null"
+            android:padding="4dp"
+            android:src="@drawable/cast_add"
+            app:layout_constraintBottom_toBottomOf="@id/video_cast_next"
+            app:layout_constraintLeft_toRightOf="@id/video_cast_mute"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@id/video_cast_next" />
 
         <TextView
             android:id="@+id/video_cast_position"

@@ -29,7 +29,7 @@ import org.fourthline.cling.support.model.TransportState.NO_MEDIA_PRESENT
 import java.util.Formatter
 import java.util.Locale
 
-class VideoViewFragment : Fragment(), OnUrlSelectCallback {
+class VideoViewFragment : Fragment(), OnUrlSelectListener {
 
     private val colorAccent: Int by lazy { resources.getColor(R.color.colorAccent) }
     private val device: Device<*, *, *> by lazy { (requireParentFragment() as DetailContainer).getDevice() }
@@ -75,6 +75,13 @@ class VideoViewFragment : Fragment(), OnUrlSelectCallback {
     private fun initComponent(view: View) {
         view.findViewById<View>(R.id.video_cast).setOnClickListener { CastUrlDialogFragment.show(childFragmentManager) }
         view.findViewById<View>(R.id.video_cast_stop).setOnClickListener { deviceControl.stop() }
+        view.findViewById<View>(R.id.video_cast_add).setOnClickListener {
+            CastUrlDialogFragment.show(childFragmentManager, object : OnUrlSelectListener {
+                override fun onUrlSelected(video: VideoUrl) {
+                    //TODO
+                }
+            })
+        }
         pauseButton.setOnClickListener {
             if (currentState == TransportState.PLAYING) {
                 deviceControl.pause()

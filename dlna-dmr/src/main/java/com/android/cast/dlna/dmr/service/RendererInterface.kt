@@ -52,9 +52,8 @@ interface AvTransportControl : RendererControl {
     }
 
     private fun startCastActivity(content: CastAction.() -> Unit) {
-        val castAction = CastAction()
-        applicationContext.startActivity(Intent().apply {
-            action = actionSetAvTransport
+        applicationContext.startActivity(Intent(actionSetAvTransport).apply {
+            val castAction = CastAction()
             content(castAction)
             this.putExtra(keyExtraCastAction, castAction)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) // start from service content,should add 'FLAG_ACTIVITY_NEW_TASK' flag.
@@ -87,6 +86,9 @@ interface AvTransportControl : RendererControl {
 
     fun stop() {
         logger.i("stop")
+        startCastActivity {
+            this.stop = "stop"
+        }
     }
 
     val currentTransportActions: Array<TransportAction>

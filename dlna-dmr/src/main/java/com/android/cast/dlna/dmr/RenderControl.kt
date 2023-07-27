@@ -37,6 +37,7 @@ class CastAction(
     var currentURIMetaData: String? = null,
     var nextURI: String? = null,
     var nextURIMetaData: String? = null,
+    var stop: String? = null,
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString(),

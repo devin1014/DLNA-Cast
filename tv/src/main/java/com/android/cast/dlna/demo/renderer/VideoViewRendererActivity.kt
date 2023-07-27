@@ -59,7 +59,7 @@ class VideoViewRendererActivity : BaseRendererActivity() {
     }
 
     override fun onNewIntent(newIntent: Intent) {
-        super.onNewIntent(intent)
+        super.onNewIntent(newIntent)
         openMedia()
     }
 

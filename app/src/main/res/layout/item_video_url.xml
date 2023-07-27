@@ -11,27 +11,35 @@
         android:id="@+id/video_url"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="bottom"
         android:maxLines="2"
         android:paddingLeft="6dp"
-        android:paddingTop="4dp"
+        android:paddingTop="6dp"
         android:paddingRight="6dp"
-        android:paddingBottom="4dp"
         android:textColor="#0e0e0e"
         android:textSize="12dp"
-        tools:ignore="SpUsage" />
+        android:textStyle="italic"
+        tools:ignore="SpUsage"
+        tools:text="http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4" />
 
     <TextView
         android:id="@+id/video_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="top"
         android:maxLines="1"
         android:paddingLeft="6dp"
-        android:paddingTop="4dp"
         android:paddingRight="6dp"
-        android:paddingBottom="4dp"
+        android:paddingBottom="6dp"
         android:textColor="#000000"
         android:textSize="12dp"
-        android:textStyle="normal"
-        tools:ignore="SpUsage" />
+        android:textStyle="bold"
+        tools:ignore="SpUsage"
+        tools:text="1分钟的视频, mp4格式" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="#888888" />
 
 </LinearLayout>

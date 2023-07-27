@@ -14,23 +14,24 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.android.cast.dlna.demo.R
-import com.android.cast.dlna.demo.R.layout
 import com.android.cast.dlna.demo.VideoUrl
 import com.android.cast.dlna.demo.videoUrlList
 
-interface OnUrlSelectCallback {
+interface OnUrlSelectListener {
     fun onUrlSelected(video: VideoUrl)
 }
 
 class CastUrlDialogFragment : DialogFragment() {
 
     companion object {
-        fun show(fragmentManager: FragmentManager) {
-            CastUrlDialogFragment().show(fragmentManager, "CastFragment")
+        fun show(fragmentManager: FragmentManager, listener: OnUrlSelectListener? = null) {
+            CastUrlDialogFragment().apply {
+                this.onUrlSelectListener = listener
+            }.show(fragmentManager, "CastFragment")
         }
     }
 
-    private val callback: OnUrlSelectCallback? by lazy { parentFragment as? OnUrlSelectCallback ?: activity as? OnUrlSelectCallback }
+    var onUrlSelectListener: OnUrlSelectListener? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         setStyle(STYLE_NO_TITLE, theme)
@@ -38,7 +39,7 @@ class CastUrlDialogFragment : DialogFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(layout.fragment_cast, container, false)
+        return inflater.inflate(R.layout.fragment_cast, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -76,7 +77,9 @@ class CastUrlDialogFragment : DialogFragment() {
         }
 
         override fun onClick(v: View) {
-            callback?.onUrlSelected(v.tag as VideoUrl)
+            (onUrlSelectListener
+                ?: parentFragment as? OnUrlSelectListener
+                ?: activity as? OnUrlSelectListener)?.onUrlSelected(v.tag as VideoUrl)
             dismiss()
         }
     }
