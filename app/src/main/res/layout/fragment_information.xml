@@ -36,19 +36,12 @@
 
     </LinearLayout>
 
-    <androidx.core.widget.NestedScrollView
+    <TextView
+        android:id="@+id/info_device_status"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true">
-
-        <TextView
-            android:id="@+id/info_device_status"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="4dp"
-            android:textColor="#000000"
-            android:textSize="14dp" />
-
-    </androidx.core.widget.NestedScrollView>
+        android:padding="4dp"
+        android:textColor="#000000"
+        android:textSize="14dp" />
 
 </LinearLayout>

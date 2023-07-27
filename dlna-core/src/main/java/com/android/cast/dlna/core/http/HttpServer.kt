@@ -1,4 +1,4 @@
-package com.android.cast.dlna.dms
+package com.android.cast.dlna.core.http
 
 import android.text.TextUtils
 import com.android.cast.dlna.core.Logger
@@ -17,7 +17,7 @@ import java.io.IOException
 // ------------------------------------------------
 // ---- Jetty Http
 // ------------------------------------------------
-internal class JettyHttpServer(port: Int) : IResourceServer {
+internal class JettyHttpServer(port: Int) : HttpServer {
     private val logger = Logger.create("JettyHttpServer")
     private val server: Server = Server(port) // Has its own QueuedThreadPool
 
@@ -64,12 +64,13 @@ internal class JettyHttpServer(port: Int) : IResourceServer {
         }
     }
 
+    override fun isRunning(): Boolean = server.isRunning
 }
 
 // ------------------------------------------------
 // ---- Nano Http
 // ------------------------------------------------
-internal class NanoHttpServer(port: Int) : NanoHTTPD(port), IResourceServer {
+internal class NanoHttpServer(port: Int) : NanoHTTPD(port), HttpServer {
 
     private val mimeType = mutableMapOf(
         "jpg" to "image/*",
@@ -108,7 +109,7 @@ internal class NanoHttpServer(port: Int) : NanoHTTPD(port), IResourceServer {
 
     override fun startServer() {
         try {
-            start()
+            if (!wasStarted()) start()
         } catch (e: IOException) {
             e.printStackTrace()
         }
@@ -117,4 +118,6 @@ internal class NanoHttpServer(port: Int) : NanoHTTPD(port), IResourceServer {
     override fun stopServer() {
         stop()
     }
+
+    override fun isRunning(): Boolean = wasStarted()
 }

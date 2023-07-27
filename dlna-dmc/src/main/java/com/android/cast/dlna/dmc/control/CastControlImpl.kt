@@ -2,11 +2,13 @@ package com.android.cast.dlna.dmc.control
 
 import com.android.cast.dlna.dmc.DLNACastManager
 import com.android.cast.dlna.dmc.control.BaseServiceExecutor.AVServiceExecutorImpl
+import com.android.cast.dlna.dmc.control.BaseServiceExecutor.ContentServiceExecutorImpl
 import com.android.cast.dlna.dmc.control.BaseServiceExecutor.RendererServiceExecutorImpl
 import org.fourthline.cling.controlpoint.ControlPoint
 import org.fourthline.cling.model.meta.Device
 import org.fourthline.cling.support.avtransport.lastchange.AVTransportLastChangeParser
 import org.fourthline.cling.support.lastchange.EventedValue
+import org.fourthline.cling.support.model.DIDLContent
 import org.fourthline.cling.support.model.MediaInfo
 import org.fourthline.cling.support.model.PositionInfo
 import org.fourthline.cling.support.model.TransportInfo
@@ -20,10 +22,11 @@ class CastControlImpl(
 
     private val avTransportService: AVServiceExecutorImpl
     private val renderService: RendererServiceExecutorImpl
+    private val contentService: ContentServiceExecutorImpl
     var released = false
 
     init {
-        avTransportService = AVServiceExecutorImpl(controlPoint, device.findService(DLNACastManager.SERVICE_AV_TRANSPORT))
+        avTransportService = AVServiceExecutorImpl(controlPoint, device.findService(DLNACastManager.SERVICE_TYPE_AV_TRANSPORT))
         avTransportService.subscribe(object : SubscriptionListener {
             override fun failed(subscriptionId: String?) {
                 if (!released) listener.onDisconnected(device)
@@ -41,11 +44,16 @@ class CastControlImpl(
                 if (!released) listener.onEventChanged(event)
             }
         }, AVTransportLastChangeParser())
-        renderService = RendererServiceExecutorImpl(controlPoint, device.findService(DLNACastManager.SERVICE_RENDERING_CONTROL))
+        renderService = RendererServiceExecutorImpl(controlPoint, device.findService(DLNACastManager.SERVICE_TYPE_RENDERING_CONTROL))
         renderService.subscribe(object : SubscriptionListener {}, RenderingControlLastChangeParser())
+        contentService = ContentServiceExecutorImpl(controlPoint, device.findService(DLNACastManager.SERVICE_TYPE_CONTENT_DIRECTORY))
+        //TODO: check the parser
+        contentService.subscribe(object : SubscriptionListener {}, AVTransportLastChangeParser())
     }
 
-    // ---- AvTransport ------------------------------------------
+    // --------------------------------------------------------
+    // ---- AvTransport ---------------------------------------
+    // --------------------------------------------------------
     override fun cast(uri: String, title: String, callback: ServiceActionCallback<String>?) {
         super.cast(uri, title, callback)
         avTransportService.cast(uri, title, callback)
@@ -86,7 +94,9 @@ class CastControlImpl(
         avTransportService.getTransportInfo(callback)
     }
 
+    // --------------------------------------------------------
     // ---- Renderer ------------------------------------------
+    // --------------------------------------------------------
     override fun setVolume(volume: Int, callback: ServiceActionCallback<Int>?) {
         super.setVolume(volume, callback)
         renderService.setVolume(volume, callback)
@@ -105,5 +115,18 @@ class CastControlImpl(
     override fun isMute(callback: ServiceActionCallback<Boolean>?) {
         super.isMute(callback)
         renderService.isMute(callback)
+    }
+
+    // --------------------------------------------------------
+    // ---- Content ------------------------------------------
+    // --------------------------------------------------------
+    override fun browse(containerId: String, callback: ServiceActionCallback<DIDLContent>?) {
+        super.browse(containerId, callback)
+        contentService.browse(containerId, callback)
+    }
+
+    override fun search(containerId: String, callback: ServiceActionCallback<DIDLContent>?) {
+        super.search(containerId, callback)
+        contentService.search(containerId, callback)
     }
 }

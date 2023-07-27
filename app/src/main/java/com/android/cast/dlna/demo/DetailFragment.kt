@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.android.cast.dlna.demo.fragment.DeviceInfoFragment
+import com.android.cast.dlna.demo.fragment.ContentFragment
 import com.android.cast.dlna.demo.fragment.VideoViewFragment
 import com.android.cast.dlna.dmc.DLNACastManager
 import org.fourthline.cling.model.meta.Device
@@ -22,7 +22,6 @@ class DetailFragment : Fragment(), DetailContainer {
     }
 
     private lateinit var device: Device<*, *, *>
-
     override fun getDevice(): Device<*, *, *> = device
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -34,7 +33,8 @@ class DetailFragment : Fragment(), DetailContainer {
 
         if (device.type == DLNACastManager.DEVICE_TYPE_MEDIA_RENDERER) {
             replace(R.id.top_container, VideoViewFragment())
+        } else if (device.type == DLNACastManager.DEVICE_TYPE_MEDIA_SERVER) {
+            replace(R.id.top_container, ContentFragment())
         }
-        replace(R.id.bottom_container, DeviceInfoFragment())
     }
 }

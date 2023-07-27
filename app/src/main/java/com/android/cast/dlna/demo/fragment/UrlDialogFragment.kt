@@ -4,18 +4,22 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.OnClickListener
 import android.view.ViewGroup
-import android.widget.RadioGroup
+import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
-import com.android.cast.dlna.demo.CAST_VIDEO_M3U8
-import com.android.cast.dlna.demo.CAST_VIDEO_MP4
-import com.android.cast.dlna.demo.CAST_VIDEO_MP4_2
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.Adapter
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.android.cast.dlna.demo.R
 import com.android.cast.dlna.demo.R.layout
+import com.android.cast.dlna.demo.VideoUrl
+import com.android.cast.dlna.demo.videoUrlList
 
 interface OnUrlSelectCallback {
-    fun onUrlSelected(url: String)
+    fun onUrlSelected(video: VideoUrl)
 }
 
 class CastUrlDialogFragment : DialogFragment() {
@@ -25,6 +29,8 @@ class CastUrlDialogFragment : DialogFragment() {
             CastUrlDialogFragment().show(fragmentManager, "CastFragment")
         }
     }
+
+    private val callback: OnUrlSelectCallback? by lazy { parentFragment as? OnUrlSelectCallback ?: activity as? OnUrlSelectCallback }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         setStyle(STYLE_NO_TITLE, theme)
@@ -37,16 +43,42 @@ class CastUrlDialogFragment : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val callback = parentFragment as? OnUrlSelectCallback ?: activity as? OnUrlSelectCallback
-        view.findViewById<View>(R.id.cast_url_ok).setOnClickListener {
-            val group = view.findViewById<RadioGroup>(R.id.cast_url_group)
-            when (group.checkedRadioButtonId) {
-                R.id.cast_video_m3u8 -> callback?.onUrlSelected(CAST_VIDEO_M3U8)
-                R.id.cast_video_mp4 -> callback?.onUrlSelected(CAST_VIDEO_MP4)
-                R.id.cast_image_jpg -> callback?.onUrlSelected(CAST_VIDEO_MP4_2)
-                else -> {}
-            }
+        view.findViewById<RecyclerView>(R.id.recycler_view).apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = ListAdapter()
+        }
+    }
+
+    private inner class ListAdapter : Adapter<ListViewHolder>() {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
+            return ListViewHolder(LayoutInflater.from(requireContext()).inflate(R.layout.item_video_url, parent, false))
+        }
+
+        override fun onBindViewHolder(holder: ListViewHolder, position: Int) {
+            holder.setData(videoUrlList[position])
+        }
+
+        override fun getItemCount(): Int = videoUrlList.size
+    }
+
+    private inner class ListViewHolder(itemView: View) : ViewHolder(itemView), OnClickListener {
+        private val url: TextView = itemView.findViewById(R.id.video_url)
+        private val title: TextView = itemView.findViewById(R.id.video_title)
+
+        init {
+            itemView.setOnClickListener(this)
+        }
+
+        fun setData(data: VideoUrl) {
+            itemView.tag = data
+            url.text = data.url
+            title.text = data.title
+        }
+
+        override fun onClick(v: View) {
+            callback?.onUrlSelected(v.tag as VideoUrl)
             dismiss()
         }
     }
 }
+

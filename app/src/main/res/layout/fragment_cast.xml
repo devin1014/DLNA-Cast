@@ -14,57 +14,12 @@
         android:gravity="center"
         android:minWidth="320dp"
         android:orientation="vertical"
-        android:padding="12dp"
         tools:ignore="UselessParent">
 
-        <RadioGroup
-            android:id="@+id/cast_url_group"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:orientation="vertical">
-
-            <RadioButton
-                android:id="@+id/cast_video_mp4"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:checked="true"
-                android:padding="2dp"
-                android:text="Video: mp4"
-                tools:ignore="HardcodedText" />
-
-            <RadioButton
-                android:id="@+id/cast_video_m3u8"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:padding="2dp"
-                android:text="Video: m3u8"
-                tools:ignore="HardcodedText" />
-
-            <RadioButton
-                android:id="@+id/cast_image_jpg"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:padding="2dp"
-                android:text="Video: mp4 (10min)"
-                tools:ignore="HardcodedText" />
-
-        </RadioGroup>
-
-        <Button
-            android:id="@+id/cast_url_ok"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:layout_marginEnd="12dp"
-            android:layout_marginRight="12dp"
-            android:paddingLeft="12dp"
-            android:paddingRight="12dp"
-            android:text="@string/OK"
-            tools:ignore="RtlHardcoded" />
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 

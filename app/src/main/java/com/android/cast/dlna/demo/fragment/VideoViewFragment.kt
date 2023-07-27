@@ -12,11 +12,11 @@ import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.widget.AppCompatImageView
 import androidx.fragment.app.Fragment
 import com.android.cast.dlna.demo.DetailContainer
 import com.android.cast.dlna.demo.MainActivity
 import com.android.cast.dlna.demo.R
+import com.android.cast.dlna.demo.VideoUrl
 import com.android.cast.dlna.dmc.DLNACastManager
 import com.android.cast.dlna.dmc.control.ActionResponse
 import com.android.cast.dlna.dmc.control.DeviceControl
@@ -36,7 +36,8 @@ class VideoViewFragment : Fragment(), OnUrlSelectCallback {
     private val positionInfo: TextView by lazy { requireView().findViewById(R.id.video_cast_position) }
     private val positionSeekBar: SeekBar by lazy { requireView().findViewById(R.id.video_cast_seekbar) }
     private val pauseButton: ImageView by lazy { requireView().findViewById(R.id.video_cast_pause) }
-    private val volumeMuteButton: AppCompatImageView by lazy { requireView().findViewById(R.id.video_cast_mute) }
+    private val volumeMuteButton: ImageView by lazy { requireView().findViewById(R.id.video_cast_mute) }
+    private val localServerButton: ImageView by lazy { requireView().findViewById(R.id.local_server) }
     private lateinit var deviceControl: DeviceControl
     private var currentState: TransportState = NO_MEDIA_PRESENT
 
@@ -88,11 +89,19 @@ class VideoViewFragment : Fragment(), OnUrlSelectCallback {
             volumeMuteButton.setColorFilter(if (mute) colorAccent else 0xFFFFFF)
         }
         positionSeekBar.setOnSeekBarChangeListener(seekBarChangeListener)
+        //TODO: need local server?
+        localServerButton.setOnClickListener {
+            val selected = !it.isSelected
+            it.isSelected = selected
+            localServerButton.setColorFilter(if (selected) colorAccent else 0xFFFFFF)
+            if (selected) DLNACastManager.startLocalHttpServer()
+            else DLNACastManager.stopLocalHttpServer()
+        }
     }
 
-    override fun onUrlSelected(url: String) {
+    override fun onUrlSelected(video: VideoUrl) {
         durationMillSeconds = 0L
-        deviceControl.cast(url, "测试视频", object : ServiceActionCallback<String> {
+        deviceControl.cast(video.url, video.title, object : ServiceActionCallback<String> {
             override fun onResponse(response: ActionResponse<String>) {
                 if (response.success) {
                     positionHandler.start()
@@ -145,6 +154,7 @@ class VideoViewFragment : Fragment(), OnUrlSelectCallback {
     }
 
     override fun onDestroyView() {
+        DLNACastManager.stopLocalHttpServer()
         DLNACastManager.disconnectDevice(device)
         positionHandler.stop()
         super.onDestroyView()

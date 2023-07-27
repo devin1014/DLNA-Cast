@@ -35,8 +35,4 @@ dependencies {
 
     //noinspection GradleDependency
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-
-    api 'org.eclipse.jetty:jetty-server:8.1.21.v20160908'
-    api 'org.eclipse.jetty:jetty-servlet:8.1.21.v20160908'
-    api 'org.eclipse.jetty:jetty-client:8.1.21.v20160908'
 }

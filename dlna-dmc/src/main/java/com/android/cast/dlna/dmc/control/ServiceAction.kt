@@ -2,6 +2,7 @@ package com.android.cast.dlna.dmc.control
 
 import com.android.cast.dlna.core.Logger
 import org.fourthline.cling.model.ModelUtil
+import org.fourthline.cling.support.model.DIDLContent
 import org.fourthline.cling.support.model.MediaInfo
 import org.fourthline.cling.support.model.PositionInfo
 import org.fourthline.cling.support.model.TransportInfo
@@ -55,4 +56,13 @@ interface RendererServiceAction {
     }
 
     fun isMute(callback: ServiceActionCallback<Boolean>?) {}
+}
+
+// --------------------------------------------------------------------------------
+// ---- ContentService
+// --------------------------------------------------------------------------------
+interface ContentServiceAction {
+    fun getLogger(): Logger? = Logger.create("ContentService")
+    fun browse(containerId: String, callback: ServiceActionCallback<DIDLContent>?) {}
+    fun search(containerId: String, callback: ServiceActionCallback<DIDLContent>?) {}
 }

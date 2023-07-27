@@ -53,7 +53,7 @@ open class DLNARendererService : AndroidUpnpServiceImpl() {
         fun startService(context: Context) = context.applicationContext.startService(Intent(context, DLNARendererService::class.java))
     }
 
-    private val logger = getLogger("DLNARendererService")
+    private val logger = getLogger("RendererService")
     private val serviceBinder = RendererServiceBinderWrapper()
     private lateinit var avTransportControl: AvTransportControl
     private lateinit var audioControl: AudioControl

@@ -32,9 +32,4 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
     api(project(':dlna-core'))
-
-    api 'org.eclipse.jetty:jetty-server:8.1.21.v20160908'
-    api 'org.eclipse.jetty:jetty-servlet:8.1.21.v20160908'
-    api 'org.eclipse.jetty:jetty-client:8.1.21.v20160908'
-    api 'org.nanohttpd:nanohttpd:2.3.1'
 }

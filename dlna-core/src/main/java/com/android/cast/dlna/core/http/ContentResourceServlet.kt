@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.cast.dlna.dms
+package com.android.cast.dlna.core.http
 
 import org.eclipse.jetty.servlet.DefaultServlet
 import org.eclipse.jetty.util.resource.FileResource

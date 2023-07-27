@@ -12,15 +12,13 @@ import androidx.fragment.app.Fragment
 import com.android.cast.dlna.core.Utils
 import com.android.cast.dlna.demo.R
 import com.android.cast.dlna.demo.R.layout
-import com.android.cast.dlna.dmc.DLNACastManager
-import com.android.cast.dlna.dms.MediaServer
 import org.fourthline.cling.model.meta.Device
 import java.util.*
 
 class LocalControlFragment : Fragment() {
 
     private val mPickupContent: TextView? by lazy { view?.findViewById(R.id.local_ctrl_pick_content_text) }
-    private lateinit var mMediaServer: MediaServer
+//    private lateinit var mMediaServer: ContentService
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(layout.fragment_local_control, container, false)
@@ -28,8 +26,8 @@ class LocalControlFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mMediaServer = MediaServer(requireContext()).apply { start() }
-        DLNACastManager.addMediaServer(mMediaServer.device)
+        //mMediaServer = ContentService(requireContext()).apply { start() }
+//        DLNACastManager.addMediaServer(mMediaServer.device)
         initComponent(view)
     }
 
@@ -39,7 +37,7 @@ class LocalControlFragment : Fragment() {
         mCastPathUrl = selectPath
         view.findViewById<View>(R.id.local_ctrl_pick_content).setOnClickListener {
             val intent = Intent(Intent.ACTION_GET_CONTENT)
-            intent.type = "video/*;audio/*;image/*"
+            intent.type = "video/*"
             startActivityForResult(intent, REQUEST_CODE_SELECT)
         }
         view.findViewById<View>(R.id.local_ctrl_cast).setOnClickListener {
@@ -56,7 +54,7 @@ class LocalControlFragment : Fragment() {
         if (requestCode == REQUEST_CODE_SELECT && resultCode == Activity.RESULT_OK && data != null) {
             val uri = data.data
             val path = Utils.parseUri2Path(requireContext(), uri)
-            mCastPathUrl = mMediaServer.baseUrl + path
+            //mCastPathUrl = mMediaServer.baseUrl + path
             mPickupContent!!.text = mCastPathUrl
             PreferenceManager.getDefaultSharedPreferences(activity)
                 .edit().putString("selectPath", mCastPathUrl)
@@ -64,14 +62,15 @@ class LocalControlFragment : Fragment() {
         }
     }
 
+
     private var mDevice: Device<*, *, *>? = null
     fun setCastDevice(device: Device<*, *, *>?) {
         mDevice = device
     }
 
     override fun onDestroyView() {
-        DLNACastManager.removeMediaServer(mMediaServer.device)
-        mMediaServer.stop()
+//        DLNACastManager.removeMediaServer(mMediaServer.device)
+        //mMediaServer.stop()
         super.onDestroyView()
     }
 

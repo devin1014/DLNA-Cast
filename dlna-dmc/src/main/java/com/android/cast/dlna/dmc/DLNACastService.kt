@@ -9,7 +9,8 @@ import org.fourthline.cling.android.FixedAndroidLogHandler
 import org.fourthline.cling.model.types.ServiceType
 import org.seamless.util.logging.LoggingUtil
 
-class DLNACastService : AndroidUpnpServiceImpl() { private val logger = Logger.create("CastService")
+class DLNACastService : AndroidUpnpServiceImpl() {
+    private val logger = Logger.create("CastService")
     override fun onCreate() {
         logger.i(String.format("[%s] onCreate", javaClass.simpleName))
         LoggingUtil.resetRootHandler(FixedAndroidLogHandler())
@@ -27,7 +28,7 @@ class DLNACastService : AndroidUpnpServiceImpl() { private val logger = Logger.c
     }
 
     override fun createConfiguration(): UpnpServiceConfiguration = object : AndroidUpnpServiceConfiguration() {
-//        arrayOf(
+        //        arrayOf(
 //        DLNACastManager.SERVICE_RENDERING_CONTROL,
 //        DLNACastManager.SERVICE_AV_TRANSPORT,
 //        DLNACastManager.SERVICE_CONNECTION_MANAGER,

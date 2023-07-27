@@ -12,6 +12,7 @@ import android.os.IBinder
 import android.os.Looper
 import com.android.cast.dlna.core.Level
 import com.android.cast.dlna.core.Logger
+import com.android.cast.dlna.core.http.LocalServer
 import com.android.cast.dlna.dmc.control.CastControlImpl
 import com.android.cast.dlna.dmc.control.DeviceControl
 import com.android.cast.dlna.dmc.control.EmptyDeviceControl
@@ -20,7 +21,6 @@ import org.fourthline.cling.android.AndroidUpnpService
 import org.fourthline.cling.model.message.header.STAllHeader
 import org.fourthline.cling.model.message.header.UDADeviceTypeHeader
 import org.fourthline.cling.model.meta.Device
-import org.fourthline.cling.model.meta.LocalDevice
 import org.fourthline.cling.model.types.DeviceType
 import org.fourthline.cling.model.types.ServiceType
 import org.fourthline.cling.model.types.UDADeviceType
@@ -32,16 +32,18 @@ import org.fourthline.cling.model.types.UDAServiceType
 object DLNACastManager : OnDeviceRegistryListener {
 
     val DEVICE_TYPE_MEDIA_RENDERER = UDADeviceType("MediaRenderer")
+    val DEVICE_TYPE_MEDIA_SERVER = UDADeviceType("MediaServer")
 
-    val SERVICE_AV_TRANSPORT: ServiceType = UDAServiceType("AVTransport")
-    val SERVICE_RENDERING_CONTROL: ServiceType = UDAServiceType("RenderingControl")
-    val SERVICE_CONTENT_DIRECTORY: ServiceType = UDAServiceType("ContentDirectory")
+    val SERVICE_TYPE_AV_TRANSPORT: ServiceType = UDAServiceType("AVTransport")
+    val SERVICE_TYPE_RENDERING_CONTROL: ServiceType = UDAServiceType("RenderingControl")
+    val SERVICE_TYPE_CONTENT_DIRECTORY: ServiceType = UDAServiceType("ContentDirectory")
 
     private val logger = Logger.create("CastManager")
     private val deviceRegistryImpl = DeviceRegistryImpl(this)
     private val mainHandler = Handler(Looper.getMainLooper())
     private var searchDeviceType: DeviceType? = null
     private var upnpService: AndroidUpnpService? = null
+    private var applicationContext: Context? = null
 
     fun enableLog(logging: Boolean = true, level: Int = Level.V) {
         Logger.enabled = logging
@@ -49,6 +51,7 @@ object DLNACastManager : OnDeviceRegistryListener {
     }
 
     fun bindCastService(context: Context) {
+        applicationContext = context.applicationContext
         if (context is Application || context is Activity) {
             context.bindService(Intent(context, DLNACastService::class.java), serviceConnection, Service.BIND_AUTO_CREATE)
         } else {
@@ -80,10 +83,6 @@ object DLNACastManager : OnDeviceRegistryListener {
                 // Now add all devices to the list we already know about
                 deviceRegistryImpl.setDevices(upnpServiceBinder.registry.devices)
             }
-            if (mediaServer != null) {
-                upnpService?.registry?.addDevice(mediaServer)
-            }
-            mediaServer = null
         }
 
         override fun onServiceDisconnected(componentName: ComponentName) {
@@ -163,27 +162,26 @@ object DLNACastManager : OnDeviceRegistryListener {
     private fun checkDeviceType(device: Device<*, *, *>): Boolean = searchDeviceType == null || searchDeviceType == device.type
 
     // -----------------------------------------------------------------------------------------
-    // ---- MediaServer
+    // ---- LocalServer
     // -----------------------------------------------------------------------------------------
-    private var mediaServer: LocalDevice? = null
-    fun addMediaServer(mediaServer: LocalDevice?) {
-        if (upnpService != null && mediaServer != null) {
-            if (upnpService?.registry?.getDevice(mediaServer.identity.udn, true) == null) {
-                upnpService?.registry?.addDevice(mediaServer)
+    private var localServer: LocalServer? = null
+
+    fun startLocalHttpServer(port: Int = 8192, jetty: Boolean = true) {
+        if (localServer == null) {
+            applicationContext?.run {
+                localServer = LocalServer(this, port, jetty)
             }
-        } else {
-            this.mediaServer = mediaServer
         }
+        localServer?.startServer()
     }
 
-    fun removeMediaServer(mediaServer: LocalDevice?) {
-        if (upnpService != null && mediaServer != null) {
-            upnpService?.registry?.removeDevice(mediaServer)
-        } else {
-            this.mediaServer = null
-        }
+    fun stopLocalHttpServer() {
+        localServer?.stopServer()
     }
 
+    // -----------------------------------------------------------------------------------------
+    // ---- Action
+    // -----------------------------------------------------------------------------------------
     fun search(type: DeviceType? = null, maxSeconds: Int = 60) {
         searchDeviceType = type
         upnpService?.get()?.also { service ->

@@ -31,5 +31,7 @@
 
     <string name="searchingLAN">Searching LAN for UPnP devices…</string>
     <string name="deviceDetailsNotYetAvailable">Device details are being discovered, please wait.</string>
+    <string name="browse">Browse</string>
+    <string name="search">Search</string>
 
 </resources>

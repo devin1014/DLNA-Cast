@@ -15,7 +15,7 @@ object Level {
 
 class Logger(private val tag: String) {
     companion object {
-        var prefixTag: String = "WL_"
+        var prefixTag: String = "DLNA_"
         var enabled: Boolean = true
         var level: Int = Level.I
         var printThread: Boolean = false

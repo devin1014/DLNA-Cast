@@ -7,7 +7,7 @@ import org.fourthline.cling.support.lastchange.EventedValue
 import org.fourthline.cling.support.renderingcontrol.lastchange.EventedValueChannelMute
 import org.fourthline.cling.support.renderingcontrol.lastchange.EventedValueChannelVolume
 
-interface DeviceControl : AvTransportServiceAction, RendererServiceAction {
+interface DeviceControl : AvTransportServiceAction, RendererServiceAction, ContentServiceAction {
     override fun getLogger(): Logger? = null
 }
 

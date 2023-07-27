@@ -1,12 +1,15 @@
 package com.android.cast.dlna.dms
 
+import com.android.cast.dlna.core.Logger
 import org.fourthline.cling.support.contentdirectory.AbstractContentDirectoryService
 import org.fourthline.cling.support.contentdirectory.ContentDirectoryException
 import org.fourthline.cling.support.model.BrowseFlag
 import org.fourthline.cling.support.model.BrowseResult
 import org.fourthline.cling.support.model.SortCriterion
 
-class ContentDirectoryService : AbstractContentDirectoryService() {
+internal class ContentDirectoryService : AbstractContentDirectoryService() {
+    private val logger = Logger.create("ContentDirectoryService")
+
     @Throws(ContentDirectoryException::class)
     override fun browse(
         objectID: String,
@@ -14,8 +17,11 @@ class ContentDirectoryService : AbstractContentDirectoryService() {
         filter: String,
         firstResult: Long,
         maxResults: Long,
-        orderBy: Array<SortCriterion>
-    ): BrowseResult? = ContentFactory.getContent(objectID)
+        orderBy: Array<SortCriterion>,
+    ): BrowseResult? {
+        logger.i("browse: $objectID, $browseFlag, $filter, $firstResult, $maxResults")
+        return ContentFactory.getContent(objectID)
+    }
 
     @Throws(ContentDirectoryException::class)
     override fun search(
@@ -24,9 +30,9 @@ class ContentDirectoryService : AbstractContentDirectoryService() {
         filter: String,
         firstResult: Long,
         maxResults: Long,
-        orderBy: Array<SortCriterion>
+        orderBy: Array<SortCriterion>,
     ): BrowseResult {
-        // You can override this method to implement searching!
+        logger.i("search: $containerId, $searchCriteria, $filter, $firstResult, $maxResults")
         return super.search(containerId, searchCriteria, filter, firstResult, maxResults, orderBy)
     }
 }

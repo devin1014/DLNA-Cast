@@ -1,21 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:background="#000000">
 
     <VideoView
         android:id="@+id/video_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="H, 16:9"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/video_cast_control"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:background="#000000"
-        android:padding="6dp">
+        android:padding="6dp"
+        app:layout_constraintBottom_toBottomOf="@id/video_view"
+        app:layout_constraintLeft_toLeftOf="@id/video_view"
+        app:layout_constraintRight_toRightOf="@id/video_view"
+        app:layout_constraintTop_toTopOf="@id/video_view">
 
         <ImageView
             android:id="@+id/video_cast"
@@ -24,8 +33,21 @@
             android:background="?android:selectableItemBackground"
             android:contentDescription="@null"
             android:padding="4dp"
-            android:src="@drawable/cast_video"
+            android:src="@drawable/cast"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@android:color/white" />
+
+        <ImageView
+            android:id="@+id/local_server"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="8dp"
+            android:background="?android:selectableItemBackground"
+            android:contentDescription="@null"
+            android:padding="4dp"
+            android:src="@drawable/local_http"
+            app:layout_constraintEnd_toStartOf="@id/video_cast"
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@android:color/white" />
 
@@ -121,4 +143,4 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

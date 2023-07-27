@@ -16,7 +16,11 @@ import org.fourthline.cling.support.avtransport.callback.Play
 import org.fourthline.cling.support.avtransport.callback.Seek
 import org.fourthline.cling.support.avtransport.callback.SetAVTransportURI
 import org.fourthline.cling.support.avtransport.callback.Stop
+import org.fourthline.cling.support.contentdirectory.callback.Browse
+import org.fourthline.cling.support.contentdirectory.callback.Search
 import org.fourthline.cling.support.lastchange.LastChangeParser
+import org.fourthline.cling.support.model.BrowseFlag.METADATA
+import org.fourthline.cling.support.model.DIDLContent
 import org.fourthline.cling.support.model.MediaInfo
 import org.fourthline.cling.support.model.PositionInfo
 import org.fourthline.cling.support.model.TransportInfo
@@ -270,6 +274,50 @@ internal abstract class BaseServiceExecutor(
 
                 override fun failure(invocation: ActionInvocation<*>?, operation: UpnpResponse?, defaultMsg: String?) {
                     notifyResponse(callback, exception = defaultMsg ?: "isMute failed.")
+                }
+            })
+        }
+    }
+
+    // ---------------------------------------------------------------------------------------------------------
+    // ContentService
+    // ---------------------------------------------------------------------------------------------------------
+    internal class ContentServiceExecutorImpl(
+        controlPoint: ControlPoint,
+        service: Service<*, *>?,
+    ) : BaseServiceExecutor(controlPoint, service), ContentServiceAction {
+        override fun browse(containerId: String, callback: ServiceActionCallback<DIDLContent>?) {
+            if (invalidServiceAction("Browse")) {
+                notifyResponse(callback, exception = "service not support this action.")
+                return
+            }
+            executeAction(object : Browse(service, containerId, METADATA, "*", 0, 99) {
+                override fun received(actionInvocation: ActionInvocation<out Service<*, *>>?, didl: DIDLContent?) {
+                    notifyResponse(callback, result = didl)
+                }
+
+                override fun updateStatus(status: Status?) {}
+
+                override fun failure(invocation: ActionInvocation<*>?, operation: UpnpResponse?, defaultMsg: String?) {
+                    notifyResponse(callback, exception = defaultMsg ?: "browse failed.")
+                }
+            })
+        }
+
+        override fun search(containerId: String, callback: ServiceActionCallback<DIDLContent>?) {
+            if (invalidServiceAction("Search")) {
+                notifyResponse(callback, exception = "service not support this action.")
+                return
+            }
+            executeAction(object : Search(service, containerId, "", "*", 0, 99) {
+                override fun received(actionInvocation: ActionInvocation<out Service<*, *>>?, didl: DIDLContent?) {
+                    notifyResponse(callback, result = didl)
+                }
+
+                override fun updateStatus(status: Status?) {}
+
+                override fun failure(invocation: ActionInvocation<*>?, operation: UpnpResponse?, defaultMsg: String?) {
+                    notifyResponse(callback, exception = defaultMsg ?: "search failed.")
                 }
             })
         }

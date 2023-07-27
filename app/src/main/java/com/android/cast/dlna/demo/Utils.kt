@@ -14,9 +14,19 @@ import androidx.fragment.app.Fragment
 // ---------------------------------------------
 // ---- URL
 // ---------------------------------------------
-const val CAST_VIDEO_MP4 = "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"
-const val CAST_VIDEO_MP4_2 = "http://mirror.aarnet.edu.au/pub/TED-talks/911Mothers_2010W-480p.mp4"
-const val CAST_VIDEO_M3U8 = "https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_ts/master.m3u8"
+const val castVideoMp4Url = "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"
+const val castVideoMp4Url_2 = "http://mirror.aarnet.edu.au/pub/TED-talks/911Mothers_2010W-480p.mp4"
+const val castVideoM3u8Url = "https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_ts/master.m3u8"
+const val castVideoLocalUrl = "http://172.16.2.37:8192/storage/emulated/0/DCIM/Camera/20230705_165729.mp4"
+
+data class VideoUrl(val url: String, val title: String)
+
+val videoUrlList = mutableListOf(
+    VideoUrl(castVideoMp4Url, "1分钟的视频, mp4格式"),
+    VideoUrl(castVideoMp4Url_2, "10分钟的视频, mp4格式"),
+    VideoUrl(castVideoM3u8Url, "标准苹果测试流, m3u8格式"),
+    VideoUrl(castVideoLocalUrl, "本地视频"),
+)
 
 class Utils {
     companion object {

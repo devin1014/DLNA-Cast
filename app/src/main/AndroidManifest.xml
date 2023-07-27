@@ -28,8 +28,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!--<activity-->
+        <!--    android:name="com.android.cast.dlna.demo.ContentServerActivity"-->
+        <!--    android:configChanges="orientation|screenSize"-->
+        <!--    android:exported="true"-->
+        <!--    android:launchMode="singleInstance">-->
+        <!--    <intent-filter>-->
+        <!--        <action android:name="android.intent.action.MAIN" />-->
+
+        <!--        <category android:name="android.intent.category.LAUNCHER" />-->
+        <!--    </intent-filter>-->
+        <!--</activity>-->
 
         <service android:name="com.android.cast.dlna.dmc.DLNACastService" />
+        <service android:name="com.android.cast.dlna.dms.DLNAContentService" />
 
     </application>
 
