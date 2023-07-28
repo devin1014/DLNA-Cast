@@ -29,7 +29,7 @@ import org.fourthline.cling.support.model.TransportState.NO_MEDIA_PRESENT
 import java.util.Formatter
 import java.util.Locale
 
-class VideoViewFragment : Fragment(), OnUrlSelectListener {
+class VideoViewFragment : Fragment() {
 
     private val colorAccent: Int by lazy { resources.getColor(R.color.colorAccent) }
     private val device: Device<*, *, *> by lazy { (requireParentFragment() as DetailContainer).getDevice() }
@@ -73,12 +73,29 @@ class VideoViewFragment : Fragment(), OnUrlSelectListener {
     }
 
     private fun initComponent(view: View) {
-        view.findViewById<View>(R.id.video_cast).setOnClickListener { CastUrlDialogFragment.show(childFragmentManager) }
-        view.findViewById<View>(R.id.video_cast_stop).setOnClickListener { deviceControl.stop() }
+        view.findViewById<View>(R.id.video_cast_stop).setOnClickListener {
+            deviceControl.stop()
+        }
+        view.findViewById<View>(R.id.video_cast).setOnClickListener {
+            CastUrlDialogFragment.show(childFragmentManager, object : OnUrlSelectListener {
+                override fun onUrlSelected(video: VideoUrl) {
+                    durationMillSeconds = 0L
+                    deviceControl.setAVTransportURI(video.url, video.title, object : ServiceActionCallback<String> {
+                        override fun onResponse(response: ActionResponse<String>) {
+                            if (response.success) {
+                                positionHandler.start()
+                            } else {
+                                Toast.makeText(requireContext(), response.exception, Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    })
+                }
+            })
+        }
         view.findViewById<View>(R.id.video_cast_add).setOnClickListener {
             CastUrlDialogFragment.show(childFragmentManager, object : OnUrlSelectListener {
                 override fun onUrlSelected(video: VideoUrl) {
-                    //TODO
+                    deviceControl.setNextAVTransportURI(video.url, video.title)
                 }
             })
         }
@@ -104,19 +121,6 @@ class VideoViewFragment : Fragment(), OnUrlSelectListener {
             if (selected) DLNACastManager.startLocalHttpServer()
             else DLNACastManager.stopLocalHttpServer()
         }
-    }
-
-    override fun onUrlSelected(video: VideoUrl) {
-        durationMillSeconds = 0L
-        deviceControl.cast(video.url, video.title, object : ServiceActionCallback<String> {
-            override fun onResponse(response: ActionResponse<String>) {
-                if (response.success) {
-                    positionHandler.start()
-                } else {
-                    Toast.makeText(requireContext(), response.exception, Toast.LENGTH_SHORT).show()
-                }
-            }
-        })
     }
 
     private var durationMillSeconds: Long = 0

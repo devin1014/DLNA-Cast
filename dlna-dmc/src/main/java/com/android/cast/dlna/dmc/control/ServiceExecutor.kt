@@ -3,6 +3,7 @@ package com.android.cast.dlna.dmc.control
 import android.os.Handler
 import android.os.Looper
 import com.android.cast.dlna.core.Utils.getStringTime
+import com.android.cast.dlna.dmc.control.action.SetNextAVTransportURI
 import org.fourthline.cling.controlpoint.ActionCallback
 import org.fourthline.cling.controlpoint.ControlPoint
 import org.fourthline.cling.model.action.ActionInvocation
@@ -69,15 +70,34 @@ internal abstract class BaseServiceExecutor(
         controlPoint: ControlPoint,
         service: Service<*, *>?,
     ) : BaseServiceExecutor(controlPoint, service), AvTransportServiceAction {
-        override fun cast(uri: String, title: String, callback: ServiceActionCallback<String>?) {
-            super.cast(uri, title, callback)
+        override fun setAVTransportURI(uri: String, title: String, callback: ServiceActionCallback<String>?) {
+            super.setAVTransportURI(uri, title, callback)
             if (invalidServiceAction("SetAVTransportURI")) {
                 notifyResponse(callback, exception = "service not support this action.")
                 return
             }
             val metadata = MetadataUtils.create(uri, title)
-            getLogger()?.i("cast: $metadata")
+            getLogger()?.i("setAVTransportURI: $metadata")
             executeAction(object : SetAVTransportURI(service, uri, metadata) {
+                override fun success(invocation: ActionInvocation<*>?) {
+                    notifyResponse(callback, result = uri)
+                }
+
+                override fun failure(invocation: ActionInvocation<*>?, operation: UpnpResponse?, defaultMsg: String?) {
+                    notifyResponse(callback, exception = defaultMsg ?: "cast failed.")
+                }
+            })
+        }
+
+        override fun setNextAVTransportURI(uri: String, title: String, callback: ServiceActionCallback<String>?) {
+            super.setNextAVTransportURI(uri, title, callback)
+            if (invalidServiceAction("SetNextAVTransportURI")) {
+                notifyResponse(callback, exception = "service not support this action.")
+                return
+            }
+            val metadata = MetadataUtils.create(uri, title)
+            getLogger()?.i("setNextAVTransportURI: $metadata")
+            executeAction(object : SetNextAVTransportURI(service = service, uri = uri, metadata = metadata) {
                 override fun success(invocation: ActionInvocation<*>?) {
                     notifyResponse(callback, result = uri)
                 }

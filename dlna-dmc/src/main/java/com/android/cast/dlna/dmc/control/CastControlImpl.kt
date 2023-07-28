@@ -54,9 +54,14 @@ class CastControlImpl(
     // --------------------------------------------------------
     // ---- AvTransport ---------------------------------------
     // --------------------------------------------------------
-    override fun cast(uri: String, title: String, callback: ServiceActionCallback<String>?) {
-        super.cast(uri, title, callback)
-        avTransportService.cast(uri, title, callback)
+    override fun setAVTransportURI(uri: String, title: String, callback: ServiceActionCallback<String>?) {
+        super.setAVTransportURI(uri, title, callback)
+        avTransportService.setAVTransportURI(uri, title, callback)
+    }
+
+    override fun setNextAVTransportURI(uri: String, title: String, callback: ServiceActionCallback<String>?) {
+        super.setNextAVTransportURI(uri, title, callback)
+        avTransportService.setNextAVTransportURI(uri, title, callback)
     }
 
     override fun play(callback: ServiceActionCallback<String>?) {

@@ -41,6 +41,7 @@ class VideoViewRendererActivity : BaseRendererActivity() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun initComponent() {
         // 方便在平板上调试，模拟遥控器
         findViewById<View>(R.id.player_action_bar).visibility = View.VISIBLE
@@ -56,6 +57,32 @@ class VideoViewRendererActivity : BaseRendererActivity() {
                 renderState = RenderState.PLAYING
             }
         }
+        videoView.setOnPreparedListener { mp ->
+            mp.start()
+            renderState = RenderState.PLAYING
+            progressBar.visibility = View.INVISIBLE
+        }
+        videoView.setOnErrorListener { _, what, extra ->
+            renderState = RenderState.ERROR
+            if (nextURI.isNullOrBlank()) {
+                progressBar.visibility = View.INVISIBLE
+                errorMsg.visibility = View.VISIBLE
+                errorMsg.text = "播放错误: $what, $extra"
+            } else {
+                videoView.setVideoURI(Uri.parse(nextURI))
+                nextURI = null
+            }
+            true
+        }
+        videoView.setOnCompletionListener {
+            renderState = RenderState.STOPPED
+            if (nextURI.isNullOrBlank()) {
+                finish()
+            } else {
+                videoView.setVideoURI(Uri.parse(nextURI))
+                nextURI = null
+            }
+        }
     }
 
     override fun onNewIntent(newIntent: Intent) {
@@ -63,34 +90,20 @@ class VideoViewRendererActivity : BaseRendererActivity() {
         openMedia()
     }
 
+    private var nextURI: String? = null
+
     @SuppressLint("SetTextI18n")
     private fun openMedia() {
-        // demo only handle currentURI...
-        val url = castAction?.currentURI
-        if (url != null) {
+        castAction?.currentURI?.run {
             progressBar.visibility = View.VISIBLE
             errorMsg.visibility = View.INVISIBLE
-            videoView.setVideoURI(Uri.parse(url))
-            videoView.setOnPreparedListener { mp ->
-                mp.start()
-                renderState = RenderState.PLAYING
-                progressBar.visibility = View.INVISIBLE
-            }
-            videoView.setOnErrorListener { _, what, extra ->
-                renderState = RenderState.ERROR
-                progressBar.visibility = View.INVISIBLE
-                errorMsg.visibility = View.VISIBLE
-                errorMsg.text = "播放错误: $what, $extra"
-                true
-            }
-            videoView.setOnCompletionListener {
-                renderState = RenderState.STOPPED
-                progressBar.visibility = View.INVISIBLE
-                finish()
-            }
-        } else {
-            errorMsg.visibility = View.VISIBLE
-            errorMsg.text = "没有找到有效的视频地址，请检查..."
+            videoView.setVideoURI(Uri.parse(this))
+        }
+        castAction?.nextURI?.run {
+            nextURI = this
+        }
+        castAction?.stop?.run {
+            finish()
         }
     }
 

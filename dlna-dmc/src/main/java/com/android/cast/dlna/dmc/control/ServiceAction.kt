@@ -15,9 +15,13 @@ interface ServiceActionCallback<T> {
 // ---- AvService
 // --------------------------------------------------------------------------------
 interface AvTransportServiceAction {
-    fun getLogger(): Logger? = Logger.create("AvTransportService")
-    fun cast(uri: String, title: String, callback: ServiceActionCallback<String>? = null) {
-        getLogger()?.i("cast: $title, $uri")
+    fun getLogger(): Logger? = Logger.create("AvTransportService")//SetAVTransportURI
+    fun setAVTransportURI(uri: String, title: String, callback: ServiceActionCallback<String>? = null) {
+        getLogger()?.i("setAVTransportURI: $title, $uri")
+    }
+
+    fun setNextAVTransportURI(uri: String, title: String, callback: ServiceActionCallback<String>? = null) {
+        getLogger()?.i("setNextAVTransportURI: $title, $uri")
     }
 
     fun play(callback: ServiceActionCallback<String>? = null) {
