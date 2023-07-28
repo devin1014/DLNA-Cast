@@ -54,27 +54,27 @@ class CastControlImpl(
     // --------------------------------------------------------
     // ---- AvTransport ---------------------------------------
     // --------------------------------------------------------
-    override fun setAVTransportURI(uri: String, title: String, callback: ServiceActionCallback<String>?) {
+    override fun setAVTransportURI(uri: String, title: String, callback: ServiceActionCallback<Unit>?) {
         avTransportService.setAVTransportURI(uri, title, callback)
     }
 
-    override fun setNextAVTransportURI(uri: String, title: String, callback: ServiceActionCallback<String>?) {
+    override fun setNextAVTransportURI(uri: String, title: String, callback: ServiceActionCallback<Unit>?) {
         avTransportService.setNextAVTransportURI(uri, title, callback)
     }
 
-    override fun play(callback: ServiceActionCallback<String>?) {
+    override fun play(callback: ServiceActionCallback<Unit>?) {
         avTransportService.play(callback)
     }
 
-    override fun pause(callback: ServiceActionCallback<String>?) {
+    override fun pause(callback: ServiceActionCallback<Unit>?) {
         avTransportService.pause(callback)
     }
 
-    override fun seek(millSeconds: Long, callback: ServiceActionCallback<Long>?) {
+    override fun seek(millSeconds: Long, callback: ServiceActionCallback<Unit>?) {
         avTransportService.seek(millSeconds, callback)
     }
 
-    override fun stop(callback: ServiceActionCallback<String>?) {
+    override fun stop(callback: ServiceActionCallback<Unit>?) {
         avTransportService.stop(callback)
     }
 
@@ -93,7 +93,7 @@ class CastControlImpl(
     // --------------------------------------------------------
     // ---- Renderer ------------------------------------------
     // --------------------------------------------------------
-    override fun setVolume(volume: Int, callback: ServiceActionCallback<Int>?) {
+    override fun setVolume(volume: Int, callback: ServiceActionCallback<Unit>?) {
         renderService.setVolume(volume, callback)
     }
 
@@ -101,12 +101,12 @@ class CastControlImpl(
         renderService.getVolume(callback)
     }
 
-    override fun setMute(mute: Boolean, callback: ServiceActionCallback<Boolean>?) {
+    override fun setMute(mute: Boolean, callback: ServiceActionCallback<Unit>?) {
         renderService.setMute(mute, callback)
     }
 
-    override fun isMute(callback: ServiceActionCallback<Boolean>?) {
-        renderService.isMute(callback)
+    override fun getMute(callback: ServiceActionCallback<Boolean>?) {
+        renderService.getMute(callback)
     }
 
     // --------------------------------------------------------

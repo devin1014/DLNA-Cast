@@ -108,8 +108,7 @@
             app:layout_constraintBottom_toBottomOf="@id/video_cast_next"
             app:layout_constraintLeft_toRightOf="@id/video_cast_next"
             app:layout_constraintRight_toLeftOf="@id/video_cast_add"
-            app:layout_constraintTop_toTopOf="@id/video_cast_next"
-            app:tint="@color/colorAccent" />
+            app:layout_constraintTop_toTopOf="@id/video_cast_next" />
 
         <ImageView
             android:id="@+id/video_cast_add"

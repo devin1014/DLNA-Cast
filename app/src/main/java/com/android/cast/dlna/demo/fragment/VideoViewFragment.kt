@@ -18,7 +18,6 @@ import com.android.cast.dlna.demo.MainActivity
 import com.android.cast.dlna.demo.R
 import com.android.cast.dlna.demo.VideoUrl
 import com.android.cast.dlna.dmc.DLNACastManager
-import com.android.cast.dlna.dmc.control.ActionResponse
 import com.android.cast.dlna.dmc.control.DeviceControl
 import com.android.cast.dlna.dmc.control.OnDeviceControlListener
 import com.android.cast.dlna.dmc.control.ServiceActionCallback
@@ -31,6 +30,7 @@ import java.util.Locale
 
 class VideoViewFragment : Fragment() {
 
+    @Suppress("DEPRECATION")
     private val colorAccent: Int by lazy { resources.getColor(R.color.colorAccent) }
     private val device: Device<*, *, *> by lazy { (requireParentFragment() as DetailContainer).getDevice() }
     private val positionInfo: TextView by lazy { requireView().findViewById(R.id.video_cast_position) }
@@ -63,11 +63,13 @@ class VideoViewFragment : Fragment() {
                 pauseButton.setImageResource(if (state == TransportState.PLAYING) R.drawable.cast_pause else R.drawable.cast_play)
             }
         })
-        deviceControl.isMute(object : ServiceActionCallback<Boolean> {
-            override fun onResponse(response: ActionResponse<Boolean>) {
-                val mute = response.data == true
-                volumeMuteButton.isSelected = mute
-                volumeMuteButton.setColorFilter(if (mute) colorAccent else 0xFFFFFF)
+        deviceControl.getMute(object : ServiceActionCallback<Boolean> {
+            override fun onSuccess(result: Boolean) {
+                volumeMuteButton.isSelected = result
+                volumeMuteButton.setColorFilter(if (result) colorAccent else 0xFFFFFF)
+            }
+
+            override fun onFailure(msg: String) {
             }
         })
     }
@@ -80,13 +82,13 @@ class VideoViewFragment : Fragment() {
             CastUrlDialogFragment.show(childFragmentManager, object : OnUrlSelectListener {
                 override fun onUrlSelected(video: VideoUrl) {
                     durationMillSeconds = 0L
-                    deviceControl.setAVTransportURI(video.url, video.title, object : ServiceActionCallback<String> {
-                        override fun onResponse(response: ActionResponse<String>) {
-                            if (response.success) {
-                                positionHandler.start()
-                            } else {
-                                Toast.makeText(requireContext(), response.exception, Toast.LENGTH_SHORT).show()
-                            }
+                    deviceControl.setAVTransportURI(video.url, video.title, object : ServiceActionCallback<Unit> {
+                        override fun onSuccess(result: Unit) {
+                            positionHandler.start()
+                        }
+
+                        override fun onFailure(msg: String) {
+                            Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
                         }
                     })
                 }
@@ -127,18 +129,16 @@ class VideoViewFragment : Fragment() {
 
     private val positionHandler = CircleMessageHandler(1000) {
         deviceControl.getPositionInfo(object : ServiceActionCallback<PositionInfo> {
-            override fun onResponse(response: ActionResponse<PositionInfo>) {
-                if (response.success) {
-                    response.data?.also { t ->
-                        if (durationMillSeconds == 0L) {
-                            durationMillSeconds = t.trackDurationSeconds * 1000
-                        }
-                        positionInfo.text = String.format("%s/%s", getStringTime(t.trackElapsedSeconds * 1000), getStringTime(t.trackDurationSeconds * 1000))
-                        positionSeekBar.progress = t.elapsedPercent
-                    }
-                } else {
-                    positionInfo.text = "--:--/--:--"
+            override fun onSuccess(result: PositionInfo) {
+                if (durationMillSeconds == 0L) {
+                    durationMillSeconds = result.trackDurationSeconds * 1000
                 }
+                positionInfo.text = String.format("%s/%s", getStringTime(result.trackElapsedSeconds * 1000), getStringTime(result.trackDurationSeconds * 1000))
+                positionSeekBar.progress = result.elapsedPercent
+            }
+
+            override fun onFailure(msg: String) {
+                positionInfo.text = "--:--/--:--"
             }
         })
     }

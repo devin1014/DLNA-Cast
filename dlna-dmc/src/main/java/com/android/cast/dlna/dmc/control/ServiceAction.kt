@@ -6,19 +6,20 @@ import org.fourthline.cling.support.model.PositionInfo
 import org.fourthline.cling.support.model.TransportInfo
 
 interface ServiceActionCallback<T> {
-    fun onResponse(response: ActionResponse<T>)
+    fun onSuccess(result: T)
+    fun onFailure(msg: String)
 }
 
 // --------------------------------------------------------------------------------
 // ---- AvService
 // --------------------------------------------------------------------------------
 interface AvTransportServiceAction {
-    fun setAVTransportURI(uri: String, title: String, callback: ServiceActionCallback<String>? = null)
-    fun setNextAVTransportURI(uri: String, title: String, callback: ServiceActionCallback<String>? = null)
-    fun play(callback: ServiceActionCallback<String>? = null)
-    fun pause(callback: ServiceActionCallback<String>? = null)
-    fun stop(callback: ServiceActionCallback<String>? = null)
-    fun seek(millSeconds: Long, callback: ServiceActionCallback<Long>? = null)
+    fun setAVTransportURI(uri: String, title: String, callback: ServiceActionCallback<Unit>? = null)
+    fun setNextAVTransportURI(uri: String, title: String, callback: ServiceActionCallback<Unit>? = null)
+    fun play(callback: ServiceActionCallback<Unit>? = null)
+    fun pause(callback: ServiceActionCallback<Unit>? = null)
+    fun stop(callback: ServiceActionCallback<Unit>? = null)
+    fun seek(millSeconds: Long, callback: ServiceActionCallback<Unit>? = null)
     fun getPositionInfo(callback: ServiceActionCallback<PositionInfo>?)
     fun getMediaInfo(callback: ServiceActionCallback<MediaInfo>?)
     fun getTransportInfo(callback: ServiceActionCallback<TransportInfo>?)
@@ -28,10 +29,10 @@ interface AvTransportServiceAction {
 // ---- RendererService
 // --------------------------------------------------------------------------------
 interface RendererServiceAction {
-    fun setVolume(volume: Int, callback: ServiceActionCallback<Int>? = null)
+    fun setVolume(volume: Int, callback: ServiceActionCallback<Unit>? = null)
     fun getVolume(callback: ServiceActionCallback<Int>?)
-    fun setMute(mute: Boolean, callback: ServiceActionCallback<Boolean>? = null)
-    fun isMute(callback: ServiceActionCallback<Boolean>?)
+    fun setMute(mute: Boolean, callback: ServiceActionCallback<Unit>? = null)
+    fun getMute(callback: ServiceActionCallback<Boolean>?)
 }
 
 // --------------------------------------------------------------------------------

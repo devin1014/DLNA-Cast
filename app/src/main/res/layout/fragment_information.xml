@@ -39,7 +39,73 @@
     <TextView
         android:id="@+id/info_device_status"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:textColor="#000000"
+        android:textSize="14dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="#0e0e0e" />
+
+    <Button
+        android:id="@+id/info_get_volume"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Volume Info"
+        android:textAllCaps="false"
+        android:textColor="#000000"
+        android:textSize="12dp" />
+
+    <TextView
+        android:id="@+id/info_device_volume"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:textColor="#000000"
+        android:textSize="14dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="#0e0e0e" />
+
+    <Button
+        android:id="@+id/info_get_media"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Media Info"
+        android:textAllCaps="false"
+        android:textColor="#000000"
+        android:textSize="12dp" />
+
+    <TextView
+        android:id="@+id/info_device_media"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:textColor="#000000"
+        android:textSize="14dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="#0e0e0e" />
+
+    <Button
+        android:id="@+id/info_get_transport"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Transport Info"
+        android:textAllCaps="false"
+        android:textColor="#000000"
+        android:textSize="12dp" />
+
+    <TextView
+        android:id="@+id/info_device_transport"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:padding="4dp"
         android:textColor="#000000"
         android:textSize="14dp" />

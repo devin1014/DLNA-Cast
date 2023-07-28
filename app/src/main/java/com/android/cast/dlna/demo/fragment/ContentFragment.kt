@@ -12,7 +12,6 @@ import com.android.cast.dlna.demo.DetailContainer
 import com.android.cast.dlna.demo.MainActivity
 import com.android.cast.dlna.demo.R
 import com.android.cast.dlna.dmc.DLNACastManager
-import com.android.cast.dlna.dmc.control.ActionResponse
 import com.android.cast.dlna.dmc.control.DeviceControl
 import com.android.cast.dlna.dmc.control.OnDeviceControlListener
 import com.android.cast.dlna.dmc.control.ServiceActionCallback
@@ -32,25 +31,23 @@ class ContentFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         view.findViewById<View>(R.id.browse).setOnClickListener {
             deviceControl.browse(ContentType.ALL.id, object : ServiceActionCallback<DIDLContent> {
-                override fun onResponse(response: ActionResponse<DIDLContent>) {
-                    if (response.success) {
-                        val result = response.data
-                    } else {
-                        logger.w(response.exception ?: "browse failed.")
-                        Toast.makeText(requireContext(), response.exception, Toast.LENGTH_SHORT).show()
-                    }
+                override fun onSuccess(result: DIDLContent) {
+                    logger.i("result: $result")
+                }
+
+                override fun onFailure(msg: String) {
+                    Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
                 }
             })
         }
         view.findViewById<View>(R.id.search).setOnClickListener {
             deviceControl.search(ContentType.ALL.id, object : ServiceActionCallback<DIDLContent> {
-                override fun onResponse(response: ActionResponse<DIDLContent>) {
-                    if (response.success) {
-                        val result = response.data
-                    } else {
-                        logger.w(response.exception ?: "search failed.")
-                        Toast.makeText(requireContext(), response.exception, Toast.LENGTH_SHORT).show()
-                    }
+                override fun onSuccess(result: DIDLContent) {
+                    logger.i("result: $result")
+                }
+
+                override fun onFailure(msg: String) {
+                    Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
                 }
             })
         }

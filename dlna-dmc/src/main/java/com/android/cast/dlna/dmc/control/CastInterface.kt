@@ -13,19 +13,19 @@ import org.fourthline.cling.support.renderingcontrol.lastchange.EventedValueChan
 interface DeviceControl : AvTransportServiceAction, RendererServiceAction, ContentServiceAction
 
 object EmptyDeviceControl : DeviceControl {
-    override fun setAVTransportURI(uri: String, title: String, callback: ServiceActionCallback<String>?) {}
-    override fun setNextAVTransportURI(uri: String, title: String, callback: ServiceActionCallback<String>?) {}
-    override fun play(callback: ServiceActionCallback<String>?) {}
-    override fun pause(callback: ServiceActionCallback<String>?) {}
-    override fun stop(callback: ServiceActionCallback<String>?) {}
-    override fun seek(millSeconds: Long, callback: ServiceActionCallback<Long>?) {}
+    override fun setAVTransportURI(uri: String, title: String, callback: ServiceActionCallback<Unit>?) {}
+    override fun setNextAVTransportURI(uri: String, title: String, callback: ServiceActionCallback<Unit>?) {}
+    override fun play(callback: ServiceActionCallback<Unit>?) {}
+    override fun pause(callback: ServiceActionCallback<Unit>?) {}
+    override fun stop(callback: ServiceActionCallback<Unit>?) {}
+    override fun seek(millSeconds: Long, callback: ServiceActionCallback<Unit>?) {}
     override fun getPositionInfo(callback: ServiceActionCallback<PositionInfo>?) {}
     override fun getMediaInfo(callback: ServiceActionCallback<MediaInfo>?) {}
     override fun getTransportInfo(callback: ServiceActionCallback<TransportInfo>?) {}
-    override fun setVolume(volume: Int, callback: ServiceActionCallback<Int>?) {}
+    override fun setVolume(volume: Int, callback: ServiceActionCallback<Unit>?) {}
     override fun getVolume(callback: ServiceActionCallback<Int>?) {}
-    override fun setMute(mute: Boolean, callback: ServiceActionCallback<Boolean>?) {}
-    override fun isMute(callback: ServiceActionCallback<Boolean>?) {}
+    override fun setMute(mute: Boolean, callback: ServiceActionCallback<Unit>?) {}
+    override fun getMute(callback: ServiceActionCallback<Boolean>?) {}
     override fun browse(containerId: String, callback: ServiceActionCallback<DIDLContent>?) {}
     override fun search(containerId: String, callback: ServiceActionCallback<DIDLContent>?) {}
 }

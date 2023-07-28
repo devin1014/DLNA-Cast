@@ -40,12 +40,12 @@ internal class CastSubscriptionCallback(
     }
 
     override fun eventReceived(subscription: GENASubscription<*>) {
-        logger.i("${getTag(subscription)} eventReceived: ${subscription.currentValues.keys}")
         val lastChangeEventValue = subscription.currentValues["LastChange"]?.value?.toString()
         if (lastChangeEventValue.isNullOrBlank()) {
-            logger.w("${getTag(subscription)} currentValues: ${subscription.currentValues}")
+            // logger.w("${getTag(subscription)} currentValues: ${subscription.currentValues}")
             return
         }
+        logger.i("${getTag(subscription)} eventReceived: ${subscription.currentValues.keys}")
         try {
             val events = lastChangeParser.parse(lastChangeEventValue)?.instanceIDs?.firstOrNull()?.values
             events?.forEach { value ->
