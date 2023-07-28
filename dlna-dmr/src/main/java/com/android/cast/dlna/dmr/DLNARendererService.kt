@@ -2,12 +2,8 @@ package com.android.cast.dlna.dmr
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.Bitmap.CompressFormat.PNG
-import android.graphics.drawable.BitmapDrawable
 import android.os.Build
 import android.os.IBinder
-import androidx.core.content.ContextCompat
 import com.android.cast.dlna.core.Utils
 import com.android.cast.dlna.core.getLogger
 import com.android.cast.dlna.dmr.service.AVTransportController
@@ -23,7 +19,6 @@ import org.fourthline.cling.binding.annotations.AnnotationLocalServiceBinder
 import org.fourthline.cling.model.ValidationException
 import org.fourthline.cling.model.meta.DeviceDetails
 import org.fourthline.cling.model.meta.DeviceIdentity
-import org.fourthline.cling.model.meta.Icon
 import org.fourthline.cling.model.meta.LocalDevice
 import org.fourthline.cling.model.meta.LocalService
 import org.fourthline.cling.model.meta.ManufacturerDetails
@@ -39,8 +34,6 @@ import org.fourthline.cling.support.model.Channel
 import org.fourthline.cling.support.renderingcontrol.lastchange.ChannelVolume
 import org.fourthline.cling.support.renderingcontrol.lastchange.RenderingControlLastChangeParser
 import org.fourthline.cling.support.renderingcontrol.lastchange.RenderingControlVariable.Volume
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.UUID
 
@@ -71,7 +64,7 @@ open class DLNARendererService : AndroidUpnpServiceImpl() {
         avTransportControl = AVTransportController(applicationContext)
         audioControl = AudioRenderController(applicationContext)
         try {
-            localDevice = createRendererDevice(applicationContext, Utils.getWiFiInfoIPAddress(applicationContext))
+            localDevice = createRendererDevice(Utils.getWiFiInfoIPAddress(applicationContext))
             upnpService.registry.addDevice(localDevice)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -93,7 +86,7 @@ open class DLNARendererService : AndroidUpnpServiceImpl() {
     }
 
     @Throws(ValidationException::class, IOException::class)
-    protected fun createRendererDevice(context: Context, ipAddress: String): LocalDevice {
+    protected fun createRendererDevice(ipAddress: String): LocalDevice {
         val info = "DLNA_MediaPlayer-$ipAddress-${Build.MODEL}-${Build.MANUFACTURER}"
         val udn = try {
             UDN(UUID.nameUUIDFromBytes(info.toByteArray()))
@@ -109,7 +102,7 @@ open class DLNARendererService : AndroidUpnpServiceImpl() {
                 ManufacturerDetails(Build.MANUFACTURER),
                 ModelDetails(Build.MODEL, "MPI MediaPlayer", "v1", String.format("http://%s:%s", ipAddress, "8191"))
             ),
-            (ContextCompat.getDrawable(context, R.drawable.ic_launcher) as? BitmapDrawable)?.bitmap?.toIcon(),
+            emptyArray(),
             generateLocalServices()
         )
     }
@@ -163,10 +156,4 @@ open class DLNARendererService : AndroidUpnpServiceImpl() {
 
 interface RendererServiceBinder {
     val service: DLNARendererService
-}
-
-private fun Bitmap.toIcon(width: Int = 48, height: Int = 48, depth: Int = 8): Icon {
-    val stream = ByteArrayOutputStream()
-    this.compress(PNG, 100, stream)
-    return Icon("image/png", width, height, depth, "icon.png", ByteArrayInputStream(stream.toByteArray()))
 }
