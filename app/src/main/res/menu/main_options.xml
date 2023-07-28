@@ -5,20 +5,11 @@
 
     <item
         android:id="@+id/menu_search_start"
-        android:icon="@android:drawable/ic_menu_search"
-        android:iconTint="@android:color/white"
+        android:icon="@drawable/search"
         android:orderInCategory="100"
         android:title="搜索设备"
         app:showAsAction="ifRoom"
         tools:ignore="HardcodedText"
         tools:targetApi="o" />
-
-    <item
-        android:id="@+id/menu_content_server"
-        android:icon="@android:drawable/ic_menu_sort_alphabetically"
-        android:orderInCategory="100"
-        android:title="开启内容服务器"
-        app:showAsAction="never"
-        tools:ignore="HardcodedText" />
 
 </menu>

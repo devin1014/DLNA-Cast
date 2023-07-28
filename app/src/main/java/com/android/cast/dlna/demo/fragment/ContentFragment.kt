@@ -1,9 +1,11 @@
 package com.android.cast.dlna.demo.fragment
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.android.cast.dlna.core.ContentType
@@ -21,6 +23,7 @@ import org.fourthline.cling.support.model.DIDLContent
 class ContentFragment : Fragment() {
     private val logger = Logger.create("ContentFragment")
     private val device: Device<*, *, *> by lazy { (requireParentFragment() as DetailContainer).getDevice() }
+    private val contentResult: TextView by lazy { requireView().findViewById(R.id.content_result) }
     private lateinit var deviceControl: DeviceControl
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -31,23 +34,25 @@ class ContentFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         view.findViewById<View>(R.id.browse).setOnClickListener {
             deviceControl.browse(ContentType.ALL.id, object : ServiceActionCallback<DIDLContent> {
+                @SuppressLint("SetTextI18n")
                 override fun onSuccess(result: DIDLContent) {
-                    logger.i("result: $result")
+                    contentResult.text = "Browse\nContainers:${result.containers.size}\nItems:${result.items.size}"
                 }
 
                 override fun onFailure(msg: String) {
-                    Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+                    contentResult.text = msg
                 }
             })
         }
         view.findViewById<View>(R.id.search).setOnClickListener {
             deviceControl.search(ContentType.ALL.id, object : ServiceActionCallback<DIDLContent> {
+                @SuppressLint("SetTextI18n")
                 override fun onSuccess(result: DIDLContent) {
-                    logger.i("result: $result")
+                    contentResult.text = "Search\nContainers:${result.containers.size}\nItems:${result.items.size}"
                 }
 
                 override fun onFailure(msg: String) {
-                    Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+                    contentResult.text = msg
                 }
             })
         }

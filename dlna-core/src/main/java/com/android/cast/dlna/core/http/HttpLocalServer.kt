@@ -10,18 +10,6 @@ interface HttpServer {
     fun startServer()
     fun stopServer()
     fun isRunning(): Boolean
-
-    interface LocalHttpServerFactory {
-        val port: Int
-        val httpServer: HttpServer
-
-        class DefaultResourceServerFactoryImpl @JvmOverloads constructor(
-            override val port: Int,
-            useJetty: Boolean = true,
-        ) : LocalHttpServerFactory {
-            override val httpServer: HttpServer = if (useJetty) JettyHttpServer(port) else NanoHttpServer(port)
-        }
-    }
 }
 
 class LocalServer(

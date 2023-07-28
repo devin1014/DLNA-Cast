@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:minHeight="200dp"
     android:orientation="vertical">
 
     <LinearLayout
@@ -33,6 +34,15 @@
             tools:ignore="ButtonStyle,SpUsage" />
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/content_result"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="6dp"
+        android:textColor="#000000"
+        android:textSize="16dp"
+        tools:ignore="SpUsage" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"

@@ -58,10 +58,6 @@ class MainActivity : AppCompatActivity(), OnItemClickListener {
         if (item.itemId == R.id.menu_search_start) {
             Toast.makeText(this, "开始搜索", Toast.LENGTH_SHORT).show()
             DLNACastManager.search(null, 60)
-        } else if (item.itemId == R.id.menu_content_server) {
-            Toast.makeText(this, "开启内容服务器", Toast.LENGTH_SHORT).show()
-            //同时开启两个服务好戏那个有冲突...
-            //DLNAContentService.startService(this)
         }
         return super.onOptionsItemSelected(item)
     }

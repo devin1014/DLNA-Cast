@@ -40,17 +40,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <!--<activity-->
-        <!--    android:name=".ImageRendererActivity"-->
-        <!--    android:configChanges="keyboard|screenSize"-->
-        <!--    android:exported="true"-->
-        <!--    android:launchMode="singleTop"-->
-        <!--    android:screenOrientation="landscape">-->
-        <!--    <intent-filter>-->
-        <!--        <action android:name="SetAvTransport" />-->
-        <!--        <data android:mimeType="image/*" />-->
-        <!--    </intent-filter>-->
-        <!--</activity>-->
 
         <service android:name="com.android.cast.dlna.dmr.DLNARendererService" />
 
