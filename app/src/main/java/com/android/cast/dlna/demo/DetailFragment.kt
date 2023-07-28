@@ -30,11 +30,12 @@ class DetailFragment : Fragment(), DetailContainer {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        if (device.type == DLNACastManager.DEVICE_TYPE_MEDIA_RENDERER) {
-            replace(R.id.top_container, VideoViewFragment())
-        } else if (device.type == DLNACastManager.DEVICE_TYPE_MEDIA_SERVER) {
-            replace(R.id.top_container, ContentFragment())
+        if (this::device.isInitialized) {
+            if (device.type == DLNACastManager.DEVICE_TYPE_MEDIA_RENDERER) {
+                replace(R.id.top_container, VideoViewFragment())
+            } else if (device.type == DLNACastManager.DEVICE_TYPE_MEDIA_SERVER) {
+                replace(R.id.top_container, ContentFragment())
+            }
         }
     }
 }
