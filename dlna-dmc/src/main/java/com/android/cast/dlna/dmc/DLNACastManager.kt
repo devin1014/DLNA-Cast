@@ -64,7 +64,6 @@ object DLNACastManager : OnDeviceRegistryListener {
             if (upnpService !== upnpServiceBinder) {
                 upnpService = upnpServiceBinder
                 logger.i(String.format("onServiceConnected: [%s]", componentName.shortClassName))
-                //logger.i(String.format("[Registry]: listener= %s, devices= %s", upnpServiceBinder.registry.listeners.size, upnpServiceBinder.registry.devices.size))
                 val registry = upnpServiceBinder.registry
                 // add registry listener
                 val collection = registry.listeners
@@ -150,7 +149,7 @@ object DLNACastManager : OnDeviceRegistryListener {
     fun search(type: DeviceType? = null, maxSeconds: Int = 60) {
         upnpService?.get()?.also { service ->
             searchDeviceType = type
-            service.registry.devices?.filter { !checkDeviceType(it) }?.onEach {
+            service.registry.devices?.filter { searchDeviceType == null || searchDeviceType != it.type }?.onEach {
                 // notify device removed without type check.
                 registerDeviceListeners.forEach { listener -> listener.onDeviceRemoved(it) }
                 service.registry.removeDevice(it.identity.udn)

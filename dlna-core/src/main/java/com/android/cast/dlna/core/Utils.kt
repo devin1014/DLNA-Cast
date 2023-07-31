@@ -15,11 +15,15 @@
  */
 package com.android.cast.dlna.core
 
+import android.Manifest.permission
 import android.content.ContentUris
 import android.content.Context
+import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
 import android.net.wifi.WifiManager
+import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
 import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore.Audio
@@ -33,6 +37,10 @@ object Utils {
     // ---- Device Wifi Information
     // ------------------------------------------------------------------------------------------------------------------------
     private const val UNKNOWN = "<unknown>"
+    private const val WIFI_DISABLED = "<disabled>"
+    private const val WIFI_NO_CONNECT = "<not connect>"
+    private const val PERMISSION_DENIED = "<permission denied>"
+
     fun getWiFiInfoIPAddress(context: Context): String {
         val wifiManager = getSystemService<WifiManager>(context, Context.WIFI_SERVICE)
         if (!wifiManager.isWifiEnabled) return ""
@@ -40,6 +48,37 @@ object Utils {
         val address = wifiInfo.ipAddress
         return if (address == 0) UNKNOWN else (address and 0xFF).toString() + "." + (address shr 8 and 0xFF) + "." + (address shr 16 and 0xFF) + "." + (address shr 24 and 0xFF)
     }
+
+    /**
+     * need permission 'Manifest.permission.ACCESS_FINE_LOCATION' and 'Manifest.permission.ACCESS_WIFI_STATE' if system sdk >= Android O.
+     */
+    fun getWiFiInfoSSID(context: Context): String {
+        val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        if (!wifiManager.isWifiEnabled) return WIFI_DISABLED
+        val wifiInfo = wifiManager.connectionInfo ?: return WIFI_NO_CONNECT
+        return if (wifiInfo.ssid == WifiManager.UNKNOWN_SSID) {
+            if (VERSION.SDK_INT >= VERSION_CODES.O) {
+                if (context.checkSelfPermission(permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    if (wifiManager.configuredNetworks != null) {
+                        for (config in wifiManager.configuredNetworks) {
+                            if (config.networkId == wifiInfo.networkId) {
+                                return config.SSID.replace("\"".toRegex(), "")
+                            }
+                        }
+                    }
+                } else {
+                    PERMISSION_DENIED
+                }
+            } else {
+                return WIFI_NO_CONNECT
+            }
+            UNKNOWN
+        } else {
+            wifiInfo.ssid.replace("\"".toRegex(), "")
+        }
+    }
+
+    fun getHttpBaseUrl(context: Context, port: Int = 9091) = "http://${getWiFiInfoIPAddress(context)}:$port/"
 
     @Suppress("UNCHECKED_CAST")
     private fun <T : Any?> getSystemService(context: Context, name: String): T {

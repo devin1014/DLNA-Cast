@@ -93,7 +93,7 @@ open class DLNARendererService : AndroidUpnpServiceImpl() {
         } catch (ex: Exception) {
             UDN(UUID.randomUUID())
         }
-        logger.i("create local device: [$udn]($ipAddress)")
+        logger.i("create local device: [MediaRenderer][$udn]($ipAddress)")
         return LocalDevice(
             DeviceIdentity(udn),
             UDADeviceType("MediaRenderer", 1),

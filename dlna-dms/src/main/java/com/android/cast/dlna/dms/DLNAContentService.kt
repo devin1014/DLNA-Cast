@@ -5,7 +5,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import com.android.cast.dlna.core.Logger
-import com.android.cast.dlna.core.http.LocalServer
+import com.android.cast.dlna.core.Utils
 import org.fourthline.cling.android.AndroidUpnpServiceImpl
 import org.fourthline.cling.binding.annotations.AnnotationLocalServiceBinder
 import org.fourthline.cling.model.DefaultServiceManager
@@ -23,15 +23,12 @@ open class DLNAContentService : AndroidUpnpServiceImpl() {
 
     private val logger = Logger.create("LocalContentService")
     private val serviceBinder = RendererServiceBinderWrapper()
-    private lateinit var localHttpServer: LocalServer
     private var localDevice: LocalDevice? = null
 
     override fun onCreate() {
         logger.i("DLNAContentService create.")
         super.onCreate()
-        localHttpServer = LocalServer(applicationContext)
-        localHttpServer.startServer()
-        val baseUrl = localHttpServer.baseUrl
+        val baseUrl = Utils.getHttpBaseUrl(this)
         try {
             localDevice = createContentServiceDevice(baseUrl = baseUrl)
             upnpService.registry.addDevice(localDevice)
@@ -52,9 +49,6 @@ open class DLNAContentService : AndroidUpnpServiceImpl() {
         localDevice?.also { device ->
             upnpService.registry.removeDevice(device)
         }
-        if (this::localHttpServer.isInitialized) {
-            localHttpServer.stopServer()
-        }
         super.onDestroy()
     }
 
@@ -66,12 +60,12 @@ open class DLNAContentService : AndroidUpnpServiceImpl() {
         } catch (ex: Exception) {
             UDN(UUID.randomUUID())
         }
-        logger.i("create local device: [$udn]($baseUrl)")
+        logger.i("create local device: [MediaServer][$udn]($baseUrl)")
         return LocalDevice(
             DeviceIdentity(udn),
             UDADeviceType("MediaServer", 1),
             DeviceDetails(
-                "DMS  (${Build.MODEL})",
+                "DMS (${Build.MODEL})",
                 ManufacturerDetails(Build.MANUFACTURER),
                 ModelDetails(Build.MODEL, "MSI MediaServer", "v1", baseUrl)
             ),

@@ -1,28 +1,27 @@
 package com.android.cast.dlna.demo.server
 
 import android.Manifest.permission
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.android.cast.dlna.core.http.LocalServer
-import com.android.cast.dlna.dms.DLNAContentService
+import com.android.cast.dlna.core.Utils
 import com.permissionx.guolindev.PermissionX
 
 class MainActivity : AppCompatActivity() {
-    private val localServer: LocalServer by lazy { LocalServer(this, 8193) }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         PermissionX.init(this)
             .permissions(permission.READ_EXTERNAL_STORAGE, permission.ACCESS_COARSE_LOCATION, permission.ACCESS_FINE_LOCATION)
             .request { _: Boolean, _: List<String?>?, _: List<String?>? ->
+                resetWifiInfo()
             }
-        localServer.startServer()
-        DLNAContentService.startService(this)
     }
 
-    override fun onDestroy() {
-        localServer.stopServer()
-        super.onDestroy()
+    @SuppressLint("SetTextI18n")
+    private fun resetWifiInfo() {
+        (findViewById<View>(R.id.network_info) as TextView).text = "${Utils.getWiFiInfoSSID(this)} - ${Utils.getWiFiInfoIPAddress(this)}"
     }
 }
