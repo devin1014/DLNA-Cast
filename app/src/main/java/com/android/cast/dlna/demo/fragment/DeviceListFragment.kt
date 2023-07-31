@@ -80,8 +80,6 @@ private class DeviceAdapter(
         }
     }
 
-    override fun onDeviceUpdated(device: Device<*, *, *>) {}
-
     override fun onDeviceRemoved(device: Device<*, *, *>) {
         if (deviceList.contains(device)) {
             deviceList.remove(device)

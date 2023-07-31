@@ -9,7 +9,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.android.cast.dlna.core.ContentType
-import com.android.cast.dlna.core.Logger
 import com.android.cast.dlna.demo.DetailContainer
 import com.android.cast.dlna.demo.MainActivity
 import com.android.cast.dlna.demo.R
@@ -21,7 +20,6 @@ import org.fourthline.cling.model.meta.Device
 import org.fourthline.cling.support.model.DIDLContent
 
 class ContentFragment : Fragment() {
-    private val logger = Logger.create("ContentFragment")
     private val device: Device<*, *, *> by lazy { (requireParentFragment() as DetailContainer).getDevice() }
     private val contentResult: TextView by lazy { requireView().findViewById(R.id.content_result) }
     private lateinit var deviceControl: DeviceControl

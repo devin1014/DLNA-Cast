@@ -1,37 +1,3 @@
 <resources>
-
     <string name="app_name">DLNA 投屏</string>
-
-    <string name="mode_info">设备</string>
-    <string name="mode_query">查询</string>
-    <string name="mode_ctrl">投射</string>
-    <string name="mode_ctrl_local">投射(本地)</string>
-
-    <string name="device_current">当前设备</string>
-    <string name="device_info">设备信息</string>
-    <string name="device_control">控制器</string>
-    <string name="device_info_refresh">刷新</string>
-
-    <string name="switchRouter">Network On/Off</string>
-    <string name="toggleDebugLogging">Toggle debug logging</string>
-
-    <string name="enablingRouter">Enabling network router…</string>
-    <string name="disablingRouter">Disabling network router…</string>
-    <string name="errorSwitchingRouter">Error switching router: </string>
-    <string name="enablingDebugLogging">Enabling debug logging…</string>
-    <string name="disablingDebugLogging">Disabling debug logging…</string>
-
-    <string name="registeringDevice">Registering UPnP BinaryLight device…</string>
-    <string name="createDeviceFailed">Creating of BinaryLight failed, check the log!</string>
-
-    <string name="deviceDetails">Device Details</string>
-
-    <string name="searchLAN">Search LAN</string>
-    <string name="OK">OK</string>
-
-    <string name="searchingLAN">Searching LAN for UPnP devices…</string>
-    <string name="deviceDetailsNotYetAvailable">Device details are being discovered, please wait.</string>
-    <string name="browse">Browse</string>
-    <string name="search">Search</string>
-
 </resources>

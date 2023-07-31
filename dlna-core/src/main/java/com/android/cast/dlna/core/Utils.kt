@@ -18,7 +18,6 @@ package com.android.cast.dlna.core
 import android.content.ContentUris
 import android.content.Context
 import android.database.Cursor
-import android.net.ConnectivityManager
 import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.Environment
@@ -33,9 +32,6 @@ object Utils {
     // ------------------------------------------------------------------------------------------------------------------------
     // ---- Device Wifi Information
     // ------------------------------------------------------------------------------------------------------------------------
-    private const val NETWORK_TYPE_WIFI = "WiFi"
-    private const val NETWORK_TYPE_MOBILE = "Mobile EDGE>"
-    private const val NETWORK_TYPE_OTHERS = "Others>"
     private const val UNKNOWN = "<unknown>"
     fun getWiFiInfoIPAddress(context: Context): String {
         val wifiManager = getSystemService<WifiManager>(context, Context.WIFI_SERVICE)
@@ -43,16 +39,6 @@ object Utils {
         val wifiInfo = wifiManager.connectionInfo ?: return UNKNOWN
         val address = wifiInfo.ipAddress
         return if (address == 0) UNKNOWN else (address and 0xFF).toString() + "." + (address shr 8 and 0xFF) + "." + (address shr 16 and 0xFF) + "." + (address shr 24 and 0xFF)
-    }
-
-    fun getActiveNetworkInfo(context: Context): String {
-        val connectivityManager = getSystemService<ConnectivityManager?>(context, Context.CONNECTIVITY_SERVICE) ?: return UNKNOWN
-        val networkInfo = connectivityManager.activeNetworkInfo ?: return UNKNOWN
-        return when (networkInfo.type) {
-            ConnectivityManager.TYPE_WIFI -> NETWORK_TYPE_WIFI
-            ConnectivityManager.TYPE_MOBILE -> NETWORK_TYPE_MOBILE
-            else -> NETWORK_TYPE_OTHERS
-        }
     }
 
     @Suppress("UNCHECKED_CAST")

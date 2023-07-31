@@ -7,11 +7,5 @@ import org.fourthline.cling.model.meta.Device
  */
 interface OnDeviceRegistryListener {
     fun onDeviceAdded(device: Device<*, *, *>) {}
-    fun onDeviceUpdated(device: Device<*, *, *>) {}
     fun onDeviceRemoved(device: Device<*, *, *>) {}
-    fun onDeviceListChanged(list: List<Device<*, *, *>>) {}
-}
-
-interface Callback<T> {
-    fun onCallback(t: T?)
 }

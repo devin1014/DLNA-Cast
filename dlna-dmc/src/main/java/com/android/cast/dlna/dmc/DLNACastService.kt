@@ -28,7 +28,7 @@ class DLNACastService : AndroidUpnpServiceImpl() {
     }
 
     override fun createConfiguration(): UpnpServiceConfiguration = object : AndroidUpnpServiceConfiguration() {
-        //        arrayOf(
+//        arrayOf(
 //        DLNACastManager.SERVICE_RENDERING_CONTROL,
 //        DLNACastManager.SERVICE_AV_TRANSPORT,
 //        DLNACastManager.SERVICE_CONNECTION_MANAGER,

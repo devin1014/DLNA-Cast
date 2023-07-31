@@ -135,7 +135,7 @@ open class DLNARendererService : AndroidUpnpServiceImpl() {
         notifyAvTransportLastChange(AVTransportVariable.TransportState(state.toTransportState()))
     }
 
-    fun notifyAvTransportLastChange(event: EventedValue<*>) {
+    private fun notifyAvTransportLastChange(event: EventedValue<*>) {
         val manager = localDevice?.findService(UDAServiceId("AVTransport"))?.manager
         (manager?.implementation as? AVTransportServiceImpl)?.lastChange?.setEventedValue(0, event)
         (manager as? LastChangeAwareServiceManager)?.fireLastChange()

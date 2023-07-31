@@ -31,7 +31,6 @@ open class DLNAContentService : AndroidUpnpServiceImpl() {
         super.onCreate()
         localHttpServer = LocalServer(applicationContext)
         localHttpServer.startServer()
-//        val baseUrl = "http://${Utils.getWiFiInfoIPAddress(applicationContext)}:8192"
         val baseUrl = localHttpServer.baseUrl
         try {
             localDevice = createContentServiceDevice(baseUrl = baseUrl)
@@ -40,6 +39,7 @@ open class DLNAContentService : AndroidUpnpServiceImpl() {
             e.printStackTrace()
             stopSelf()
         }
+        // TODO: 这个用法不对！！！
         ContentFactory.setServerUrl(this, baseUrl)
     }
 

@@ -7,10 +7,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.os.Handler
 import android.os.IBinder
-import android.os.Looper
-import com.android.cast.dlna.core.Level
 import com.android.cast.dlna.core.Logger
 import com.android.cast.dlna.core.http.LocalServer
 import com.android.cast.dlna.dmc.control.CastControlImpl
@@ -40,15 +37,9 @@ object DLNACastManager : OnDeviceRegistryListener {
 
     private val logger = Logger.create("CastManager")
     private val deviceRegistryImpl = DeviceRegistryImpl(this)
-    private val mainHandler = Handler(Looper.getMainLooper())
     private var searchDeviceType: DeviceType? = null
     private var upnpService: AndroidUpnpService? = null
     private var applicationContext: Context? = null
-
-    fun enableLog(logging: Boolean = true, level: Int = Level.V) {
-        Logger.enabled = logging
-        Logger.level = level
-    }
 
     fun bindCastService(context: Context) {
         applicationContext = context.applicationContext
@@ -80,8 +71,6 @@ object DLNACastManager : OnDeviceRegistryListener {
                 if (collection == null || !collection.contains(deviceRegistryImpl)) {
                     registry.addListener(deviceRegistryImpl)
                 }
-                // Now add all devices to the list we already know about
-                deviceRegistryImpl.setDevices(upnpServiceBinder.registry.devices)
             }
         }
 
@@ -104,58 +93,34 @@ object DLNACastManager : OnDeviceRegistryListener {
     // -----------------------------------------------------------------------------------------
     // ---- register or unregister device listener
     // -----------------------------------------------------------------------------------------
-    private val lock = ByteArray(0)
     private val registerDeviceListeners: MutableList<OnDeviceRegistryListener> = ArrayList()
 
     fun registerDeviceListener(listener: OnDeviceRegistryListener?) {
         if (listener == null) return
         upnpService?.also { service ->
-            service.registry.devices
-                .filter { searchDeviceType == null || searchDeviceType == it.type }
-                .forEach { device ->
-                    // if some devices has been found, notify first.
-                    exeActionInUIThread { listener.onDeviceAdded(device) }
-                }
-
+            service.registry.devices?.forEach { device ->
+                // if some devices has been found, notify first.
+                listener.onDeviceAdded(device)
+            }
         }
-        synchronized(lock) {
-            if (!registerDeviceListeners.contains(listener)) registerDeviceListeners.add(listener)
-        }
-    }
-
-    private fun exeActionInUIThread(action: Runnable) {
-        if (Thread.currentThread() !== Looper.getMainLooper().thread) mainHandler.post(action)
-        else action.run()
+        if (!registerDeviceListeners.contains(listener)) registerDeviceListeners.add(listener)
     }
 
     fun unregisterListener(listener: OnDeviceRegistryListener) {
-        synchronized(lock) { registerDeviceListeners.remove(listener) }
+        registerDeviceListeners.remove(listener)
     }
 
     override fun onDeviceAdded(device: Device<*, *, *>) {
         if (checkDeviceType(device)) {
-            synchronized(lock) {
-                registerDeviceListeners.forEach { listener -> listener.onDeviceAdded(device) }
-            }
-        }
-    }
-
-    override fun onDeviceUpdated(device: Device<*, *, *>) {
-        if (checkDeviceType(device)) {
-            synchronized(lock) {
-                registerDeviceListeners.forEach { listener -> listener.onDeviceUpdated(device) }
-            }
+            registerDeviceListeners.forEach { listener -> listener.onDeviceAdded(device) }
         }
     }
 
     override fun onDeviceRemoved(device: Device<*, *, *>) {
+        // TODO:if this device is casting, disconnect first!
+        // disconnectDevice(device)
         if (checkDeviceType(device)) {
-            // if this device is casting, disconnect first!
-            //TODO:check
-//            if (controlImpl?.isCasting(device) == true) controlImpl?.stop()
-            synchronized(lock) {
-                registerDeviceListeners.forEach { listener -> listener.onDeviceRemoved(device) }
-            }
+            registerDeviceListeners.forEach { listener -> listener.onDeviceRemoved(device) }
         }
     }
 
@@ -183,10 +148,17 @@ object DLNACastManager : OnDeviceRegistryListener {
     // ---- Action
     // -----------------------------------------------------------------------------------------
     fun search(type: DeviceType? = null, maxSeconds: Int = 60) {
-        searchDeviceType = type
         upnpService?.get()?.also { service ->
-            //when search device, clear all founded first.
-            service.registry.removeAllRemoteDevices()
+            searchDeviceType = type
+            service.registry.devices?.filter { !checkDeviceType(it) }?.onEach {
+                // notify device removed without type check.
+                registerDeviceListeners.forEach { listener -> listener.onDeviceRemoved(it) }
+                service.registry.removeDevice(it.identity.udn)
+            }
+            // when search device, clear all founded first.
+            // service.registry.removeAllRemoteDevices()
+
+            // search the special type device
             service.controlPoint.search(type?.let { UDADeviceTypeHeader(it) } ?: STAllHeader(), maxSeconds)
         }
     }

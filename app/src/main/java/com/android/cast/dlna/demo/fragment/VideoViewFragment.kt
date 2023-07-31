@@ -88,7 +88,9 @@ class VideoViewFragment : Fragment() {
                         }
 
                         override fun onFailure(msg: String) {
-                            Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+                            activity?.also { context ->
+                                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                            }
                         }
                     })
                 }
