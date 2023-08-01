@@ -22,6 +22,6 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun resetWifiInfo() {
-        (findViewById<View>(R.id.network_info) as TextView).text = "${Utils.getWiFiInfoSSID(this)} - ${Utils.getWiFiInfoIPAddress(this)}"
+        (findViewById<View>(R.id.network_info) as TextView).text = "${Utils.getWiFiName(this)} - ${Utils.getWiFiIpAddress(this)}"
     }
 }

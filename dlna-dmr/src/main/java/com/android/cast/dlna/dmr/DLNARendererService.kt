@@ -64,7 +64,7 @@ open class DLNARendererService : AndroidUpnpServiceImpl() {
         avTransportControl = AVTransportController(applicationContext)
         audioControl = AudioRenderController(applicationContext)
         try {
-            localDevice = createRendererDevice(Utils.getWiFiInfoIPAddress(applicationContext))
+            localDevice = createRendererDevice(Utils.getWiFiIpAddress(applicationContext))
             upnpService.registry.addDevice(localDevice)
         } catch (e: Exception) {
             e.printStackTrace()

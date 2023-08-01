@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <item
-        android:id="@+id/menu_search_start"
+        android:id="@+id/menu_search"
         android:icon="@drawable/search"
         android:orderInCategory="100"
         android:title="搜索设备"

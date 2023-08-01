@@ -38,26 +38,15 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:id="@+id/local_server"
+            android:id="@+id/local_cast"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginEnd="8dp"
             android:background="?android:selectableItemBackground"
             android:contentDescription="@null"
-            android:padding="4dp"
-            android:src="@drawable/local_http"
+            android:padding="7dp"
+            android:src="@drawable/cast_phone"
             app:layout_constraintEnd_toStartOf="@id/video_cast"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
-            android:id="@+id/video_cast_stop"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="?android:selectableItemBackground"
-            android:contentDescription="@null"
-            android:padding="4dp"
-            android:src="@drawable/cast_stop"
-            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
@@ -94,8 +83,21 @@
             android:src="@drawable/cast_next"
             app:layout_constraintBottom_toBottomOf="@id/video_cast_pause"
             app:layout_constraintLeft_toRightOf="@id/video_cast_pause"
-            app:layout_constraintRight_toLeftOf="@id/video_cast_mute"
+            app:layout_constraintRight_toLeftOf="@id/video_cast_stop"
             app:layout_constraintTop_toTopOf="@id/video_cast_pause" />
+
+        <ImageView
+            android:id="@+id/video_cast_stop"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?android:selectableItemBackground"
+            android:contentDescription="@null"
+            android:padding="4dp"
+            android:src="@drawable/cast_stop"
+            app:layout_constraintBottom_toBottomOf="@id/video_cast_next"
+            app:layout_constraintLeft_toRightOf="@id/video_cast_next"
+            app:layout_constraintRight_toLeftOf="@id/video_cast_mute"
+            app:layout_constraintTop_toTopOf="@id/video_cast_next" />
 
         <ImageView
             android:id="@+id/video_cast_mute"
@@ -105,10 +107,10 @@
             android:contentDescription="@null"
             android:padding="4dp"
             android:src="@drawable/cast_mute"
-            app:layout_constraintBottom_toBottomOf="@id/video_cast_next"
-            app:layout_constraintLeft_toRightOf="@id/video_cast_next"
+            app:layout_constraintBottom_toBottomOf="@id/video_cast_stop"
+            app:layout_constraintLeft_toRightOf="@id/video_cast_stop"
             app:layout_constraintRight_toLeftOf="@id/video_cast_add"
-            app:layout_constraintTop_toTopOf="@id/video_cast_next" />
+            app:layout_constraintTop_toTopOf="@id/video_cast_stop" />
 
         <ImageView
             android:id="@+id/video_cast_add"

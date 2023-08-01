@@ -1,5 +1,8 @@
 package com.android.cast.dlna.demo.fragment
 
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -13,6 +16,8 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.android.cast.dlna.core.Logger
+import com.android.cast.dlna.core.Utils
 import com.android.cast.dlna.demo.DetailContainer
 import com.android.cast.dlna.demo.MainActivity
 import com.android.cast.dlna.demo.R
@@ -30,6 +35,8 @@ import java.util.Locale
 
 class VideoViewFragment : Fragment() {
 
+    private val logger = Logger.create("VideoViewFragment")
+
     @Suppress("DEPRECATION")
     private val colorAccent: Int by lazy { resources.getColor(R.color.colorAccent) }
     private val device: Device<*, *, *> by lazy { (requireParentFragment() as DetailContainer).getDevice() }
@@ -37,7 +44,6 @@ class VideoViewFragment : Fragment() {
     private val positionSeekBar: SeekBar by lazy { requireView().findViewById(R.id.video_cast_seekbar) }
     private val pauseButton: ImageView by lazy { requireView().findViewById(R.id.video_cast_pause) }
     private val volumeMuteButton: ImageView by lazy { requireView().findViewById(R.id.video_cast_mute) }
-    private val localServerButton: ImageView by lazy { requireView().findViewById(R.id.local_server) }
     private lateinit var deviceControl: DeviceControl
     private var currentState: TransportState = NO_MEDIA_PRESENT
 
@@ -96,6 +102,12 @@ class VideoViewFragment : Fragment() {
                 }
             })
         }
+        view.findViewById<View>(R.id.local_cast).setOnClickListener {
+            startActivityForResult(Intent().apply {
+                action = Intent.ACTION_GET_CONTENT
+                type = "video/*;audio/*"
+            }, 987)
+        }
         view.findViewById<View>(R.id.video_cast_add).setOnClickListener {
             CastUrlDialogFragment.show(childFragmentManager, object : OnUrlSelectListener {
                 override fun onUrlSelected(video: VideoUrl) {
@@ -117,14 +129,6 @@ class VideoViewFragment : Fragment() {
             volumeMuteButton.setColorFilter(if (mute) colorAccent else 0xFFFFFF)
         }
         positionSeekBar.setOnSeekBarChangeListener(seekBarChangeListener)
-        //TODO: need local server?
-        localServerButton.setOnClickListener {
-            val selected = !it.isSelected
-            it.isSelected = selected
-            localServerButton.setColorFilter(if (selected) colorAccent else 0xFFFFFF)
-            if (selected) DLNACastManager.startLocalHttpServer()
-            else DLNACastManager.stopLocalHttpServer()
-        }
     }
 
     private var durationMillSeconds: Long = 0
@@ -162,6 +166,38 @@ class VideoViewFragment : Fragment() {
         override fun onStopTrackingTouch(seekBar: SeekBar) {
             if (durationMillSeconds > 0) {
                 deviceControl.seek(seekBar.progress * durationMillSeconds / seekBar.max)
+            }
+        }
+    }
+
+    // content://com.android.providers.media.documents/document/video:6217
+    // content://com.android.providers.media.documents/document/video:6224
+    // content://com.android.providers.downloads.documents/document/raw:/storage/emulated/0/Download/big_buck_bunny.mp4
+    @Deprecated("Deprecated in Java", ReplaceWith("super.onActivityResult(requestCode, resultCode, data)", "androidx.fragment.app.Fragment"))
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 987 && resultCode == Activity.RESULT_OK) {
+            data?.data?.also { uri ->
+                val file = Utils.parseUri2File(requireContext(), uri)
+                if (file == null) {
+                    logger.w("selected: ${Uri.decode(uri.toString())}")
+                    Toast.makeText(context, "找不到文件路径...", Toast.LENGTH_SHORT).show()
+                } else {
+                    logger.i("selected: $file")
+                    DLNACastManager.startLocalHttpServer()
+                    durationMillSeconds = 0L
+                    deviceControl.setAVTransportURI("${DLNACastManager.localServer?.baseUrl}${file.path}", file.nameWithoutExtension, object : ServiceActionCallback<Unit> {
+                        override fun onSuccess(result: Unit) {
+                            positionHandler.start()
+                        }
+
+                        override fun onFailure(msg: String) {
+                            activity?.also { context ->
+                                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    })
+                }
             }
         }
     }

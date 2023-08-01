@@ -3,7 +3,6 @@ package com.android.cast.dlna.dmc.control
 import android.os.Handler
 import android.os.Looper
 import com.android.cast.dlna.core.Logger
-import com.android.cast.dlna.core.Utils.getStringTime
 import com.android.cast.dlna.dmc.control.action.SetNextAVTransportURI
 import org.fourthline.cling.controlpoint.ActionCallback
 import org.fourthline.cling.controlpoint.ControlPoint
@@ -31,6 +30,8 @@ import org.fourthline.cling.support.renderingcontrol.callback.GetMute
 import org.fourthline.cling.support.renderingcontrol.callback.GetVolume
 import org.fourthline.cling.support.renderingcontrol.callback.SetMute
 import org.fourthline.cling.support.renderingcontrol.callback.SetVolume
+import java.util.Formatter
+import java.util.Locale
 
 private object Actions {
     // AvTransport
@@ -392,4 +393,13 @@ internal abstract class BaseServiceExecutor(
             })
         }
     }
+}
+
+private fun getStringTime(timeMs: Long): String {
+    val formatter = Formatter(StringBuilder(), Locale.US)
+    val totalSeconds = timeMs / 1000
+    val seconds = totalSeconds % 60
+    val minutes = totalSeconds / 60 % 60
+    val hours = totalSeconds / 3600
+    return formatter.format("%02d:%02d:%02d", hours, minutes, seconds).toString()
 }

@@ -128,7 +128,8 @@ object DLNACastManager : OnDeviceRegistryListener {
     // -----------------------------------------------------------------------------------------
     // ---- LocalServer
     // -----------------------------------------------------------------------------------------
-    private var localServer: LocalServer? = null
+    var localServer: LocalServer? = null
+        private set
 
     fun startLocalHttpServer(port: Int = 8192, jetty: Boolean = true) {
         if (localServer == null) {
