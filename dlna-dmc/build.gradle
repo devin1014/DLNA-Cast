@@ -4,15 +4,13 @@ plugins {
 }
 
 android {
-    compileSdkVersion 32
-
+    namespace 'com.android.cast.dlna.dmc'
+    compileSdk 32
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 32
-
+        minSdk 24
+        targetSdk 32
         consumerProguardFiles "consumer-rules.pro"
     }
-
     buildTypes {
         release {
             minifyEnabled false

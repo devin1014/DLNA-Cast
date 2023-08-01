@@ -4,15 +4,13 @@ plugins {
 }
 
 android {
-    compileSdkVersion 32
-
+    namespace 'com.android.cast.dlna.dmr'
+    compileSdk 32
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 32
-
+        minSdk 24
+        targetSdk 32
         consumerProguardFiles "consumer-rules.pro"
     }
-
     buildTypes {
         release {
             minifyEnabled false
@@ -29,11 +27,6 @@ dependencies {
     api(project(':dlna-core'))
 
     implementation 'androidx.appcompat:appcompat:1.4.2'
-
-    api 'org.eclipse.jetty:jetty-server:8.1.21.v20160908'
-    api 'org.eclipse.jetty:jetty-servlet:8.1.21.v20160908'
-    api 'org.eclipse.jetty:jetty-client:8.1.21.v20160908'
-
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
 repositories {

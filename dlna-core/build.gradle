@@ -4,16 +4,13 @@ plugins {
 }
 
 android {
-    compileSdkVersion 32
-
+    namespace 'com.android.cast.dlna.core'
+    compileSdk 32
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 32
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        minSdk 24
+        targetSdk 32
         consumerProguardFiles "consumer-rules.pro"
     }
-
     buildTypes {
         release {
             minifyEnabled false

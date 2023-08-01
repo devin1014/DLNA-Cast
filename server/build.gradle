@@ -8,7 +8,7 @@ android {
     compileSdk 32
     defaultConfig {
         applicationId "com.android.cast.dlna.demo.server"
-        minSdk 21
+        minSdk 24
         targetSdk 32
         versionCode 1
         versionName "1.0"
@@ -33,10 +33,9 @@ android {
 
 dependencies {
     implementation project(':dlna-dms')
+    implementation 'com.permissionx.guolindev:permissionx:1.4.0'
     //noinspection GradleDependency
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.4.2'
     implementation 'com.google.android.material:material:1.6.1'
-
-    implementation 'com.permissionx.guolindev:permissionx:1.4.0'
 }
