@@ -10,7 +10,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.android.cast.dlna.core.Utils
 import com.android.cast.dlna.demo.fragment.OnItemClickListener
-import com.android.cast.dlna.demo.fragment.VideoViewFragment
 import com.android.cast.dlna.dmc.DLNACastManager
 import com.permissionx.guolindev.PermissionX
 import org.fourthline.cling.model.meta.Device

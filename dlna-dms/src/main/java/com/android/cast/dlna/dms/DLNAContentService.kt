@@ -6,14 +6,16 @@ import android.os.Build
 import android.os.IBinder
 import com.android.cast.dlna.core.Logger
 import com.android.cast.dlna.core.Utils
+import com.android.cast.dlna.dms.service.ContentControl
+import com.android.cast.dlna.dms.service.ContentDirectoryServiceController
+import com.android.cast.dlna.dms.service.ContentDirectoryServiceImpl
 import org.fourthline.cling.android.AndroidUpnpServiceImpl
 import org.fourthline.cling.binding.annotations.AnnotationLocalServiceBinder
 import org.fourthline.cling.model.DefaultServiceManager
-import org.fourthline.cling.model.ValidationException
 import org.fourthline.cling.model.meta.*
 import org.fourthline.cling.model.types.UDADeviceType
 import org.fourthline.cling.model.types.UDN
-import java.io.IOException
+import org.fourthline.cling.support.contentdirectory.AbstractContentDirectoryService
 import java.util.*
 
 open class DLNAContentService : AndroidUpnpServiceImpl() {
@@ -24,10 +26,12 @@ open class DLNAContentService : AndroidUpnpServiceImpl() {
     private val logger = Logger.create("LocalContentService")
     private val serviceBinder = RendererServiceBinderWrapper()
     private var localDevice: LocalDevice? = null
+    private lateinit var contentControl: ContentControl
 
     override fun onCreate() {
         logger.i("DLNAContentService create.")
         super.onCreate()
+        contentControl = ContentDirectoryServiceController(this)
         val baseUrl = Utils.getHttpBaseUrl(this)
         try {
             localDevice = createContentServiceDevice(baseUrl = baseUrl)
@@ -36,8 +40,6 @@ open class DLNAContentService : AndroidUpnpServiceImpl() {
             e.printStackTrace()
             stopSelf()
         }
-        // TODO: 这个用法不对！！！
-        ContentFactory.setServerUrl(this, baseUrl)
     }
 
     override fun onBind(intent: Intent?): IBinder? = serviceBinder
@@ -52,8 +54,7 @@ open class DLNAContentService : AndroidUpnpServiceImpl() {
         super.onDestroy()
     }
 
-    @Throws(ValidationException::class, IOException::class)
-    protected fun createContentServiceDevice(baseUrl: String): LocalDevice {
+    protected open fun createContentServiceDevice(baseUrl: String): LocalDevice {
         val info = "DLNA_ContentService-$baseUrl-${Build.MODEL}-${Build.MANUFACTURER}"
         val udn = try {
             UDN(UUID.nameUUIDFromBytes(info.toByteArray()))
@@ -78,14 +79,12 @@ open class DLNAContentService : AndroidUpnpServiceImpl() {
     protected open fun generateLocalServices(): Array<LocalService<*>> {
         val serviceBinder = AnnotationLocalServiceBinder()
         // content directory service
-        val contentDirectoryService = serviceBinder.read(ContentDirectoryService::class.java) as LocalService<ContentDirectoryService>
-        contentDirectoryService.manager = DefaultServiceManager(contentDirectoryService, ContentDirectoryService::class.java)
-        //TODO: check here
-//        contentDirectoryService.manager = object : LastChangeAwareServiceManager<AbstractContentDirectoryService>(contentDirectoryService, AVTransportLastChangeParser()) {
-//            override fun createServiceInstance(): AbstractContentDirectoryService {
-//                return ContentDirectoryService()
-//            }
-//        }
+        val contentDirectoryService = serviceBinder.read(AbstractContentDirectoryService::class.java) as LocalService<AbstractContentDirectoryService>
+        contentDirectoryService.manager = object : DefaultServiceManager<AbstractContentDirectoryService>(contentDirectoryService) {
+            override fun createServiceInstance(): AbstractContentDirectoryService {
+                return ContentDirectoryServiceImpl(contentControl)
+            }
+        }
         return arrayOf(contentDirectoryService)
     }
 
