@@ -3,12 +3,14 @@ package com.android.cast.dlna.demo
 import android.Manifest.permission
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.android.cast.dlna.core.Utils
 import com.android.cast.dlna.demo.fragment.OnItemClickListener
+import com.android.cast.dlna.demo.fragment.VideoViewFragment
 import com.android.cast.dlna.dmc.DLNACastManager
 import com.permissionx.guolindev.PermissionX
 import org.fourthline.cling.model.meta.Device
@@ -35,15 +37,6 @@ class MainActivity : AppCompatActivity(), OnItemClickListener {
         resetToolbar()
     }
 
-    override fun onDestroy() {
-//        DLNACastManager.unbindCastService(this)
-        super.onDestroy()
-    }
-
-    override fun onItemClick(device: Device<*, *, *>) {
-        replace(R.id.detail_container, DetailFragment.create(device))
-    }
-
     override fun onBackPressed() {
         val detailFragment = supportFragmentManager.findFragmentById(R.id.detail_container)
         if (detailFragment != null) {
@@ -51,6 +44,21 @@ class MainActivity : AppCompatActivity(), OnItemClickListener {
             return
         }
         super.onBackPressed()
+    }
+
+    override fun onDestroy() {
+//        DLNACastManager.unbindCastService(this)
+        super.onDestroy()
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        val result = super.onKeyDown(keyCode, event)
+        (supportFragmentManager.findFragmentById(R.id.detail_container) as? OnKeyEventHandler)?.onKeyDown(keyCode, event)
+        return result
+    }
+
+    override fun onItemClick(device: Device<*, *, *>) {
+        replace(R.id.detail_container, DetailFragment.create(device))
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

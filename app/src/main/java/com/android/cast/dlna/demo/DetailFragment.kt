@@ -1,6 +1,7 @@
 package com.android.cast.dlna.demo
 
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +15,11 @@ interface DetailContainer {
     fun getDevice(): Device<*, *, *>
 }
 
-class DetailFragment : Fragment(), DetailContainer {
+interface OnKeyEventHandler {
+    fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean = false
+}
+
+class DetailFragment : Fragment(), DetailContainer, OnKeyEventHandler {
     companion object {
         fun create(device: Device<*, *, *>): Fragment = DetailFragment().apply {
             this.device = device
@@ -37,5 +42,12 @@ class DetailFragment : Fragment(), DetailContainer {
                 replace(R.id.top_container, ContentFragment())
             }
         }
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        childFragmentManager.fragments.forEach {
+            (it as? OnKeyEventHandler)?.onKeyDown(keyCode, event)
+        }
+        return false
     }
 }

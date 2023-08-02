@@ -45,7 +45,7 @@ class AVTransportController(override val applicationContext: Context) : AvTransp
             val realTime = ModelUtil.toTimeString(ctrl.currentPosition / 1000)
             PositionInfo(0, duration, currentURI, realTime, realTime)
         } ?: PositionInfo()
-    override val currentTransportActions: Array<TransportAction> //TODO: check
+    override val currentTransportActions: Array<TransportAction>
         get() = when (transportInfo.currentTransportState) {
             TransportState.PLAYING -> TRANSPORT_ACTION_PLAYING
             TransportState.PAUSED_PLAYBACK -> TRANSPORT_ACTION_PAUSE_PLAYBACK

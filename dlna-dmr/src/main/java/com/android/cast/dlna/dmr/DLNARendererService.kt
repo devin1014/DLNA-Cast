@@ -64,7 +64,7 @@ open class DLNARendererService : AndroidUpnpServiceImpl() {
         avTransportControl = AVTransportController(applicationContext)
         audioControl = AudioRenderController(applicationContext)
         try {
-            localDevice = createRendererDevice(Utils.getWiFiIpAddress(applicationContext))
+            localDevice = createRendererDevice(Utils.getHttpBaseUrl(applicationContext))
             upnpService.registry.addDevice(localDevice)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -86,21 +86,21 @@ open class DLNARendererService : AndroidUpnpServiceImpl() {
     }
 
     @Throws(ValidationException::class, IOException::class)
-    protected fun createRendererDevice(ipAddress: String): LocalDevice {
-        val info = "DLNA_MediaPlayer-$ipAddress-${Build.MODEL}-${Build.MANUFACTURER}"
+    protected fun createRendererDevice(baseUrl: String): LocalDevice {
+        val info = "DLNA_MediaPlayer-$baseUrl-${Build.MODEL}-${Build.MANUFACTURER}"
         val udn = try {
             UDN(UUID.nameUUIDFromBytes(info.toByteArray()))
         } catch (ex: Exception) {
             UDN(UUID.randomUUID())
         }
-        logger.i("create local device: [MediaRenderer][$udn]($ipAddress)")
+        logger.i("create local device: [MediaRenderer][$udn]($baseUrl)")
         return LocalDevice(
             DeviceIdentity(udn),
             UDADeviceType("MediaRenderer", 1),
             DeviceDetails(
                 "DMR  (${Build.MODEL})",
                 ManufacturerDetails(Build.MANUFACTURER),
-                ModelDetails(Build.MODEL, "MPI MediaPlayer", "v1", String.format("http://%s:%s", ipAddress, "8191"))
+                ModelDetails(Build.MODEL, "MPI MediaPlayer", "v1", baseUrl)
             ),
             emptyArray(),
             generateLocalServices()

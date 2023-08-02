@@ -1,12 +1,15 @@
 package com.android.cast.dlna.demo.fragment
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.media.AudioManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +23,7 @@ import com.android.cast.dlna.core.Logger
 import com.android.cast.dlna.core.Utils
 import com.android.cast.dlna.demo.DetailContainer
 import com.android.cast.dlna.demo.MainActivity
+import com.android.cast.dlna.demo.OnKeyEventHandler
 import com.android.cast.dlna.demo.R
 import com.android.cast.dlna.demo.VideoUrl
 import com.android.cast.dlna.dmc.DLNACastManager
@@ -33,7 +37,7 @@ import org.fourthline.cling.support.model.TransportState.NO_MEDIA_PRESENT
 import java.util.Formatter
 import java.util.Locale
 
-class VideoViewFragment : Fragment() {
+class VideoViewFragment : Fragment(), OnKeyEventHandler {
 
     private val logger = Logger.create("VideoViewFragment")
 
@@ -191,6 +195,15 @@ class VideoViewFragment : Fragment() {
                 deviceControl.seek(seekBar.progress * durationMillSeconds / seekBar.max)
             }
         }
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+            val audioManager = requireContext().getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            deviceControl.setVolume(audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) * 100 / audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC))
+            return true
+        }
+        return false
     }
 
     // content://com.android.providers.media.documents/document/video:6217

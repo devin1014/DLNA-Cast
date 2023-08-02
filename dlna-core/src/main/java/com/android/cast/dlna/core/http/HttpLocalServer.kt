@@ -15,8 +15,6 @@ class LocalServer(
     jetty: Boolean = true,
     httpServer: HttpServer = if (jetty) JettyHttpServer(port) else NanoHttpServer(port),
 ) : HttpServer by httpServer {
-
     val ip: String = Utils.getWiFiIpAddress(context)
     val baseUrl: String = "http://$ip:$port"
-    val available: Boolean = ip.isNotEmpty()
 }
