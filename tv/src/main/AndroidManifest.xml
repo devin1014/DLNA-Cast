@@ -34,7 +34,8 @@
             android:configChanges="keyboard|screenSize"
             android:exported="true"
             android:launchMode="singleTop"
-            android:screenOrientation="landscape">
+            android:screenOrientation="landscape"
+            android:theme="@style/Player">
             <intent-filter>
                 <action android:name="com.dlna.action.SetAvTransport" />
                 <category android:name="android.intent.category.DEFAULT" />

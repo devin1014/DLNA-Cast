@@ -15,10 +15,12 @@ interface DeviceControl : AvTransportServiceAction, RendererServiceAction, Conte
 object EmptyDeviceControl : DeviceControl {
     override fun setAVTransportURI(uri: String, title: String, callback: ServiceActionCallback<Unit>?) {}
     override fun setNextAVTransportURI(uri: String, title: String, callback: ServiceActionCallback<Unit>?) {}
-    override fun play(callback: ServiceActionCallback<Unit>?) {}
+    override fun play(speed: String, callback: ServiceActionCallback<Unit>?) {}
     override fun pause(callback: ServiceActionCallback<Unit>?) {}
     override fun stop(callback: ServiceActionCallback<Unit>?) {}
     override fun seek(millSeconds: Long, callback: ServiceActionCallback<Unit>?) {}
+    override fun next(callback: ServiceActionCallback<Unit>?) {}
+    override fun previous(callback: ServiceActionCallback<Unit>?) {}
     override fun getPositionInfo(callback: ServiceActionCallback<PositionInfo>?) {}
     override fun getMediaInfo(callback: ServiceActionCallback<MediaInfo>?) {}
     override fun getTransportInfo(callback: ServiceActionCallback<TransportInfo>?) {}

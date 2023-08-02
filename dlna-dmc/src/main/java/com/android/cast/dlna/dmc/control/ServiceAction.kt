@@ -16,10 +16,18 @@ interface ServiceActionCallback<T> {
 interface AvTransportServiceAction {
     fun setAVTransportURI(uri: String, title: String, callback: ServiceActionCallback<Unit>? = null)
     fun setNextAVTransportURI(uri: String, title: String, callback: ServiceActionCallback<Unit>? = null)
-    fun play(callback: ServiceActionCallback<Unit>? = null)
+    fun play(speed: String = "1", callback: ServiceActionCallback<Unit>? = null)
     fun pause(callback: ServiceActionCallback<Unit>? = null)
     fun stop(callback: ServiceActionCallback<Unit>? = null)
     fun seek(millSeconds: Long, callback: ServiceActionCallback<Unit>? = null)
+    fun next(callback: ServiceActionCallback<Unit>? = null)
+    fun canNext(callback: ServiceActionCallback<Boolean>? = null) {
+        callback?.onSuccess(false)
+    }
+    fun previous(callback: ServiceActionCallback<Unit>? = null)
+    fun canPrevious(callback: ServiceActionCallback<Boolean>? = null) {
+        callback?.onSuccess(false)
+    }
     fun getPositionInfo(callback: ServiceActionCallback<PositionInfo>?)
     fun getMediaInfo(callback: ServiceActionCallback<MediaInfo>?)
     fun getTransportInfo(callback: ServiceActionCallback<TransportInfo>?)

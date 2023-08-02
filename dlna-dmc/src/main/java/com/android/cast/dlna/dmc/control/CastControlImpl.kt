@@ -62,8 +62,8 @@ class CastControlImpl(
         avTransportService.setNextAVTransportURI(uri, title, callback)
     }
 
-    override fun play(callback: ServiceActionCallback<Unit>?) {
-        avTransportService.play(callback)
+    override fun play(speed: String, callback: ServiceActionCallback<Unit>?) {
+        avTransportService.play(speed, callback)
     }
 
     override fun pause(callback: ServiceActionCallback<Unit>?) {
@@ -76,6 +76,22 @@ class CastControlImpl(
 
     override fun stop(callback: ServiceActionCallback<Unit>?) {
         avTransportService.stop(callback)
+    }
+
+    override fun next(callback: ServiceActionCallback<Unit>?) {
+        avTransportService.next(callback)
+    }
+
+    override fun canNext(callback: ServiceActionCallback<Boolean>?) {
+        avTransportService.canNext(callback)
+    }
+
+    override fun previous(callback: ServiceActionCallback<Unit>?) {
+        avTransportService.previous(callback)
+    }
+
+    override fun canPrevious(callback: ServiceActionCallback<Boolean>?) {
+        avTransportService.canPrevious(callback)
     }
 
     override fun getMediaInfo(callback: ServiceActionCallback<MediaInfo>?) {
@@ -110,7 +126,7 @@ class CastControlImpl(
     }
 
     // --------------------------------------------------------
-    // ---- Content ------------------------------------------
+    // ---- Content -------------------------------------------
     // --------------------------------------------------------
     override fun browse(containerId: String, callback: ServiceActionCallback<DIDLContent>?) {
         contentService.browse(containerId, callback)

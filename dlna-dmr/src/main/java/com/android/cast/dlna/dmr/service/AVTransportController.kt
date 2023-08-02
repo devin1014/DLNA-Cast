@@ -90,6 +90,30 @@ class AVTransportController(override val applicationContext: Context) : AvTransp
         }
     }
 
+    override fun next() {
+        super.next()
+        if (nextURI != null && nextURIMetaData != null) {
+            previousURI = currentURI
+            previousURIMetaData = currentURIMetaData
+            setAVTransportURI(nextURI!!, nextURIMetaData)
+        }
+        nextURI = null
+        nextURIMetaData = null
+    }
+
+    private var previousURI: String? = null
+    private var previousURIMetaData: String? = null
+    override fun previous() {
+        super.previous()
+        if (previousURI != null && previousURIMetaData != null) {
+            nextURI = currentURI
+            nextURIMetaData = currentURIMetaData
+            setAVTransportURI(previousURI!!, previousURIMetaData)
+        }
+        previousURI = null
+        previousURIMetaData = null
+    }
+
     override fun stop() {
         super.stop()
         mediaControl?.stop()

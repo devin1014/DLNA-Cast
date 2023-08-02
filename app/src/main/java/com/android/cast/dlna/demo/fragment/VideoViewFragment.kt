@@ -81,6 +81,12 @@ class VideoViewFragment : Fragment() {
     }
 
     private fun initComponent(view: View) {
+        view.findViewById<View>(R.id.video_cast_previous).setOnClickListener {
+            deviceControl.previous()
+        }
+        view.findViewById<View>(R.id.video_cast_next).setOnClickListener {
+            deviceControl.next()
+        }
         view.findViewById<View>(R.id.video_cast_stop).setOnClickListener {
             deviceControl.stop()
         }

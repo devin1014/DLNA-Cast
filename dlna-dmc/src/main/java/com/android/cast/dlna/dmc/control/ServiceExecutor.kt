@@ -13,8 +13,10 @@ import org.fourthline.cling.model.meta.Service
 import org.fourthline.cling.support.avtransport.callback.GetMediaInfo
 import org.fourthline.cling.support.avtransport.callback.GetPositionInfo
 import org.fourthline.cling.support.avtransport.callback.GetTransportInfo
+import org.fourthline.cling.support.avtransport.callback.Next
 import org.fourthline.cling.support.avtransport.callback.Pause
 import org.fourthline.cling.support.avtransport.callback.Play
+import org.fourthline.cling.support.avtransport.callback.Previous
 import org.fourthline.cling.support.avtransport.callback.Seek
 import org.fourthline.cling.support.avtransport.callback.SetAVTransportURI
 import org.fourthline.cling.support.avtransport.callback.Stop
@@ -41,6 +43,8 @@ private object Actions {
     const val Pause = "Pause"
     const val Stop = "Stop"
     const val Seek = "Seek"
+    const val Next = "Next"
+    const val Previous = "Previous"
     const val GetPositionInfo = "GetPositionInfo"
     const val GetMediaInfo = "GetMediaInfo"
     const val GetTransportInfo = "GetTransportInfo"
@@ -152,13 +156,13 @@ internal abstract class BaseServiceExecutor(
             })
         }
 
-        override fun play(callback: ServiceActionCallback<Unit>?) {
+        override fun play(speed: String, callback: ServiceActionCallback<Unit>?) {
             logger.i(Actions.Play)
             if (invalidServiceAction(Actions.Play)) {
                 notifyFailure(callback)
                 return
             }
-            executeAction(object : Play(service) {
+            executeAction(object : Play(service, speed) {
                 override fun success(invocation: ActionInvocation<*>?) {
                     notifySuccess(callback, result = Unit)
                 }
@@ -210,6 +214,40 @@ internal abstract class BaseServiceExecutor(
                 return
             }
             executeAction(object : Seek(service, getStringTime(millSeconds)) {
+                override fun success(invocation: ActionInvocation<*>?) {
+                    notifySuccess(callback, result = Unit)
+                }
+
+                override fun failure(invocation: ActionInvocation<*>?, operation: UpnpResponse?, defaultMsg: String?) {
+                    notifyFailure(callback, defaultMsg ?: "Error")
+                }
+            })
+        }
+
+        override fun next(callback: ServiceActionCallback<Unit>?) {
+            logger.i(Actions.Next)
+            if (invalidServiceAction(Actions.Next)) {
+                notifyFailure(callback)
+                return
+            }
+            executeAction(object : Next(service) {
+                override fun success(invocation: ActionInvocation<*>?) {
+                    notifySuccess(callback, result = Unit)
+                }
+
+                override fun failure(invocation: ActionInvocation<*>?, operation: UpnpResponse?, defaultMsg: String?) {
+                    notifyFailure(callback, defaultMsg ?: "Error")
+                }
+            })
+        }
+
+        override fun previous(callback: ServiceActionCallback<Unit>?) {
+            logger.i(Actions.Previous)
+            if (invalidServiceAction(Actions.Previous)) {
+                notifyFailure(callback)
+                return
+            }
+            executeAction(object : Previous(service) {
                 override fun success(invocation: ActionInvocation<*>?) {
                     notifySuccess(callback, result = Unit)
                 }
