@@ -43,6 +43,8 @@ class VideoViewFragment : Fragment() {
     private val positionInfo: TextView by lazy { requireView().findViewById(R.id.video_cast_position) }
     private val positionSeekBar: SeekBar by lazy { requireView().findViewById(R.id.video_cast_seekbar) }
     private val pauseButton: ImageView by lazy { requireView().findViewById(R.id.video_cast_pause) }
+    private val slowPlay: ImageView by lazy { requireView().findViewById(R.id.video_cast_slow) }
+    private val fastPlay: ImageView by lazy { requireView().findViewById(R.id.video_cast_fast) }
     private val volumeMuteButton: ImageView by lazy { requireView().findViewById(R.id.video_cast_mute) }
     private lateinit var deviceControl: DeviceControl
     private var currentState: TransportState = NO_MEDIA_PRESENT
@@ -87,10 +89,25 @@ class VideoViewFragment : Fragment() {
         view.findViewById<View>(R.id.video_cast_next).setOnClickListener {
             deviceControl.next()
         }
+        // 倍速好像没有效果!
+        slowPlay.setOnClickListener {
+            deviceControl.play(speed = "1/2")
+            fastPlay.isSelected = false
+            val selected = !it.isSelected
+            it.isSelected = selected
+            (it as ImageView).setColorFilter(if (selected) colorAccent else 0xFFFFFF)
+        }
+        fastPlay.setOnClickListener {
+            deviceControl.play(speed = "2")
+            slowPlay.isSelected = false
+            val selected = !it.isSelected
+            it.isSelected = selected
+            (it as ImageView).setColorFilter(if (selected) colorAccent else 0xFFFFFF)
+        }
         view.findViewById<View>(R.id.video_cast_stop).setOnClickListener {
             deviceControl.stop()
         }
-        view.findViewById<View>(R.id.video_cast).setOnClickListener {
+        view.findViewById<View>(R.id.video_cast_remote).setOnClickListener {
             CastUrlDialogFragment.show(childFragmentManager, object : OnUrlSelectListener {
                 override fun onUrlSelected(video: VideoUrl) {
                     durationMillSeconds = 0L
@@ -108,7 +125,7 @@ class VideoViewFragment : Fragment() {
                 }
             })
         }
-        view.findViewById<View>(R.id.local_cast).setOnClickListener {
+        view.findViewById<View>(R.id.video_cast_local).setOnClickListener {
             startActivityForResult(Intent().apply {
                 action = Intent.ACTION_GET_CONTENT
                 type = "video/*;audio/*"

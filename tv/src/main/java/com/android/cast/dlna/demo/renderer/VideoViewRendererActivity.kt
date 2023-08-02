@@ -138,7 +138,7 @@ class VideoViewRendererActivity : BaseRendererActivity() {
         override val duration: Long
             get() = videoView.duration.toLong()
 
-        override fun play() {
+        override fun play(speed: Double?) { // video view 不支持倍速播放
             videoView.start()
             renderState = RenderState.PLAYING
         }

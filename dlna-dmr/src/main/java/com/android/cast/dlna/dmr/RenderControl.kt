@@ -12,7 +12,7 @@ interface RenderControl {
     val currentPosition: Long
     val duration: Long
 
-    fun play()
+    fun play(speed: Double? = 1.0)
     fun pause()
     fun seek(millSeconds: Long)
     fun stop()
