@@ -23,7 +23,7 @@ import org.fourthline.cling.support.avtransport.callback.Stop
 import org.fourthline.cling.support.contentdirectory.callback.Browse
 import org.fourthline.cling.support.contentdirectory.callback.Search
 import org.fourthline.cling.support.lastchange.LastChangeParser
-import org.fourthline.cling.support.model.BrowseFlag.METADATA
+import org.fourthline.cling.support.model.BrowseFlag
 import org.fourthline.cling.support.model.DIDLContent
 import org.fourthline.cling.support.model.MediaInfo
 import org.fourthline.cling.support.model.PositionInfo
@@ -395,12 +395,12 @@ internal abstract class BaseServiceExecutor(
         service: Service<*, *>?,
     ) : BaseServiceExecutor(controlPoint, service), ContentServiceAction {
         override val logger: Logger = Logger.create("ContentService")
-        override fun browse(containerId: String, callback: ServiceActionCallback<DIDLContent>?) {
+        override fun browse(objectId: String, flag: BrowseFlag, filter: String, firstResult: Int, maxResults: Int, callback: ServiceActionCallback<DIDLContent>?) {
             if (invalidServiceAction("Browse")) {
                 notifyFailure(callback)
                 return
             }
-            executeAction(object : Browse(service, containerId, METADATA, "*", 0, 99) {
+            executeAction(object : Browse(service, objectId, flag, filter, firstResult.toLong(), maxResults.toLong()) {
                 override fun received(actionInvocation: ActionInvocation<out Service<*, *>>?, didl: DIDLContent) {
                     notifySuccess(callback, result = didl)
                 }
@@ -413,12 +413,12 @@ internal abstract class BaseServiceExecutor(
             })
         }
 
-        override fun search(containerId: String, callback: ServiceActionCallback<DIDLContent>?) {
+        override fun search(containerId: String, searchCriteria: String, filter: String, firstResult: Int, maxResults: Int, callback: ServiceActionCallback<DIDLContent>?) {
             if (invalidServiceAction("Search")) {
                 notifyFailure(callback)
                 return
             }
-            executeAction(object : Search(service, containerId, "", "*", 0, 99) {
+            executeAction(object : Search(service, containerId, searchCriteria, filter, firstResult.toLong(), maxResults.toLong()) {
                 override fun received(actionInvocation: ActionInvocation<out Service<*, *>>?, didl: DIDLContent) {
                     notifySuccess(callback, result = didl)
                 }

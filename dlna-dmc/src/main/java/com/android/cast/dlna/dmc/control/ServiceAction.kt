@@ -1,5 +1,6 @@
 package com.android.cast.dlna.dmc.control
 
+import org.fourthline.cling.support.model.BrowseFlag
 import org.fourthline.cling.support.model.DIDLContent
 import org.fourthline.cling.support.model.MediaInfo
 import org.fourthline.cling.support.model.PositionInfo
@@ -49,6 +50,6 @@ interface RendererServiceAction {
 // ---- ContentService
 // --------------------------------------------------------------------------------
 interface ContentServiceAction {
-    fun browse(containerId: String = "0", callback: ServiceActionCallback<DIDLContent>?)
-    fun search(containerId: String = "0", callback: ServiceActionCallback<DIDLContent>?)
+    fun browse(objectId: String = "0", flag: BrowseFlag = BrowseFlag.DIRECT_CHILDREN, filter: String = "*", firstResult: Int = 0, maxResults: Int = Int.MAX_VALUE, callback: ServiceActionCallback<DIDLContent>?)
+    fun search(containerId: String = "0", searchCriteria: String = "", filter: String = "*", firstResult: Int = 0, maxResults: Int = Int.MAX_VALUE, callback: ServiceActionCallback<DIDLContent>?)
 }

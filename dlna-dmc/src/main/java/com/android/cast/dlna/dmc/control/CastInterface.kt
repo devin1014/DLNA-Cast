@@ -3,6 +3,7 @@ package com.android.cast.dlna.dmc.control
 import org.fourthline.cling.model.meta.Device
 import org.fourthline.cling.support.avtransport.lastchange.AVTransportVariable.TransportState
 import org.fourthline.cling.support.lastchange.EventedValue
+import org.fourthline.cling.support.model.BrowseFlag
 import org.fourthline.cling.support.model.DIDLContent
 import org.fourthline.cling.support.model.MediaInfo
 import org.fourthline.cling.support.model.PositionInfo
@@ -28,8 +29,8 @@ object EmptyDeviceControl : DeviceControl {
     override fun getVolume(callback: ServiceActionCallback<Int>?) {}
     override fun setMute(mute: Boolean, callback: ServiceActionCallback<Unit>?) {}
     override fun getMute(callback: ServiceActionCallback<Boolean>?) {}
-    override fun browse(containerId: String, callback: ServiceActionCallback<DIDLContent>?) {}
-    override fun search(containerId: String, callback: ServiceActionCallback<DIDLContent>?) {}
+    override fun browse(objectId: String, flag: BrowseFlag, filter: String, firstResult: Int, maxResults: Int, callback: ServiceActionCallback<DIDLContent>?) {}
+    override fun search(containerId: String, searchCriteria: String, filter: String, firstResult: Int, maxResults: Int, callback: ServiceActionCallback<DIDLContent>?) {}
 }
 
 interface OnDeviceControlListener {

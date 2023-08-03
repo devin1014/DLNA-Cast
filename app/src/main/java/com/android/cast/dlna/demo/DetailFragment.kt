@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.android.cast.dlna.demo.fragment.ContentFragment
+import com.android.cast.dlna.demo.fragment.DeviceInfoFragment
+import com.android.cast.dlna.demo.fragment.DeviceServiceActionFragment
 import com.android.cast.dlna.demo.fragment.VideoViewFragment
 import com.android.cast.dlna.dmc.DLNACastManager
 import org.fourthline.cling.model.meta.Device
@@ -37,9 +39,11 @@ class DetailFragment : Fragment(), DetailContainer, OnKeyEventHandler {
         super.onViewCreated(view, savedInstanceState)
         if (this::device.isInitialized) {
             if (device.type == DLNACastManager.DEVICE_TYPE_MEDIA_RENDERER) {
-                replace(R.id.top_container, VideoViewFragment())
+                replace(R.id.detail_video_container, VideoViewFragment())
+                replace(R.id.detail_service_container, DeviceServiceActionFragment())
+                replace(R.id.detail_info_container, DeviceInfoFragment())
             } else if (device.type == DLNACastManager.DEVICE_TYPE_MEDIA_SERVER) {
-                replace(R.id.top_container, ContentFragment())
+                replace(R.id.detail_content_container, ContentFragment())
             }
         }
     }

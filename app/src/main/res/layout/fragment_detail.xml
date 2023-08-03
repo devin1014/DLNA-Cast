@@ -12,15 +12,24 @@
         android:orientation="vertical">
 
         <FrameLayout
-            android:id="@+id/top_container"
+            android:id="@+id/detail_video_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/info_fragment"
-            android:name="com.android.cast.dlna.demo.fragment.DeviceInfoFragment"
+        <FrameLayout
+            android:id="@+id/detail_service_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content" />
+
+        <FrameLayout
+            android:id="@+id/detail_info_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <FrameLayout
+            android:id="@+id/detail_content_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 

@@ -8,6 +8,7 @@ import org.fourthline.cling.controlpoint.ControlPoint
 import org.fourthline.cling.model.meta.Device
 import org.fourthline.cling.support.avtransport.lastchange.AVTransportLastChangeParser
 import org.fourthline.cling.support.lastchange.EventedValue
+import org.fourthline.cling.support.model.BrowseFlag
 import org.fourthline.cling.support.model.DIDLContent
 import org.fourthline.cling.support.model.MediaInfo
 import org.fourthline.cling.support.model.PositionInfo
@@ -128,11 +129,11 @@ class CastControlImpl(
     // --------------------------------------------------------
     // ---- Content -------------------------------------------
     // --------------------------------------------------------
-    override fun browse(containerId: String, callback: ServiceActionCallback<DIDLContent>?) {
-        contentService.browse(containerId, callback)
+    override fun browse(objectId: String, flag: BrowseFlag, filter: String, firstResult: Int, maxResults: Int, callback: ServiceActionCallback<DIDLContent>?) {
+        contentService.browse(objectId, flag, filter, firstResult, maxResults, callback)
     }
 
-    override fun search(containerId: String, callback: ServiceActionCallback<DIDLContent>?) {
-        contentService.search(containerId, callback)
+    override fun search(containerId: String, searchCriteria: String, filter: String, firstResult: Int, maxResults: Int, callback: ServiceActionCallback<DIDLContent>?) {
+        contentService.search(containerId, searchCriteria, filter, firstResult, maxResults, callback)
     }
 }

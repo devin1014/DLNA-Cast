@@ -5,39 +5,44 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:padding="6dp"
+        android:text="Browse"
+        android:textColor="#000000"
+        android:textSize="14dp"
+        android:textStyle="bold"
+        tools:ignore="HardcodedText,SpUsage" />
 
-        <Button
-            android:id="@+id/browse"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="6dp"
-            android:text="Browse"
-            android:textAllCaps="false"
-            android:textColor="#000000"
-            android:textSize="12dp"
-            tools:ignore="ButtonStyle,HardcodedText,SpUsage" />
-
-        <Button
-            android:id="@+id/search"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="6dp"
-            android:text="Search"
-            android:textAllCaps="false"
-            android:textColor="#000000"
-            android:textSize="12dp"
-            tools:ignore="ButtonStyle,HardcodedText,SpUsage" />
-
-    </LinearLayout>
-
-    <View
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:background="#0e0e0e" />
+        android:layout_height="48dp"
+        android:layout_gravity="center_vertical">
+
+        <LinearLayout
+            android:id="@+id/content_browse_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            tools:ignore="UselessLeaf" />
+
+    </androidx.core.widget.NestedScrollView>
+
+    <TextView
+        android:id="@+id/content_result_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:background="@drawable/common_button_bg_night"
+        android:backgroundTintMode="add"
+        android:padding="6dp"
+        android:text="Container: 0\nItem: 0"
+        android:textColor="#000000"
+        android:textSize="14dp"
+        tools:ignore="HardcodedText,SpUsage" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
