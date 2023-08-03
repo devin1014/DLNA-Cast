@@ -9,10 +9,13 @@ import com.android.cast.dlna.core.Utils
 import com.android.cast.dlna.dms.service.ContentControl
 import com.android.cast.dlna.dms.service.ContentDirectoryServiceController
 import com.android.cast.dlna.dms.service.ContentDirectoryServiceImpl
+import org.fourthline.cling.UpnpServiceConfiguration
+import org.fourthline.cling.android.AndroidUpnpServiceConfiguration
 import org.fourthline.cling.android.AndroidUpnpServiceImpl
 import org.fourthline.cling.binding.annotations.AnnotationLocalServiceBinder
 import org.fourthline.cling.model.DefaultServiceManager
 import org.fourthline.cling.model.meta.*
+import org.fourthline.cling.model.types.ServiceType
 import org.fourthline.cling.model.types.UDADeviceType
 import org.fourthline.cling.model.types.UDN
 import org.fourthline.cling.support.contentdirectory.AbstractContentDirectoryService
@@ -21,6 +24,11 @@ import java.util.*
 open class DLNAContentService : AndroidUpnpServiceImpl() {
     companion object {
         fun startService(context: Context) = context.applicationContext.startService(Intent(context, DLNAContentService::class.java))
+    }
+
+    protected inner class RendererServiceBinderWrapper : AndroidUpnpServiceImpl.Binder(), ContentServiceBinder {
+        override val service: DLNAContentService
+            get() = this@DLNAContentService
     }
 
     private val logger = Logger.create("LocalContentService")
@@ -40,18 +48,6 @@ open class DLNAContentService : AndroidUpnpServiceImpl() {
             e.printStackTrace()
             stopSelf()
         }
-    }
-
-    override fun onBind(intent: Intent?): IBinder? = serviceBinder
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int = START_STICKY
-
-    override fun onDestroy() {
-        logger.w("DLNAContentService destroy.")
-        localDevice?.also { device ->
-            upnpService.registry.removeDevice(device)
-        }
-        super.onDestroy()
     }
 
     protected open fun createContentServiceDevice(baseUrl: String): LocalDevice {
@@ -88,9 +84,21 @@ open class DLNAContentService : AndroidUpnpServiceImpl() {
         return arrayOf(contentDirectoryService)
     }
 
-    protected inner class RendererServiceBinderWrapper : AndroidUpnpServiceImpl.Binder(), ContentServiceBinder {
-        override val service: DLNAContentService
-            get() = this@DLNAContentService
+    override fun onBind(intent: Intent?): IBinder? = serviceBinder
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int = START_STICKY
+
+    override fun onDestroy() {
+        logger.w("DLNAContentService destroy.")
+        localDevice?.also { device ->
+            upnpService.registry.removeDevice(device)
+        }
+        super.onDestroy()
+    }
+
+    override fun createConfiguration(): UpnpServiceConfiguration = object : AndroidUpnpServiceConfiguration() {
+        // content service never need find other device
+        override fun getExclusiveServiceTypes(): Array<ServiceType>? = null
     }
 }
 

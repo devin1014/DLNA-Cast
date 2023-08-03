@@ -24,10 +24,12 @@ interface AvTransportServiceAction {
     fun canNext(callback: ServiceActionCallback<Boolean>? = null) {
         callback?.onSuccess(false)
     }
+
     fun previous(callback: ServiceActionCallback<Unit>? = null)
     fun canPrevious(callback: ServiceActionCallback<Boolean>? = null) {
         callback?.onSuccess(false)
     }
+
     fun getPositionInfo(callback: ServiceActionCallback<PositionInfo>?)
     fun getMediaInfo(callback: ServiceActionCallback<MediaInfo>?)
     fun getTransportInfo(callback: ServiceActionCallback<TransportInfo>?)
@@ -47,6 +49,6 @@ interface RendererServiceAction {
 // ---- ContentService
 // --------------------------------------------------------------------------------
 interface ContentServiceAction {
-    fun browse(containerId: String, callback: ServiceActionCallback<DIDLContent>?)
-    fun search(containerId: String, callback: ServiceActionCallback<DIDLContent>?)
+    fun browse(containerId: String = "0", callback: ServiceActionCallback<DIDLContent>?)
+    fun search(containerId: String = "0", callback: ServiceActionCallback<DIDLContent>?)
 }

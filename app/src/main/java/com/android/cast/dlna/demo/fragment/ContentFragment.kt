@@ -40,8 +40,8 @@ class ContentFragment : Fragment() {
             adapter = this@ContentFragment.adapter
         }
         view.findViewById<View>(R.id.browse).setOnClickListener {
-            // '*' containerId 目前不清楚这个是什么意思，查询其他server的时候，都是返回500，应该是这个id不对
-            deviceControl.browse("*", object : ServiceActionCallback<DIDLContent> {
+            // '0' 应该是代表根目录，具体要看server的实现
+            deviceControl.browse("0", object : ServiceActionCallback<DIDLContent> {
                 @SuppressLint("SetTextI18n")
                 override fun onSuccess(result: DIDLContent) {
                     adapter.list = result.items
@@ -55,7 +55,8 @@ class ContentFragment : Fragment() {
             })
         }
         view.findViewById<View>(R.id.search).setOnClickListener {
-            deviceControl.search("*", object : ServiceActionCallback<DIDLContent> {
+            // '0' 应该是代表根目录，具体要看server的实现
+            deviceControl.search("0", object : ServiceActionCallback<DIDLContent> {
                 @SuppressLint("SetTextI18n")
                 override fun onSuccess(result: DIDLContent) {
                     adapter.list = result.items

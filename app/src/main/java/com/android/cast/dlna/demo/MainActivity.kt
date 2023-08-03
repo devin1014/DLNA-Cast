@@ -23,7 +23,6 @@ class MainActivity : AppCompatActivity(), OnItemClickListener {
         PermissionX.init(this)
             .permissions(permission.READ_EXTERNAL_STORAGE, permission.ACCESS_COARSE_LOCATION, permission.ACCESS_FINE_LOCATION)
             .request { _: Boolean, _: List<String?>?, _: List<String?>? -> resetToolbar() }
-        DLNACastManager.bindCastService(this)
     }
 
     private fun resetToolbar() {
@@ -34,6 +33,7 @@ class MainActivity : AppCompatActivity(), OnItemClickListener {
     override fun onStart() {
         super.onStart()
         resetToolbar()
+        DLNACastManager.bindCastService(this)
     }
 
     override fun onBackPressed() {

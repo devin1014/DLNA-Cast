@@ -34,19 +34,19 @@ class ContentDirectoryServiceController(context: Context) : ContentControl {
         return get(containerId, filter, firstResult, maxResults)
     }
 
-    private fun get(objectID: String, filter: String?, firstResult: Long, maxResults: Long): BrowseResult {
+    private fun get(objectID: String, @Suppress("UNUSED_PARAMETER") filter: String?, firstResult: Long, maxResults: Long): BrowseResult {
         var maxCount = maxResults
         val list = mutableListOf<Item>()
         val didlContent = DIDLContent()
-        if (objectID.isBlank() || objectID == "*" || objectID.contains("video")) {
+        if (objectID.isBlank() || objectID == "*" || objectID == "0" || objectID.contains("video")) {
             list.addAll(getItems(applicationContext, Video.Media.EXTERNAL_CONTENT_URI, firstResult, maxCount))
             maxCount -= list.size
         }
-        if (objectID.isBlank() || objectID == "*" || objectID.contains("audio")) {
+        if (objectID.isBlank() || objectID == "*" || objectID == "0" || objectID.contains("audio")) {
             list.addAll(getItems(applicationContext, Audio.Media.EXTERNAL_CONTENT_URI, firstResult, maxCount))
             maxCount -= list.size
         }
-        if (objectID.isBlank() || objectID == "*" || objectID.contains("image")) {
+        if (objectID.isBlank() || objectID == "*" || objectID == "0" || objectID.contains("image")) {
             list.addAll(getItems(applicationContext, Images.Media.EXTERNAL_CONTENT_URI, firstResult, maxCount))
             maxCount -= list.size
         }

@@ -34,6 +34,7 @@ object DLNACastManager : OnDeviceRegistryListener {
     val SERVICE_TYPE_AV_TRANSPORT: ServiceType = UDAServiceType("AVTransport")
     val SERVICE_TYPE_RENDERING_CONTROL: ServiceType = UDAServiceType("RenderingControl")
     val SERVICE_TYPE_CONTENT_DIRECTORY: ServiceType = UDAServiceType("ContentDirectory")
+    val SERVICE_CONNECTION_MANAGER: ServiceType = UDAServiceType("ConnectionManager")
 
     private val logger = Logger.create("CastManager")
     private val deviceRegistryImpl = DeviceRegistryImpl(this)
@@ -70,6 +71,7 @@ object DLNACastManager : OnDeviceRegistryListener {
                 if (collection == null || !collection.contains(deviceRegistryImpl)) {
                     registry.addListener(deviceRegistryImpl)
                 }
+                search()
             }
         }
 
@@ -147,7 +149,7 @@ object DLNACastManager : OnDeviceRegistryListener {
     // -----------------------------------------------------------------------------------------
     // ---- Action
     // -----------------------------------------------------------------------------------------
-    fun search(type: DeviceType? = null, maxSeconds: Int = 60) {
+    fun search(type: DeviceType? = null) {
         upnpService?.get()?.also { service ->
             searchDeviceType = type
             service.registry.devices?.filter { searchDeviceType == null || searchDeviceType != it.type }?.onEach {
@@ -159,7 +161,7 @@ object DLNACastManager : OnDeviceRegistryListener {
             // service.registry.removeAllRemoteDevices()
 
             // search the special type device
-            service.controlPoint.search(type?.let { UDADeviceTypeHeader(it) } ?: STAllHeader(), maxSeconds)
+            service.controlPoint.search(type?.let { UDADeviceTypeHeader(it) } ?: STAllHeader())
         }
     }
 
