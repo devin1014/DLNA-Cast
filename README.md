@@ -34,6 +34,7 @@ Cling库(v2.1.1)
 ![AppScreenshot](https://raw.githubusercontent.com/devin1014/DLNA-Cast/master/screen/Screenshot_20230801_173015.png)
 ![AppScreenshot](https://raw.githubusercontent.com/devin1014/DLNA-Cast/master/screen/Screenshot_20230801_173051.png)
 ![AppScreenshot](https://raw.githubusercontent.com/devin1014/DLNA-Cast/master/screen/Screenshot_20230801_173059.png)
+![AppScreenshot](https://raw.githubusercontent.com/devin1014/DLNA-Cast/master/screen/Screenshot_20230801_173117.png)
 
 ## 使用说明
 ### 引用地址
