@@ -23,7 +23,13 @@ import java.util.*
 
 open class DLNAContentService : AndroidUpnpServiceImpl() {
     companion object {
-        fun startService(context: Context) = context.applicationContext.startService(Intent(context, DLNAContentService::class.java))
+        fun startService(context: Context) {
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                context.applicationContext.startForegroundService(Intent(context, DLNAContentService::class.java))
+//            } else {
+            context.applicationContext.startService(Intent(context, DLNAContentService::class.java))
+//            }
+        }
     }
 
     protected inner class RendererServiceBinderWrapper : AndroidUpnpServiceImpl.Binder(), ContentServiceBinder {

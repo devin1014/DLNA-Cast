@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.android.cast.dlna.core.Utils
+import com.android.cast.dlna.dms.DLNAContentService
 import com.permissionx.guolindev.PermissionX
 
 class MainActivity : AppCompatActivity() {
@@ -18,6 +19,7 @@ class MainActivity : AppCompatActivity() {
             .request { _: Boolean, _: List<String?>?, _: List<String?>? ->
                 resetWifiInfo()
             }
+        DLNAContentService.startService(this)
     }
 
     @SuppressLint("SetTextI18n")

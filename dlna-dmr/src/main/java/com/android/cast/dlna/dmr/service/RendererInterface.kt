@@ -86,9 +86,9 @@ interface AvTransportControl : RendererControl {
 
     fun stop() {
         logger.i("stop")
-        startCastActivity {
-            this.stop = "stop"
-        }
+//        startCastActivity {
+//            this.stop = "stop"
+//        }
     }
 
     val currentTransportActions: Array<TransportAction>

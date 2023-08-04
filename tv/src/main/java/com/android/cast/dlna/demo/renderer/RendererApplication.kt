@@ -1,7 +1,6 @@
 package com.android.cast.dlna.demo.renderer
 
 import android.app.Application
-import com.android.cast.dlna.dmr.DLNARendererService
 import java.util.logging.Level
 
 class RendererApplication : Application() {
@@ -13,6 +12,5 @@ class RendererApplication : Application() {
         com.android.cast.dlna.core.Logger.enabled = true
         com.android.cast.dlna.core.Logger.level = com.android.cast.dlna.core.Level.D
         com.android.cast.dlna.core.Logger.create("RendererApplication").i("Application onCreate.")
-        DLNARendererService.startService(this)
     }
 }

@@ -152,6 +152,8 @@ class VideoViewRendererActivity : BaseRendererActivity() {
         override fun stop() {
             videoView.stopPlayback()
             renderState = RenderState.STOPPED
+            // close player
+            finish()
         }
 
         override fun getState(): RenderState = renderState

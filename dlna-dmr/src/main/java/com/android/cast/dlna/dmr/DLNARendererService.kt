@@ -37,13 +37,15 @@ import org.fourthline.cling.support.renderingcontrol.lastchange.RenderingControl
 import java.io.IOException
 import java.util.UUID
 
-/**
- *
- */
 open class DLNARendererService : AndroidUpnpServiceImpl() {
-
     companion object {
-        fun startService(context: Context) = context.applicationContext.startService(Intent(context, DLNARendererService::class.java))
+        fun startService(context: Context) {
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                context.applicationContext.startForegroundService(Intent(context, DLNARendererService::class.java))
+//            } else {
+            context.applicationContext.startService(Intent(context, DLNARendererService::class.java))
+//            }
+        }
     }
 
     private val logger = getLogger("RendererService")
@@ -93,12 +95,12 @@ open class DLNARendererService : AndroidUpnpServiceImpl() {
         } catch (ex: Exception) {
             UDN(UUID.randomUUID())
         }
-        logger.i("create local device: [MediaRenderer][$udn]($baseUrl)")
+        logger.i("create local device: [MediaRenderer][${udn.identifierString.split("-").last()}]($baseUrl)")
         return LocalDevice(
             DeviceIdentity(udn),
             UDADeviceType("MediaRenderer", 1),
             DeviceDetails(
-                "DMR  (${Build.MODEL})",
+                "DMR (${Build.MODEL})",
                 ManufacturerDetails(Build.MANUFACTURER),
                 ModelDetails(Build.MODEL, "MPI MediaPlayer", "v1", baseUrl)
             ),
@@ -126,6 +128,12 @@ open class DLNARendererService : AndroidUpnpServiceImpl() {
         }
         return arrayOf(avTransportService, renderingControlService)
     }
+
+//    fun updateDevice() {
+//        localDevice?.run {
+//            upnpService.registry.addDevice(this)
+//        }
+//    }
 
     fun bindRealPlayer(control: RenderControl?) {
         (avTransportControl as? AVTransportController)?.mediaControl = control

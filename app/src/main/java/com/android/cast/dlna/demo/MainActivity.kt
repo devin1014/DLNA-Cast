@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity(), OnItemClickListener {
     }
 
     override fun onDestroy() {
-//        DLNACastManager.unbindCastService(this)
+        DLNACastManager.unbindCastService(this)
         super.onDestroy()
     }
 

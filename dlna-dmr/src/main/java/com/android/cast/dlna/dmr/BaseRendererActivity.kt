@@ -31,6 +31,10 @@ abstract class BaseRendererActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!castAction?.stop.isNullOrBlank()) {
+            finish()
+            return
+        }
         bindService(Intent(this, DLNARendererService::class.java), serviceConnection, Context.BIND_AUTO_CREATE)
     }
 
