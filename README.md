@@ -19,9 +19,9 @@
 # 功能
 
 基于Cling库封装的DLNA投屏库
-* 支持移动端设备控制（DMC）功能
-* 支持投射本地视频（DMS）或者网络视频
+* 支持移动端设备发现控制投射功能（DMC）
 * 支持电视端设备播放器功能（DMR）
+* 支持服务端设备共享内容（DMS）
 
 Cling库(v2.1.1) 
 
@@ -31,8 +31,9 @@ Cling库(v2.1.1)
 
 #App示例
 
-
-![AppScreenshot](https://raw.githubusercontent.com/devin1014/DLNA-Cast/master/screen/device-2021-05-13-155608.png)
+![AppScreenshot](https://raw.githubusercontent.com/devin1014/DLNA-Cast/master/screen/Screenshot_20230801_173015.png)
+![AppScreenshot](https://raw.githubusercontent.com/devin1014/DLNA-Cast/master/screen/Screenshot_20230801_173051.png)
+![AppScreenshot](https://raw.githubusercontent.com/devin1014/DLNA-Cast/master/screen/Screenshot_20230801_173059.png)
 
 ## 使用说明
 ### 引用地址
@@ -68,6 +69,8 @@ api 'com.github.devin1014.DLNA-Cast:dlna-dmc:V1.0.0'
 
 ```
 <service android:name="com.android.cast.dlna.dmc.DLNACastService"/>
+<service android:name="com.android.cast.dlna.dmr.DLNARendererService"/>
+<service android:name="com.android.cast.dlna.dms.DLNAContentSercice"/>
 ```
 
 ### 注册服务
@@ -86,10 +89,8 @@ protected void onStop() {
 
 当绑定服务后，会自动搜索设备，也可以手动搜索。
 ```
-DLNACastManager.getInstance().search(null, 60);
+DLNACastManager.getInstance().search();
 ```
-* type：需要搜索设备的类型，null表示不限制类型
-* maxSeconds：搜索最大搜索时长（单位：秒）
 
 ### 监听设备
 ```
@@ -99,71 +100,47 @@ DLNACastManager.getInstance().unregisterListener(listener);
 当发现新设备时需要添加到设备列表中用于显示。
 * OnDeviceRegistryListener 该接口回调始终在**主线程**线程被调用
 
-### 投屏
-
+### 连接设备
 ```
-DLNACastManager.getInstance().cast(device, castObject)
-```
+deviceControl: DeviceControl = DLNACastManager.connectDevice(device, callback)
 
-* device：已发现的设备（这个设备需要是Renderer类型，支持播放器才能投屏）
-* castObject：实现了ICast接口的实现类（主要参数是投屏的url）
-
-### 事件监听
-控制器事件监听
-
-```
-DLNACastManager.getInstance().registerActionCallbacks(callbacks);
-```
-* callbacks: 操作事件回调接口，主要有如下事件接口(*投屏、播放、暂停、停止、快进*)
- **CastEventListener**、**PlayEventListener**、**PauseEventListener**、**StopEventListener**、**SeekToEventListener**
-以上接口都继承自*IServiceAction.IServiceActionCallback<Long>* 
-
-```
-interface IServiceActionCallback<T> {
-    void onSuccess(T result); //成功
-    void onFailed(String errMsg); //失败
+DeviceControl接口如下：
+DeviceControl {
+    // 投射当前视频
+    fun setAVTransportURI(uri: String, title: String, callback: ServiceActionCallback<Unit>?) {}
+    // 投射下一个视频（不是每个播放器都支持这个功能，当前播放结束自动播放下一个）
+    fun setNextAVTransportURI(uri: String, title: String, callback: ServiceActionCallback<Unit>?) {}
+    // 播放
+    fun play(speed: String, callback: ServiceActionCallback<Unit>?) {}
+    // 暂停
+    fun pause(callback: ServiceActionCallback<Unit>?) {}
+    // 停止
+    fun stop(callback: ServiceActionCallback<Unit>?) {}
+    // 快进/快退
+    fun seek(millSeconds: Long, callback: ServiceActionCallback<Unit>?) {}
+    // 播放下一个视频
+    fun next(callback: ServiceActionCallback<Unit>?) {}
+    // 播放上一个视频
+    fun previous(callback: ServiceActionCallback<Unit>?) {}
+    // 获取当前投射视频的播放信息，当前时间/总时间
+    fun getPositionInfo(callback: ServiceActionCallback<PositionInfo>?) {}
+    // 获取当前视频信息
+    fun getMediaInfo(callback: ServiceActionCallback<MediaInfo>?) {}
+    // 获取当前播放状态等
+    fun getTransportInfo(callback: ServiceActionCallback<TransportInfo>?) {}
+    // 设置音量
+    fun setVolume(volume: Int, callback: ServiceActionCallback<Unit>?) {}
+    // 获取音量
+    fun getVolume(callback: ServiceActionCallback<Int>?) {}
+    // 设置静音
+    fun setMute(mute: Boolean, callback: ServiceActionCallback<Unit>?) {}
+    // 获取是否静音
+    fun getMute(callback: ServiceActionCallback<Boolean>?) {}
+    // 查询objectId的信息（‘0’默认值即所有信息）
+    fun browse(objectId: String, flag: BrowseFlag, filter: String, firstResult: Int, maxResults: Int, callback: ServiceActionCallback<DIDLContent>?) {}
+    // 查找objectId的信息
+    fun search(containerId: String, searchCriteria: String, filter: String, firstResult: Int, maxResults: Int, callback: ServiceActionCallback<DIDLContent>?) {}
 }
-```
 
-播放器事件监听
-`DLNACastManager.getInstance().registerSubscriptionListener(listener)`
-* listener:监听播放器端状态改变（根据测试每个电视端实现不同效果也不同，有的发有的不发！）
-
+每个操作都有相应的参数和事件回调接口，监听操作是否成功
 ```
-interface ISubscriptionListener {
-    void onSubscriptionTransportStateChanged(TransportState event);
-}
-```
-### 控制
-目前支持的控制事件如下
-
-```
-interface IControl {
-    void cast(Device<?, ?, ?> device, ICast object);
-    boolean isCasting(Device<?, ?, ?> device);
-    boolean isCasting(Device<?, ?, ?> device, @Nullable String uri);
-    void stop();
-    void play();
-    void pause();
-    void seekTo(long position);
-    void setVolume(int percent);
-    void setMute(boolean mute);
-    void setBrightness(int percent);
-}
-```
-### 查询
-
-```
- interface IGetInfo {
-    void getMediaInfo(Device<?, ?, ?> device, ICastInterface.GetInfoListener<MediaInfo> listener);
-    void getPositionInfo(Device<?, ?, ?> device, ICastInterface.GetInfoListener<PositionInfo> listener);
-    void getTransportInfo(Device<?, ?, ?> device, ICastInterface.GetInfoListener<TransportInfo> listener);
-    void getVolumeInfo(Device<?, ?, ?> device, ICastInterface.GetInfoListener<Integer> listener);
-    void getContent(Device<?, ?, ?> device, ContentType contentType, ICastInterface.GetInfoListener<DIDLContent> listener);
-}
-```
-* getMediaInfo：获取媒体信息
-* getPositionInfo：获取视频播放位置
-* getTransportInfo：获取当前设备播放状态
-* getVolumeInfo：获取当前设备音量信息
-* getContent：获取当前设备提供的目录信息（当前设备是DMS）
