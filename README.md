@@ -23,7 +23,7 @@
 * 支持电视端设备播放器功能（DMR）
 * 支持服务端设备共享内容（DMS）
 
-Cling库(v2.1.1) 
+Cling库(v2.1.1)
 
 [Cling Core](http://4thline.org/projects/cling/core/manual/cling-core-manual.xhtml)
 [Cling Support](http://4thline.org/projects/cling/support/manual/cling-support-manual.xhtml)
@@ -51,7 +51,9 @@ allprojects {
 在项目模块gradle中引入
 
 ```
-api 'com.github.devin1014.DLNA-Cast:dlna-dmc:V1.0.0'
+api 'com.github.devin1014.DLNA-Cast:dlna-dmc:vx.x.x' 
+api 'com.github.devin1014.DLNA-Cast:dlna-dmr:vx.x.x'
+api 'com.github.devin1014.DLNA-Cast:dlna-dms:vx.x.x'
 ```
 
 ### 权限申明
