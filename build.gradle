@@ -7,7 +7,6 @@ buildscript {
         google()
         mavenCentral()
         mavenLocal()
-        maven { url 'https://maven.aliyun.com/repository/jcenter' }
         maven {
             url 'http://4thline.org/m2'
             allowInsecureProtocol = true
@@ -25,7 +24,6 @@ allprojects {
         google()
         mavenCentral()
         mavenLocal()
-        maven { url 'https://maven.aliyun.com/repository/jcenter' }
         maven {
             url 'http://4thline.org/m2'
             allowInsecureProtocol = true
@@ -33,6 +31,6 @@ allprojects {
     }
 }
 
-task clean(type: Delete) {
+tasks.register('clean', Delete) {
     delete rootProject.buildDir
 }

@@ -30,7 +30,7 @@ android {
 
 dependencies {
     implementation project(':dlna-dmr')
-    implementation 'com.permissionx.guolindev:permissionx:1.4.0'
+    implementation 'com.guolindev.permissionx:permissionx:1.7.1'
     //noinspection GradleDependency
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.4.2'
