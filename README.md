@@ -41,7 +41,7 @@ Cling库(v2.1.1)
 在项目根gradle中引入
 ```
 allprojects {
-	repositories {
+    repositories {
 		...
         maven { url 'http://4thline.org/m2' }
 		maven { url 'https://jitpack.io' }
@@ -54,6 +54,8 @@ allprojects {
 api 'com.github.devin1014.DLNA-Cast:dlna-dmc:vx.x.x' 
 api 'com.github.devin1014.DLNA-Cast:dlna-dmr:vx.x.x'
 api 'com.github.devin1014.DLNA-Cast:dlna-dms:vx.x.x'
+
+直接引用aar亦可
 ```
 
 ### 权限申明
