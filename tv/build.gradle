@@ -5,11 +5,11 @@ plugins {
 
 android {
     namespace 'com.android.cast.dlna.demo.renderer'
-    compileSdk 32
+    compileSdk 33
     defaultConfig {
         applicationId "com.android.cast.dlna.demo.renderer"
         minSdk 24
-        targetSdk 32
+        targetSdk 33
         versionCode 1
         versionName "1.0"
     }
@@ -23,8 +23,8 @@ android {
         exclude 'META-INF/beans.xml'
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 }
 
