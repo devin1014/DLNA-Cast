@@ -16,6 +16,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:8.13.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'org.jetbrains.kotlin:compose-compiler-gradle-plugin:2.2.10'
     }
 }
 
@@ -28,6 +29,7 @@ allprojects {
             url 'http://4thline.org/m2'
             allowInsecureProtocol = true
         }
+        maven { url 'https://jitpack.io' }
     }
 }
 
