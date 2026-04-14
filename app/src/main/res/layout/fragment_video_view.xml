@@ -143,11 +143,28 @@
             android:background="@drawable/common_button_bg"
             android:contentDescription="@null"
             android:foreground="?android:selectableItemBackground"
-            android:padding="4dp"
+            android:paddingLeft="6dp"
+            android:paddingRight="6dp"
+            android:paddingBottom="6dp"
             android:src="@drawable/cast_slow"
             app:layout_constraintBottom_toTopOf="@id/video_cast_position"
             app:layout_constraintLeft_toLeftOf="@id/video_cast_previous"
             app:layout_constraintTop_toBottomOf="@id/video_cast_previous" />
+
+        <TextView
+            android:id="@+id/video_cast_slow_description"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:gravity="center_horizontal|bottom"
+            android:paddingBottom="2dp"
+            android:text="x0.5"
+            android:textColor="#ffffff"
+            android:textSize="10dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/video_cast_position"
+            app:layout_constraintLeft_toLeftOf="@id/video_cast_previous"
+            app:layout_constraintTop_toBottomOf="@id/video_cast_previous"
+            tools:ignore="HardcodedText,SpUsage" />
 
         <ImageView
             android:id="@+id/video_cast_fast"
@@ -156,11 +173,28 @@
             android:background="@drawable/common_button_bg"
             android:contentDescription="@null"
             android:foreground="?android:selectableItemBackground"
-            android:padding="4dp"
+            android:paddingLeft="6dp"
+            android:paddingRight="6dp"
+            android:paddingBottom="6dp"
             android:src="@drawable/cast_fast"
             app:layout_constraintBottom_toTopOf="@id/video_cast_position"
             app:layout_constraintLeft_toLeftOf="@id/video_cast_pause"
             app:layout_constraintTop_toBottomOf="@id/video_cast_pause" />
+
+        <TextView
+            android:id="@+id/video_cast_fast_description"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:gravity="center_horizontal|bottom"
+            android:paddingBottom="2dp"
+            android:text="x2"
+            android:textColor="#ffffff"
+            android:textSize="10dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/video_cast_position"
+            app:layout_constraintLeft_toLeftOf="@id/video_cast_pause"
+            app:layout_constraintTop_toBottomOf="@id/video_cast_pause"
+            tools:ignore="HardcodedText,SpUsage" />
 
         <TextView
             android:id="@+id/video_cast_position"

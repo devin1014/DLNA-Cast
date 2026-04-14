@@ -3,6 +3,7 @@ package com.android.cast.dlna.demo.fragment
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.media.AudioManager
 import android.net.Uri
 import android.os.Bundle
@@ -18,6 +19,7 @@ import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.graphics.toColorInt
 import androidx.fragment.app.Fragment
 import com.android.cast.dlna.core.Logger
 import com.android.cast.dlna.core.Utils
@@ -42,7 +44,7 @@ class VideoViewFragment : Fragment(), OnKeyEventHandler {
     private val logger = Logger.create("VideoViewFragment")
 
     @Suppress("DEPRECATION")
-    private val colorAccent: Int by lazy { resources.getColor(R.color.colorAccent) }
+    private val colorAccent: Int = "#FF4081".toColorInt()
     private val device: Device<*, *, *> by lazy { (requireParentFragment() as DetailContainer).getDevice() }
     private val positionInfo: TextView by lazy { requireView().findViewById(R.id.video_cast_position) }
     private val positionSeekBar: SeekBar by lazy { requireView().findViewById(R.id.video_cast_seekbar) }
@@ -78,7 +80,7 @@ class VideoViewFragment : Fragment(), OnKeyEventHandler {
         deviceControl.getMute(object : ServiceActionCallback<Boolean> {
             override fun onSuccess(result: Boolean) {
                 volumeMuteButton.isSelected = result
-                volumeMuteButton.setColorFilter(if (result) colorAccent else 0xFFFFFF)
+                volumeMuteButton.setColorFilter(if (result) colorAccent else Color.WHITE)
             }
 
             override fun onFailure(msg: String) {
@@ -93,20 +95,23 @@ class VideoViewFragment : Fragment(), OnKeyEventHandler {
         view.findViewById<View>(R.id.video_cast_next).setOnClickListener {
             deviceControl.next()
         }
-        // 倍速好像没有效果!
+
+        // ExoPlayer demo support x2 speed
         slowPlay.setOnClickListener {
-            deviceControl.play(speed = "1/2")
             fastPlay.isSelected = false
+            fastPlay.setColorFilter(Color.WHITE)
             val selected = !it.isSelected
+            deviceControl.play(speed = if (selected) "0.5" else "1")
             it.isSelected = selected
-            (it as ImageView).setColorFilter(if (selected) colorAccent else 0xFFFFFF)
+            (it as ImageView).setColorFilter(if (selected) colorAccent else Color.WHITE)
         }
         fastPlay.setOnClickListener {
-            deviceControl.play(speed = "2")
             slowPlay.isSelected = false
+            slowPlay.setColorFilter(Color.WHITE)
             val selected = !it.isSelected
+            deviceControl.play(speed = if (selected) "2" else "1")
             it.isSelected = selected
-            (it as ImageView).setColorFilter(if (selected) colorAccent else 0xFFFFFF)
+            (it as ImageView).setColorFilter(if (selected) colorAccent else Color.WHITE)
         }
         view.findViewById<View>(R.id.video_cast_stop).setOnClickListener {
             deviceControl.stop()
@@ -153,7 +158,7 @@ class VideoViewFragment : Fragment(), OnKeyEventHandler {
             val mute = !it.isSelected
             deviceControl.setMute(mute)
             it.isSelected = mute
-            volumeMuteButton.setColorFilter(if (mute) colorAccent else 0xFFFFFF)
+            volumeMuteButton.setColorFilter(if (mute) colorAccent else Color.WHITE)
         }
         positionSeekBar.setOnSeekBarChangeListener(seekBarChangeListener)
     }

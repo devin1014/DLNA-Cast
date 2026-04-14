@@ -33,6 +33,23 @@
             android:name=".VideoViewRendererActivity"
             android:configChanges="keyboard|screenSize"
             android:exported="true"
+            android:icon="@drawable/ic_videoview"
+            android:label="VideoView"
+            android:launchMode="singleTop"
+            android:screenOrientation="landscape"
+            android:theme="@style/Player">
+            <intent-filter>
+                <action android:name="com.dlna.action.SetAvTransport" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ExoPlayerRendererActivity"
+            android:configChanges="keyboard|screenSize"
+            android:exported="true"
+            android:icon="@drawable/ic_exoplayer"
+            android:label="ExoPlayer"
             android:launchMode="singleTop"
             android:screenOrientation="landscape"
             android:theme="@style/Player">

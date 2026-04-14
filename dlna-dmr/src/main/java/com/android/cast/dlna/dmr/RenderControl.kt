@@ -1,5 +1,7 @@
 package com.android.cast.dlna.dmr
 
+import android.os.Handler
+import android.os.Looper
 import android.os.Parcel
 import android.os.Parcelable
 import android.os.Parcelable.Creator
@@ -17,6 +19,56 @@ interface RenderControl {
     fun seek(millSeconds: Long)
     fun stop()
     fun getState(): RenderState
+}
+
+interface ThreadSafetyRenderControl : RenderControl
+
+class ThreadSafetyRenderControlImpl(private val renderControl: RenderControl) : ThreadSafetyRenderControl {
+    private val handler = Handler(Looper.getMainLooper())
+
+    override val currentPosition: Long
+        get() = renderControl.currentPosition
+
+    override val duration: Long
+        get() = renderControl.duration
+
+    override fun play(speed: Double?) {
+        if (isMainThread()) {
+            renderControl.play(speed)
+        } else {
+            handler.post { renderControl.play(speed) }
+        }
+    }
+
+    override fun pause() {
+        if (isMainThread()) {
+            renderControl.pause()
+        } else {
+            handler.post { renderControl.pause() }
+        }
+    }
+
+    override fun seek(millSeconds: Long) {
+        if (isMainThread()) {
+            renderControl.seek(millSeconds)
+        } else {
+            handler.post { renderControl.seek(millSeconds) }
+        }
+    }
+
+    override fun stop() {
+        if (isMainThread()) {
+            renderControl.stop()
+        } else {
+            handler.post { renderControl.stop() }
+        }
+    }
+
+    override fun getState(): RenderState {
+        return renderControl.getState()
+    }
+
+    private fun isMainThread() = Looper.myLooper() == Looper.getMainLooper()
 }
 
 enum class RenderState {

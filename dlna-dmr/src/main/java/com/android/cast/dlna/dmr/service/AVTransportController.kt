@@ -3,10 +3,23 @@ package com.android.cast.dlna.dmr.service
 import android.content.Context
 import com.android.cast.dlna.core.Logger
 import com.android.cast.dlna.dmr.RenderControl
+import com.android.cast.dlna.dmr.ThreadSafetyRenderControl
+import com.android.cast.dlna.dmr.ThreadSafetyRenderControlImpl
 import org.fourthline.cling.model.ModelUtil
 import org.fourthline.cling.support.avtransport.AVTransportException
-import org.fourthline.cling.support.model.*
-import org.fourthline.cling.support.model.TransportAction.*
+import org.fourthline.cling.support.model.DeviceCapabilities
+import org.fourthline.cling.support.model.MediaInfo
+import org.fourthline.cling.support.model.PositionInfo
+import org.fourthline.cling.support.model.StorageMedium
+import org.fourthline.cling.support.model.TransportAction
+import org.fourthline.cling.support.model.TransportAction.Pause
+import org.fourthline.cling.support.model.TransportAction.Play
+import org.fourthline.cling.support.model.TransportAction.Seek
+import org.fourthline.cling.support.model.TransportAction.Stop
+import org.fourthline.cling.support.model.TransportInfo
+import org.fourthline.cling.support.model.TransportSettings
+import org.fourthline.cling.support.model.TransportState
+import org.fourthline.cling.support.model.TransportStatus
 
 class AVTransportController(override val applicationContext: Context) : AvTransportControl {
     companion object {
@@ -20,12 +33,14 @@ class AVTransportController(override val applicationContext: Context) : AvTransp
             if (value != null) {
                 _mediaInfo = MediaInfo(currentURI, currentURIMetaData)
                 _positionInfo = PositionInfo(0, currentURIMetaData, currentURI)
+                field = value as? ThreadSafetyRenderControl ?: ThreadSafetyRenderControlImpl(value)
             } else {
-                mediaControl?.stop()
                 _mediaInfo = MediaInfo()
                 _positionInfo = PositionInfo()
+                field?.stop()
+                field = null
             }
-            field = value
+
         }
     private var _positionInfo = PositionInfo()
     private var _mediaInfo = MediaInfo()
@@ -73,7 +88,7 @@ class AVTransportController(override val applicationContext: Context) : AvTransp
 
     override fun play(speed: String?) {
         super.play(speed)
-        mediaControl?.play()
+        mediaControl?.play(speed?.toDouble())
     }
 
     override fun pause() {

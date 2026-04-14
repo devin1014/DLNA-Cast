@@ -5,11 +5,11 @@ plugins {
 
 android {
     namespace 'com.android.cast.dlna.demo.renderer'
-    compileSdk 33
+    compileSdk rootProject.ext.compileSdk
     defaultConfig {
         applicationId "com.android.cast.dlna.demo.renderer"
-        minSdk 24
-        targetSdk 33
+        minSdk rootProject.ext.minSdk
+        targetSdk rootProject.ext.targetSdk
         versionCode 1
         versionName "1.0"
     }
@@ -28,11 +28,23 @@ android {
     }
 }
 
+kotlin {
+    jvmToolchain(17)
+}
+
 dependencies {
     implementation project(':dlna-dmr')
-    implementation 'com.guolindev.permissionx:permissionx:1.7.1'
+    implementation "com.guolindev.permissionx:permissionx:$permissionx"
     //noinspection GradleDependency
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.4.2'
     implementation 'com.google.android.material:material:1.6.1'
+
+    // exo player
+    implementation "androidx.media3:media3-exoplayer:$media3"
+    implementation "androidx.media3:media3-ui:$media3"
+    implementation "androidx.media3:media3-common:$media3"
+    implementation "androidx.media3:media3-session:$media3"
+    implementation("androidx.media3:media3-exoplayer-hls:$media3")
+//    implementation("androidx.media3:media3-exoplayer-dash:$media3")
 }

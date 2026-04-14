@@ -5,16 +5,17 @@
     android:layout_height="match_parent"
     android:background="#000000">
 
-    <VideoView
-        android:id="@+id/video_view"
+    <androidx.media3.ui.PlayerView
+        android:id="@+id/player_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center" />
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:keepScreenOn="true" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="VideoView"
+        android:text="ExoPlayer"
         android:textColor="#00ff00" />
 
     <ProgressBar
